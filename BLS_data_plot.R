@@ -38,7 +38,7 @@ filterd_columns <- c(
 )
 
 Year_2011 <- Year_2011[
-  str_detect(
+-  str_detect(
     string = Year_2011$area_title,
     pattern = counties_of_interest
   ), filterd_columns
