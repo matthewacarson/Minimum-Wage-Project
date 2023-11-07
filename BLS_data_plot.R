@@ -274,6 +274,8 @@ plot(
   y = MO_Before_2018$`Employment Change`
 )
 
+predict(lm_missouri_before, newdata = data.frame(Year = 2018))
+
 ggplot(transpose_plot) +
   aes(
     x = Year
