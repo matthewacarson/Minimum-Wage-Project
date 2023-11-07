@@ -161,8 +161,16 @@ Combined_Years <- Combined_Years |>
       )
   )
 
+Combined_Years <- Combined_Years |> select(
+  area_fips, area_title, year, qtr, month, qtrly_estabs_count, emplvl
+)
 Combined_Years <- Combined_Years |> arrange(area_title, year, qtr)
 
+Combined_Years$old_year <- Combined_Years$year
+
+Combined_Years$year <- with(Combined_Years, 
+  old_year + (qtr - 1) * (1/4) + (month - 1) * (1/12)
+)
 
 # Change the file location below to where you want to save the csv
 
@@ -200,7 +208,7 @@ transpose <- cbind(
 )
 rownames(transpose) <- NULL
 
-transpose_plot <- transpose |> gather(key = "County", value = "Employment Change", -Year)
+transpose_plot <- transpose |> gather(key = "County", value = "Employment_Change", -Year)
 
 
 
@@ -219,7 +227,7 @@ transpose_plot <- transpose_plot |>
 
 # Filter out values < -50
 transpose_plot <- transpose_plot |> 
-  filter(`Employment Change` > -90)
+  filter(Employment_Change > -90)
 
 
 MO_sub <- transpose_plot[str_detect(string = transpose_plot$County, pattern = "Missouri"),]
@@ -230,22 +238,22 @@ MO_After_2018 <- MO_sub |> filter(Year > 2018)
 
 lm_missouri_before <- lm(
   data = MO_Before_2018,
-  formula = `Employment Change` ~ Year
+  formula = Employment_Change ~ Year
 )
 
 lm_missouri_after <- lm(
   data = MO_After_2018,
-  formula = `Employment Change` ~ Year
+  formula = Employment_Change ~ Year
 )
 
 lm_missouri_overall <- lm(
   data = MO_sub,
-  formula = `Employment Change` ~ Year
+  formula = Employment_Change ~ Year
 )
 
 plot(
   x = MO_sub$Year,
-  y = MO_sub$`Employment Change`,
+  y = MO_sub$Employment_Change,
   xlab = "Year",
   ylab = "Employment level change since 2011 (%)",
   ylim = c(-60, 80),
@@ -253,13 +261,24 @@ plot(
 )
 
 abline(lm_missouri_before, col = 'red', lwd = 2) # Before Min Wage Increase
-abline(lm_missouri_after, col = 'green', lwd = 2) # After
-abline(v = 2018, col = 'blue', lwd = 2) # Min wage Increase
+# abline(lm_missouri_after, col = 'green', lwd = 2) # After
+# 
+# Creating manually
+line_difference <- predict(lm_missouri_before, newdata = data.frame(Year = 2018)) - predict(lm_missouri_after, newdata = data.frame(Year = 2018))
+
+abline(
+  a = coef(lm_missouri_after)[1] + line_difference,
+  b = coef(lm_missouri_after)[2],
+  col = 'blue',
+  lwd = 2
+)
+
+abline(v = 2018, col = 'orange', lwd = 2) # Min wage Increase
 
 legend(
   "bottomleft", # Position of the legend on the plot
   legend = c("Regression Line (Before)", "Regression Line (After)", "Min Wage Increase"),
-  col = c("red", "green", "blue"), # Colors corresponding to the lines
+  col = c("red", "blue", "orange"), # Colors corresponding to the lines
   lwd = 2, # Line width
   # pch = 16, # Point type
   title = "Legend" # Legend title
@@ -271,12 +290,17 @@ abline(lm_missouri_overall, col = 'blue', lwd = 2)
 # plotting before 2018 only
 plot(
   x = MO_Before_2018$Year,
-  y = MO_Before_2018$`Employment Change`
+  y = MO_Before_2018$Employment_Change
 )
 
-predict(lm_missouri_before, newdata = data.frame(Year = 2018))
+# Plotting after 2018 only
 
-ggplot(transpose_plot) +
-  aes(
-    x = Year
-  )
+plot(
+  x = MO_After_2018$Year,
+  y = MO_After_2018$Employment_Change
+)
+
+
+ggplot(data = MO_sub, aes(x = Year, y = Employment_Change)) +
+  # Add a line for Employment Change
+  geom_point(color = 'black') 
