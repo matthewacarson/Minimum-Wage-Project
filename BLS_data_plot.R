@@ -256,7 +256,7 @@ plot(
   y = MO_sub$Employment_Change,
   xlab = "Year",
   ylab = "Employment level change since 2011 (%)",
-  ylim = c(-60, 80),
+  ylim = c(-70, 80),
   las = 1
 )
 
@@ -266,12 +266,21 @@ abline(lm_missouri_before, col = 'red', lwd = 2) # Before Min Wage Increase
 # Creating manually
 line_difference <- predict(lm_missouri_before, newdata = data.frame(Year = 2018)) - predict(lm_missouri_after, newdata = data.frame(Year = 2018))
 
-abline(
-  a = coef(lm_missouri_after)[1] + line_difference,
-  b = coef(lm_missouri_after)[2],
+segments(
+  x0 = 2018,
+  y0 = predict(lm_missouri_before, newdata = data.frame(Year = 2018)),
+  x1 = 2025,
+  y1 = predict(lm_missouri_after, newdata = data.frame(Year = 2025)) + line_difference,
   col = 'blue',
   lwd = 2
 )
+
+# abline(
+#   a = coef(lm_missouri_after)[1] + line_difference,
+#   b = coef(lm_missouri_after)[2],
+#   col = 'blue',
+#   lwd = 2
+# )
 
 abline(v = 2018, col = 'orange', lwd = 2) # Min wage Increase
 
@@ -299,7 +308,6 @@ plot(
   x = MO_After_2018$Year,
   y = MO_After_2018$Employment_Change
 )
-
 
 ggplot(data = MO_sub, aes(x = Year, y = Employment_Change)) +
   # Add a line for Employment Change
