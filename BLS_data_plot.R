@@ -312,3 +312,6 @@ plot(
 ggplot(data = MO_sub, aes(x = Year, y = Employment_Change)) +
   # Add a line for Employment Change
   geom_point(color = 'black') 
+
+
+KS_sub <- transpose_plot[str_detect(string = transpose_plot$County, pattern = "Kansas"),]
