@@ -38,7 +38,7 @@ filterd_columns <- c(
 )
 
 Year_2011 <- Year_2011[
--  str_detect(
+  str_detect(
     string = Year_2011$area_title,
     pattern = counties_of_interest
   ), filterd_columns
@@ -244,7 +244,9 @@ MO_sub <- transpose_plot[str_detect(string = transpose_plot$County, pattern = "M
 
 MO_Before_2019 <- MO_sub |> filter(Year < treatment_year)
 
+
 MO_After_2019 <- MO_sub |> filter(Year >= treatment_year)
+
 
 lm_missouri_before <- lm(
   data = MO_Before_2019,
@@ -408,4 +410,3 @@ legend(
   # pch = 16, # Point type
   title = "Legend" # Legend title
 )
-
