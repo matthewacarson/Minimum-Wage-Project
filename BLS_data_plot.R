@@ -143,7 +143,7 @@ Combined_Years <- Year_2011 |>
   add_row(Year_2022) |> 
   add_row(Year_2023)
 
-write_csv(x = Combined_Years, file = "BLS_Combined_Years.csv")
+# write_csv(x = Combined_Years, file = "BLS_Combined_Years.csv")
 
 Combined_Years_backup <- Combined_Years
 # Combined_Years <- Combined_Years_backup
@@ -166,11 +166,6 @@ Combined_Years <- Combined_Years |> select(
 )
 Combined_Years <- Combined_Years |> arrange(area_title, year, qtr)
 
-Combined_Years$old_year <- Combined_Years$year
-
-Combined_Years$year <- with(Combined_Years, 
-  old_year + (qtr - 1) * (1/4) + (month - 1) * (1/12)
-)
 
 # Change the file location below to where you want to save the csv
 
@@ -226,8 +221,8 @@ transpose_plot <- transpose_plot |>
   )
 
 # Filter out values < -50
-transpose_plot <- transpose_plot |> 
-  filter(Employment_Change > -90)
+# transpose_plot <- transpose_plot |> 
+  # filter(Employment_Change > -90)
 
 transpose_plot$Employment_Change <- as.numeric(transpose_plot$Employment_Change)
 #################################### #
@@ -314,35 +309,27 @@ legend(
 
 abline(lm_missouri_overall, col = 'green', lwd = 2)
 
-# plotting before 2018 only
-plot(
-  x = MO_Before_2018$Year,
-  y = MO_Before_2018$Employment_Change
-)
-
 # Plotting after 2018 only
-
-plot(
-  x = MO_After_2018$Year,
-  y = MO_After_2018$Employment_Change
-)
 
 ggplot(data = MO_sub, aes(x = Year, y = Employment_Change)) +
   # Add a line for Employment Change
-  geom_point(color = 'black') 
+  geom_point(color = 'black') +
+  geom_smooth(method = "lm", formula = y ~ x, data = MO_Before_2019, color = "blue", se = TRUE) +
+  geom_smooth(method = "lm", formula = y ~ x, data = MO_After_2019, color = "red", se = TRUE) +
+  labs(
+    title = "MO"
+  ) + geom_vline(xintercept = 2019)
 
 ############################## #
 # Begin Kansas Analysis ####
 ############################## #
 
-
 KS_sub <- transpose_plot[str_detect(string = transpose_plot$County, pattern = "Kansas"),]
-KS_sub$Employment_Change[is.infinite(KS_sub$Employment_Change)] <- 1
+KS_sub$Employment_Change[is.infinite(KS_sub$Employment_Change)] <- 100
 
 KS_Before_2019 <- KS_sub[KS_sub$Year < treatment_year,]
 
 KS_After_2019 <- KS_sub[KS_sub$Year >= treatment_year,]
-
 
 
 # Edit everything below before running so that it is for KS instrad of MO
@@ -368,7 +355,7 @@ plot(
   y = KS_sub$Employment_Change,
   xlab = "Year",
   ylab = "Employment level change since 2011 (%)",
-  ylim = c(-70, 80),
+  # ylim = c(-70, 80),
   las = 1,
   main = "Kansas"
 )
@@ -410,3 +397,12 @@ legend(
   # pch = 16, # Point type
   title = "Legend" # Legend title
 )
+
+ggplot(data = KS_sub, aes(x = Year, y = Employment_Change)) +
+  # Add a line for Employment Change
+  geom_point(color = 'black') +
+  geom_smooth(method = "lm", formula = y ~ x, data = KS_Before_2019, color = "blue", se = TRUE) +
+  geom_smooth(method = 'lm', formula = y ~ x, data = KS_After_2019, color = "red", se = TRUE) +
+  labs(
+    title = "KS"
+  ) + geom_vline(xintercept = 2019)
