@@ -234,7 +234,7 @@ MO_sub <- transpose_plot[str_detect(string = transpose_plot$County, pattern = "M
 
 MO_Before_2018 <- MO_sub |> filter(Year < 2018)
 
-MO_After_2018 <- MO_sub |> filter(Year > 2018)
+MO_After_2018 <- MO_sub |> filter(Year >= 2018)
 
 lm_missouri_before <- lm(
   data = MO_Before_2018,
@@ -315,3 +315,9 @@ ggplot(data = MO_sub, aes(x = Year, y = Employment_Change)) +
 
 
 KS_sub <- transpose_plot[str_detect(string = transpose_plot$County, pattern = "Kansas"),]
+
+KS_Before_2018 <- KS_sub[KS_sub$Year < 2018,]
+
+KS_After_2018 <- KS_sub[KS_sub$Year >= 2018,]
+
+
