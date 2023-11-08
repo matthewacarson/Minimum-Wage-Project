@@ -229,20 +229,30 @@ transpose_plot <- transpose_plot |>
 transpose_plot <- transpose_plot |> 
   filter(Employment_Change > -90)
 
+transpose_plot$Employment_Change <- as.numeric(transpose_plot$Employment_Change)
+#################################### #
+# Begin Analysis ####
+#################################### #
+## Missouri ####
+#################################### #
+treatment_year <- 2019
+# Subset for MO
+# 
+
 
 MO_sub <- transpose_plot[str_detect(string = transpose_plot$County, pattern = "Missouri"),]
 
-MO_Before_2018 <- MO_sub |> filter(Year < 2018)
+MO_Before_2019 <- MO_sub |> filter(Year < treatment_year)
 
-MO_After_2018 <- MO_sub |> filter(Year > 2018)
+MO_After_2019 <- MO_sub |> filter(Year >= treatment_year)
 
 lm_missouri_before <- lm(
-  data = MO_Before_2018,
+  data = MO_Before_2019,
   formula = Employment_Change ~ Year
 )
 
 lm_missouri_after <- lm(
-  data = MO_After_2018,
+  data = MO_After_2019,
   formula = Employment_Change ~ Year
 )
 
@@ -257,32 +267,38 @@ plot(
   xlab = "Year",
   ylab = "Employment level change since 2011 (%)",
   ylim = c(-70, 80),
-  las = 1
+  las = 1,
+  main = "Missouri"
 )
 
 abline(lm_missouri_before, col = 'red', lwd = 2) # Before Min Wage Increase
-# abline(lm_missouri_after, col = 'green', lwd = 2) # After
+abline(lm_missouri_after, col = 'blue', lwd = 2) # After
 # 
 # Creating manually
-line_difference <- predict(lm_missouri_before, newdata = data.frame(Year = 2018)) - predict(lm_missouri_after, newdata = data.frame(Year = 2018))
+line_difference <- predict(lm_missouri_before, newdata = data.frame(Year = treatment_year)) - predict(lm_missouri_after, newdata = data.frame(Year = treatment_year))
 
-segments(
-  x0 = 2018,
-  y0 = predict(lm_missouri_before, newdata = data.frame(Year = 2018)),
-  x1 = 2025,
-  y1 = predict(lm_missouri_after, newdata = data.frame(Year = 2025)) + line_difference,
+################## #
+# Segments aren't plotting right
+################## #
+
+# segments(
+#   x0 = treatment_year,
+#   y0 = predict(lm_missouri_before, newdata = data.frame(Year = treatment_year)),
+#   x1 = 2025,
+#   y1 = predict(lm_missouri_after, newdata = data.frame(Year = max(MO_After_2019$Year))) + line_difference,
+#   col = 'blue',
+#   lwd = 2,
+#   lty = 2
+# )
+
+abline(
+  a = coef(lm_missouri_after)[1] + line_difference,
+  b = coef(lm_missouri_after)[2],
   col = 'blue',
   lwd = 2
 )
 
-# abline(
-#   a = coef(lm_missouri_after)[1] + line_difference,
-#   b = coef(lm_missouri_after)[2],
-#   col = 'blue',
-#   lwd = 2
-# )
-
-abline(v = 2018, col = 'orange', lwd = 2) # Min wage Increase
+abline(v = treatment_year, col = 'orange', lwd = 2) # Min wage Increase
 
 legend(
   "bottomleft", # Position of the legend on the plot
@@ -294,7 +310,7 @@ legend(
 )
 
 
-abline(lm_missouri_overall, col = 'blue', lwd = 2)
+abline(lm_missouri_overall, col = 'green', lwd = 2)
 
 # plotting before 2018 only
 plot(
@@ -313,5 +329,83 @@ ggplot(data = MO_sub, aes(x = Year, y = Employment_Change)) +
   # Add a line for Employment Change
   geom_point(color = 'black') 
 
+############################## #
+# Begin Kansas Analysis ####
+############################## #
+
 
 KS_sub <- transpose_plot[str_detect(string = transpose_plot$County, pattern = "Kansas"),]
+KS_sub$Employment_Change[is.infinite(KS_sub$Employment_Change)] <- 1
+
+KS_Before_2019 <- KS_sub[KS_sub$Year < treatment_year,]
+
+KS_After_2019 <- KS_sub[KS_sub$Year >= treatment_year,]
+
+
+
+# Edit everything below before running so that it is for KS instrad of MO
+# 
+
+lm_kansas_before <- lm(
+  data = KS_Before_2019,
+  formula = Employment_Change ~ Year
+)
+
+lm_kansas_after <- lm(
+  data = KS_After_2019,
+  formula = Employment_Change ~ Year
+)
+
+lm_kansas_overall <- lm(
+  data = KS_sub,
+  formula = Employment_Change ~ Year
+)
+
+plot(
+  x = KS_sub$Year,
+  y = KS_sub$Employment_Change,
+  xlab = "Year",
+  ylab = "Employment level change since 2011 (%)",
+  ylim = c(-70, 80),
+  las = 1,
+  main = "Kansas"
+)
+
+abline(lm_kansas_before, col = 'red', lwd = 2) # Before Min Wage Increase
+abline(lm_kansas_after, col = 'green', lwd = 2) # After
+# 
+# Creating manually
+line_difference <- predict(lm_kansas_before, newdata = data.frame(Year = treatment_year)) - predict(lm_kansas_after, newdata = data.frame(Year = treatment_year))
+
+##################
+# Segments aren't plotting right
+##################
+
+# segments(
+#   x0 = treatment_year,
+#   y0 = predict(lm_kansas_before, newdata = data.frame(Year = treatment_year)),
+#   x1 = 2025,
+#   y1 = predict(lm_kansas_after, newdata = data.frame(Year = max(KS_After_2019$Year))) + line_difference,
+#   col = 'blue',
+#   lwd = 2,
+#   lty = 2
+# )
+
+abline(
+  a = coef(lm_kansas_after)[1] + line_difference,
+  b = coef(lm_kansas_after)[2],
+  col = 'blue',
+  lwd = 2
+)
+
+abline(v = treatment_year, col = 'orange', lwd = 2) # Min wage Increase
+
+legend(
+  "bottomleft", # Position of the legend on the plot
+  legend = c("Regression Line (Before)", "Regression Line (After)", "Min Wage Increase"),
+  col = c("red", "blue", "orange"), # Colors corresponding to the lines
+  lwd = 2, # Line width
+  # pch = 16, # Point type
+  title = "Legend" # Legend title
+)
+
