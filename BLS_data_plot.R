@@ -129,6 +129,9 @@ Year_2023 <- Year_2023[
   ), filterd_columns
 ]
 
+
+
+
 Combined_Years <- Year_2011 |> 
   add_row(Year_2012) |> 
   add_row(Year_2013) |> 
