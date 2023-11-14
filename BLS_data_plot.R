@@ -129,11 +129,6 @@ Year_2023_f <- Year_2023[
   ), filterd_columns
 ]
 
-
-
-PS_170_Minimum_Wage_Master_Data_Set <- 
-  read_csv("BLS/PS 170 Minimum Wage Master Data Set.csv")
-
 Combined_Years <- 
   Year_2011_f |> 
   add_row(Year_2012_f) |> 
@@ -151,14 +146,16 @@ Combined_Years <-
 
 Combined_Years$area_fips <- as.numeric(Combined_Years$area_fips)
 
-Combined_Years_All_Ind <- 
-  Combined_Years |> 
-  add_row(PS_170_Minimum_Wage_Master_Data_Set)
+# all_ind_empl <- 
+#   read_csv("BLS/PS 170 Minimum Wage Master Data Set.csv")
 
-# Matt (11/13): Stopped here in adding the other data set
+library(readxl)
+all_ind_empl <- read_excel("BLS/PS 170 Minimum Wage Master Data Set.xlsx")
+
+
 
 Combined_Years_gather <- 
-  Combined_Years_All_Ind |> 
+  Combined_Years |> 
   # Gather the columns month1_emplvl, month2_emplvl, and month3_emplvl into key-value pairs
   gather(
     key = "month", 
@@ -175,24 +172,64 @@ Combined_Years_gather <-
         month == "month2_emplvl" ~ 2,
         month == "month3_emplvl" ~ 3))
 
-# Combined_Years_arrange <- Combined_Years |> select(
-#   area_fips, area_title, year, qtr, month, qtrly_estabs_count, emplvl
-# ) |> arrange(area_title, year, qtr)
+all_ind_emp_gather <- 
+  all_ind_empl |> 
+  # Gather the columns month1_emplvl, month2_emplvl, and month3_emplvl into key-value pairs
+  gather(
+    key = "month", 
+    value = "emplvl",  
+    month1_emplvl, 
+    month2_emplvl, 
+    month3_emplvl
+  ) |> 
+  # Extract the numeric part from the "month" column
+  mutate(
+    month =
+      case_when(
+        month == "month1_emplvl" ~ 1,
+        month == "month2_emplvl" ~ 2,
+        month == "month3_emplvl" ~ 3))
+
+Combined_Years_arrange <- Combined_Years_gather |> select(
+  area_fips, area_title, year, qtr, month, qtrly_estabs_count, emplvl
+) |> arrange(area_title, year, qtr)
 
 # Change the file location below to where you want to save the csv
-Combined_Years_pivot <- Combined_Years |>  pivot_wider(
-  id_cols = c("area_fips", "area_title"),
-  names_from = c("year", "qtr", "month"),
-  values_from = c(
-    # "qtrly_estabs_count", 
-    "emplvl",
-  ),
-  names_sep = "_"
-)
+Combined_Years_pivot <- 
+  Combined_Years_arrange |>  
+  pivot_wider(
+    id_cols = c("area_fips", "area_title"),
+    names_from = c("year", "qtr", "month"),
+    values_from = c(
+      # "qtrly_estabs_count", 
+      "emplvl",
+    ),
+    names_sep = "_"
+  )
+
+# Do the same thing for the all industries data set
+
+all_ind_empl_arrange <- all_ind_emp_gather |> select(
+  area_fips, area_title, year, qtr, month, qtrly_estabs_count, emplvl
+) |> arrange(area_title, year, qtr)
+
+# Change the file location below to where you want to save the csv
+all_ind_empl_pivot <- 
+  all_ind_empl_arrange |>  
+  pivot_wider(
+    id_cols = c("area_fips", "area_title"),
+    names_from = c("year", "qtr", "month"),
+    values_from = c(
+      # "qtrly_estabs_count", 
+      "emplvl",
+    ),
+    names_sep = "_"
+  )
+
 
 Combined_Years_pivot$`201111_pct_change` <- 0
-
 # Calculate percent change for each pair of columns and create new columns for the results
+
 for (i in 3:(ncol(Combined_Years_pivot) - 2)) {
   # Calculate percent change using the formula: ((new value - old value) / old value) * 100
   col_name <- colnames(Combined_Years_pivot)[i + 1]
