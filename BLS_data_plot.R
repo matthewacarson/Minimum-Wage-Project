@@ -29,13 +29,13 @@ Year_2022 <- read_csv(file = "BLS/2022.q1-q4 722513 NAICS 722513 Limited-service
 Year_2023 <- read_csv(file = "BLS/2023.q1-q1 722513 NAICS 722513 Limited-service restaurants.csv")
 
 
-counties_of_interest <- "((Wyandotte|Johnson|Leavenworth|Jefferson|Doniphan|Atchison|Miami|Linn|Bourbon|Crawford|Cherokee|Brown) County, Kansas|(Holt|Andrew|Buchanan|Platte|Clay|Jackson|Cass|Bates|Vernon|Barton|Jasper|Newton) County, Missouri)"
+counties_of_interest <- "((Wyandotte|Johnson|Leavenworth|Atchison|Bourbon|Crawford|Cherokee|Brown) County, Kansas|(Buchanan|Platte|Clay|Jackson|Cass|Bates|Vernon|Barton|Jasper|Newton) County, Missouri)"
 
 columns_of_interest <- c(
   "area_fips", "year", "qtr", "area_title", 
   # "qtrly_estabs_count", 
   "month1_emplvl", "month2_emplvl", 
-  "month3_emplvl", "industry_code"
+  "month3_emplvl", "industry_code", "own_title"
 )
 
 Year_2011_f <- Year_2011[
@@ -86,7 +86,6 @@ Year_2017_f <- Year_2017[
     pattern = counties_of_interest
   ), columns_of_interest
 ]
-
 
 Year_2018_f <- Year_2018[
   str_detect(
@@ -150,16 +149,126 @@ Combined_Years$area_fips <- as.numeric(Combined_Years$area_fips)
 # all_ind_empl <- 
 #   read_csv("BLS/PS 170 Minimum Wage Master Data Set.csv")
 
-library(readxl)
-all_ind_empl <- read_excel("BLS/PS 170 Minimum Wage Master Data Set.xlsx")
+X2023 <- read_csv("BLS/2023.q1-q1 10 10 Total, all industries.csv")
+X2022 <- read_csv("BLS/2022.q1-q4 10 10 Total, all industries.csv")
+X2021 <- read_csv("BLS/2021.q1-q4 10 10 Total, all industries.csv")
+X2020 <- read_csv("BLS/2020.q1-q4 10 10 Total, all industries.csv")
+X2019 <- read_csv("BLS/2019.q1-q4 10 10 Total, all industries.csv")
+X2018 <- read_csv("BLS/2018.q1-q4 10 10 Total, all industries.csv")
+X2017 <- read_csv("BLS/2017.q1-q4 10 10 Total, all industries.csv")
+X2016 <- read_csv("BLS/2016.q1-q4 10 10 Total, all industries.csv")
+X2015 <- read_csv("BLS/2015.q1-q4 10 Total, all industries.csv")
+X2014 <- read_csv("BLS/2014.q1-q4 10 Total, all industries.csv")
+X2013 <- read_csv("BLS/2013.q1-q4 10 Total, all industries.csv")
+X2012 <- read_csv("BLS/2012.q1-q4 10 Total, all industries.csv")
+X2011 <- read_csv("BLS/2011.q1-q4 10 Total, all industries.csv")
+
+X2023_f <- X2023[
+  str_detect(
+    string = X2023$area_title,
+    pattern = counties_of_interest
+  ), columns_of_interest
+]
+
+X2022_f <- X2022[
+  str_detect(
+    string = X2022$area_title,
+    pattern = counties_of_interest
+  ), columns_of_interest
+]
+
+X2021_f <- X2021[
+  str_detect(
+    string = X2021$area_title,
+    pattern = counties_of_interest
+  ), columns_of_interest
+]
+
+X2020_f <- X2020[
+  str_detect(
+    string = X2020$area_title,
+    pattern = counties_of_interest
+  ), columns_of_interest
+]
+
+X2019_f <- X2019[
+  str_detect(
+    string = X2019$area_title,
+    pattern = counties_of_interest
+  ), columns_of_interest
+]
+
+X2018_f <- X2018[
+  str_detect(
+    string = X2018$area_title,
+    pattern = counties_of_interest
+  ), columns_of_interest
+]
+
+X2017_f <- X2017[
+  str_detect(
+    string = X2017$area_title,
+    pattern = counties_of_interest
+  ), columns_of_interest
+]
+
+X2016_f <- X2016[
+  str_detect(
+    string = X2016$area_title,
+    pattern = counties_of_interest
+  ), columns_of_interest
+]
+
+X2015_f <- X2015[
+  str_detect(
+    string = X2015$area_title,
+    pattern = counties_of_interest
+  ), columns_of_interest
+]
+
+X2014_f <- X2014[
+  str_detect(
+    string = X2014$area_title,
+    pattern = counties_of_interest
+  ), columns_of_interest
+]
+
+X2013_f <- X2013[
+  str_detect(
+    string = X2013$area_title,
+    pattern = counties_of_interest
+  ), columns_of_interest
+]
+
+X2012_f <- X2012[
+  str_detect(
+    string = X2012$area_title,
+    pattern = counties_of_interest
+  ), columns_of_interest
+]
+
+X2011_f <- X2011[
+  str_detect(
+    string = X2011$area_title,
+    pattern = counties_of_interest
+  ), columns_of_interest
+]
 
 all_ind_empl_filter <- 
-  all_ind_empl[
-    str_detect(
-      string = all_ind_empl$area_title,
-      pattern = counties_of_interest,
-    ), columns_of_interest
-  ] |> na.omit()
+  X2011_f |> 
+  add_row(X2012_f) |> 
+  add_row(X2013_f) |> 
+  add_row(X2014_f) |> 
+  add_row(X2015_f) |> 
+  add_row(X2016_f) |> 
+  add_row(X2017_f) |> 
+  add_row(X2018_f) |> 
+  add_row(X2019_f) |> 
+  add_row(X2020_f) |> 
+  add_row(X2021_f) |> 
+  add_row(X2022_f) |> 
+  add_row(X2023_f) |> 
+  filter(own_title == "Private")
 
 Combined_Years_gather <- 
   Combined_Years |> 
@@ -217,22 +326,35 @@ Combined_Years_pivot <-
 
 # Do the same thing for the all industries data set
 
-all_ind_empl_arrange <- all_ind_emp_gather |> select(
-  area_fips, area_title, year, qtr, month, emplvl
-) |> arrange(year, qtr)
+all_ind_empl_arrange <- 
+  all_ind_emp_gather |> 
+  select(area_fips, area_title, year, qtr, month, emplvl) |> 
+  arrange(month) |> 
+  arrange(qtr) |> 
+  arrange(area_title) |> 
+  arrange(year)
 
 # Change the file location below to where you want to save the csv
+# This is producing a lot of NA columns
 all_ind_empl_pivot <- 
   all_ind_empl_arrange |>  
-  pivot_wider(
-    id_cols = c("area_fips", "area_title"),
-    names_from = c("year", "qtr", "month"),
-    values_from = c(
-      # "qtrly_estabs_count", 
-      "emplvl",
-    ),
-    names_sep = "_"
-  )
+pivot_wider(
+  id_cols = c("area_fips", "area_title"),
+  names_from = c("year", "qtr", "month"),
+  values_from = "emplvl",
+  names_sep = "_"
+)
+
+table(all_ind_empl_filter$area_title, all_ind_empl_filter$year, all_ind_empl_filter$qtr)
+
+all_ind_empl_filter %>%
+  count(area_title, year, qtr) %>%
+  arrange(desc(n))
+
+
+# ########################################### #
+# 11/14 5:30 AM: I am done to this point. The all industries data are now joined together. Next I need to run calculations.
+# ########################################### #
 
 Combined_Years_pivot$`201111_pct_change` <- 0
 # Calculate percent change for each pair of columns and create new columns for the results
@@ -259,8 +381,6 @@ transpose <- cbind(
 rownames(transpose) <- NULL
 
 transpose_plot <- transpose |> gather(key = "County", value = "Employment_Change", -Year)
-
-
 
 transpose_plot$old_year <- transpose_plot$Year
 
