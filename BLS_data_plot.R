@@ -1,33 +1,47 @@
-setwd("C:/Users/madou/OneDrive - UCLA IT Services/2)_2023_Fall/PS-170A/Minimum-Wage-Project")
-
+# setwd("C:/Users/madou/OneDrive - UCLA IT Services/2)_2023_Fall/PS-170A/Minimum-Wage-Project")
 library(tidyverse)
-
-Year_2011 <- read_csv(file = "BLS/2011.q1-q4 722513 Limited-service restaurants.csv")
-
-Year_2012 <- read_csv(file = "BLS/2012.q1-q4 722513 Limited-service restaurants.csv")
-
-Year_2013 <- read_csv(file = "BLS/2013.q1-q4 722513 Limited-service restaurants.csv")
-
-Year_2014 <- read_csv(file = "BLS/2014.q1-q4 722513 Limited-service restaurants.csv")
-
-Year_2015 <- read_csv(file = "BLS/2015.q1-q4 722513 Limited-service restaurants.csv")
-
-Year_2016 <- read_csv(file = "BLS/2016.q1-q4 722513 NAICS 722513 Limited-service restaurants.csv")
-
-Year_2017 <- read_csv(file = "BLS/2017.q1-q4 722513 NAICS 722513 Limited-service restaurants.csv")
-
-Year_2018 <- read_csv(file = "BLS/2018.q1-q4 722513 NAICS 722513 Limited-service restaurants.csv")
-
-Year_2019 <- read_csv(file = "BLS/2019.q1-q4 722513 NAICS 722513 Limited-service restaurants.csv")
-
-Year_2020 <- read_csv(file = "BLS/2020.q1-q4 722513 NAICS 722513 Limited-service restaurants.csv")
-
-Year_2021 <- read_csv(file = "BLS/2021.q1-q4 722513 NAICS 722513 Limited-service restaurants.csv")
-
-Year_2022 <- read_csv(file = "BLS/2022.q1-q4 722513 NAICS 722513 Limited-service restaurants.csv")
-
-Year_2023 <- read_csv(file = "BLS/2023.q1-q1 722513 NAICS 722513 Limited-service restaurants.csv")
-
+# ################################################################ #
+# Importing CSVs for fast food/limited-service restaurants only ####
+# ################################################################ #
+Year_2011 <- 
+  read_csv(
+    file = "BLS/2011.q1-q4 722513 Limited-service restaurants.csv")
+Year_2012 <- 
+  read_csv(
+    file = "BLS/2012.q1-q4 722513 Limited-service restaurants.csv")
+Year_2013 <- 
+  read_csv(
+    file = "BLS/2013.q1-q4 722513 Limited-service restaurants.csv")
+Year_2014 <- 
+  read_csv(
+    file = "BLS/2014.q1-q4 722513 Limited-service restaurants.csv")
+Year_2015 <- 
+  read_csv(
+    file = "BLS/2015.q1-q4 722513 Limited-service restaurants.csv")
+Year_2016 <- 
+  read_csv(
+    file = "BLS/2016.q1-q4 722513 NAICS 722513 Limited-service restaurants.csv")
+Year_2017 <- 
+  read_csv(
+    file = "BLS/2017.q1-q4 722513 NAICS 722513 Limited-service restaurants.csv")
+Year_2018 <- 
+  read_csv(
+    file = "BLS/2018.q1-q4 722513 NAICS 722513 Limited-service restaurants.csv")
+Year_2019 <- 
+  read_csv(
+    file = "BLS/2019.q1-q4 722513 NAICS 722513 Limited-service restaurants.csv")
+Year_2020 <- 
+  read_csv(
+    file = "BLS/2020.q1-q4 722513 NAICS 722513 Limited-service restaurants.csv")
+Year_2021 <- 
+  read_csv(
+    file = "BLS/2021.q1-q4 722513 NAICS 722513 Limited-service restaurants.csv")
+Year_2022 <- 
+  read_csv(
+    file = "BLS/2022.q1-q4 722513 NAICS 722513 Limited-service restaurants.csv")
+Year_2023 <- 
+  read_csv(
+    file = "BLS/2023.q1-q1 722513 NAICS 722513 Limited-service restaurants.csv")
 
 counties_of_interest <- "((Wyandotte|Johnson|Leavenworth|Atchison|Bourbon|Crawford|Cherokee|Brown) County, Kansas|(Buchanan|Platte|Clay|Jackson|Cass|Bates|Vernon|Barton|Jasper|Newton) County, Missouri)"
 
@@ -37,7 +51,9 @@ columns_of_interest <- c(
   "month1_emplvl", "month2_emplvl", 
   "month3_emplvl", "industry_code", "own_title"
 )
-
+## ############################################# #
+## Filtering counties and columns of interest ####
+## ############################################# #
 Year_2011_f <- Year_2011[
   str_detect(
     string = Year_2011$area_title,
@@ -146,133 +162,11 @@ Combined_Years <-
 
 Combined_Years$area_fips <- as.numeric(Combined_Years$area_fips)
 
-# all_ind_empl <- 
-#   read_csv("BLS/PS 170 Minimum Wage Master Data Set.csv")
-
-X2023 <- read_csv("BLS/2023.q1-q1 10 10 Total, all industries.csv")
-X2022 <- read_csv("BLS/2022.q1-q4 10 10 Total, all industries.csv")
-X2021 <- read_csv("BLS/2021.q1-q4 10 10 Total, all industries.csv")
-X2020 <- read_csv("BLS/2020.q1-q4 10 10 Total, all industries.csv")
-X2019 <- read_csv("BLS/2019.q1-q4 10 10 Total, all industries.csv")
-X2018 <- read_csv("BLS/2018.q1-q4 10 10 Total, all industries.csv")
-X2017 <- read_csv("BLS/2017.q1-q4 10 10 Total, all industries.csv")
-X2016 <- read_csv("BLS/2016.q1-q4 10 10 Total, all industries.csv")
-X2015 <- read_csv("BLS/2015.q1-q4 10 Total, all industries.csv")
-X2014 <- read_csv("BLS/2014.q1-q4 10 Total, all industries.csv")
-X2013 <- read_csv("BLS/2013.q1-q4 10 Total, all industries.csv")
-X2012 <- read_csv("BLS/2012.q1-q4 10 Total, all industries.csv")
-X2011 <- read_csv("BLS/2011.q1-q4 10 Total, all industries.csv")
-
-X2023_f <- X2023[
-  str_detect(
-    string = X2023$area_title,
-    pattern = counties_of_interest
-  ), columns_of_interest
-]
-
-X2022_f <- X2022[
-  str_detect(
-    string = X2022$area_title,
-    pattern = counties_of_interest
-  ), columns_of_interest
-]
-
-X2021_f <- X2021[
-  str_detect(
-    string = X2021$area_title,
-    pattern = counties_of_interest
-  ), columns_of_interest
-]
-
-X2020_f <- X2020[
-  str_detect(
-    string = X2020$area_title,
-    pattern = counties_of_interest
-  ), columns_of_interest
-]
-
-X2019_f <- X2019[
-  str_detect(
-    string = X2019$area_title,
-    pattern = counties_of_interest
-  ), columns_of_interest
-]
-
-X2018_f <- X2018[
-  str_detect(
-    string = X2018$area_title,
-    pattern = counties_of_interest
-  ), columns_of_interest
-]
-
-X2017_f <- X2017[
-  str_detect(
-    string = X2017$area_title,
-    pattern = counties_of_interest
-  ), columns_of_interest
-]
-
-X2016_f <- X2016[
-  str_detect(
-    string = X2016$area_title,
-    pattern = counties_of_interest
-  ), columns_of_interest
-]
-
-X2015_f <- X2015[
-  str_detect(
-    string = X2015$area_title,
-    pattern = counties_of_interest
-  ), columns_of_interest
-]
-
-X2014_f <- X2014[
-  str_detect(
-    string = X2014$area_title,
-    pattern = counties_of_interest
-  ), columns_of_interest
-]
-
-X2013_f <- X2013[
-  str_detect(
-    string = X2013$area_title,
-    pattern = counties_of_interest
-  ), columns_of_interest
-]
-
-X2012_f <- X2012[
-  str_detect(
-    string = X2012$area_title,
-    pattern = counties_of_interest
-  ), columns_of_interest
-]
-
-X2011_f <- X2011[
-  str_detect(
-    string = X2011$area_title,
-    pattern = counties_of_interest
-  ), columns_of_interest
-]
-
-all_ind_empl_filter <- 
-  X2011_f |> 
-  add_row(X2012_f) |> 
-  add_row(X2013_f) |> 
-  add_row(X2014_f) |> 
-  add_row(X2015_f) |> 
-  add_row(X2016_f) |> 
-  add_row(X2017_f) |> 
-  add_row(X2018_f) |> 
-  add_row(X2019_f) |> 
-  add_row(X2020_f) |> 
-  add_row(X2021_f) |> 
-  add_row(X2022_f) |> 
-  add_row(X2023_f) |> 
-  filter(own_title == "Private")
-
+### ################################################################### #
+### Gathering monthly emplvl into one column and month into another. ####
+### ################################################################### #
 Combined_Years_gather <- 
   Combined_Years |> 
-  # Gather the columns month1_emplvl, month2_emplvl, and month3_emplvl into key-value pairs
   gather(
     key = "month", 
     value = "emplvl",  
@@ -283,35 +177,21 @@ Combined_Years_gather <-
   # Extract the numeric part from the "month" column
   mutate(
     month =
-      case_when(
+      case_when( # Converting to numeric values
         month == "month1_emplvl" ~ 1,
         month == "month2_emplvl" ~ 2,
         month == "month3_emplvl" ~ 3))
 
-all_ind_emp_gather <- 
-  all_ind_empl_filter |> 
-  # Gather the columns month1_emplvl, month2_emplvl, and month3_emplvl into key-value pairs
-  gather(
-    key = "month", 
-    value = "emplvl",  
-    month1_emplvl, 
-    month2_emplvl, 
-    month3_emplvl
-  ) |> 
-  # Extract the numeric part from the "month" column
-  mutate(
-    month =
-      case_when(
-        month == "month1_emplvl" ~ 1,
-        month == "month2_emplvl" ~ 2,
-        month == "month3_emplvl" ~ 3))
-
+### ############################### #
+### Arrange columns before pivot ####
+### ############################### #
 Combined_Years_arrange <- Combined_Years_gather |> 
-  select(
-  area_fips, area_title, year, qtr, month, emplvl
-) |> arrange(area_title, year, qtr)
+  select(area_fips, area_title, year, qtr, month, emplvl) |> 
+  arrange(area_title, year, qtr)
 
-# Change the file location below to where you want to save the csv
+### ##################################################### #
+### Pivot_wider to prepare for looping through columns ####
+### ##################################################### #
 Combined_Years_pivot <- 
   Combined_Years_arrange |>  
   pivot_wider(
@@ -323,6 +203,165 @@ Combined_Years_pivot <-
     ),
     names_sep = "_"
   )
+#### ############################################# #
+#### Changing column names to continuous values ####
+#### This will be helpful for plotting later ##### #
+#### ############################################# #
+limited_serv_colnames <- colnames(Combined_Years_pivot)[3:149]
+d1 <- as.numeric(str_split_i(string = limited_serv_colnames, pattern = "_", i = 1))
+d2 <- as.numeric(str_split_i(string = limited_serv_colnames, pattern = "_", i = 2))
+d3 <- as.numeric(str_split_i(string = limited_serv_colnames, pattern = "_", i = 3))
+limited_serv_converted <- d1 + (d2 - 1) * (1/4) + (d3 - 1) * (1/12)
+
+# Testing to make sure all intervals are consistent.
+round(diff(limited_serv_converted), digits = 5) |> table()
+
+# ##################################################### #
+# Begin importing CSVs for emp lvl in ALL industries ####
+# ##################################################### #
+All_Ind_2023 <- read_csv("BLS/2023.q1-q1 10 10 Total, all industries.csv")
+All_Ind_2022 <- read_csv("BLS/2022.q1-q4 10 10 Total, all industries.csv")
+All_Ind_2021 <- read_csv("BLS/2021.q1-q4 10 10 Total, all industries.csv")
+All_Ind_2020 <- read_csv("BLS/2020.q1-q4 10 10 Total, all industries.csv")
+All_Ind_2019 <- read_csv("BLS/2019.q1-q4 10 10 Total, all industries.csv")
+All_Ind_2018 <- read_csv("BLS/2018.q1-q4 10 10 Total, all industries.csv")
+All_Ind_2017 <- read_csv("BLS/2017.q1-q4 10 10 Total, all industries.csv")
+All_Ind_2016 <- read_csv("BLS/2016.q1-q4 10 10 Total, all industries.csv")
+All_Ind_2015 <- read_csv("BLS/2015.q1-q4 10 Total, all industries.csv")
+All_Ind_2014 <- read_csv("BLS/2014.q1-q4 10 Total, all industries.csv")
+All_Ind_2013 <- read_csv("BLS/2013.q1-q4 10 Total, all industries.csv")
+All_Ind_2012 <- read_csv("BLS/2012.q1-q4 10 Total, all industries.csv")
+All_Ind_2011 <- read_csv("BLS/2011.q1-q4 10 Total, all industries.csv")
+
+## ############################################# #
+## Filtering columns and counties of interest ####
+## ############################################# #
+All_Ind_2023_f <- All_Ind_2023[
+  str_detect(
+    string = All_Ind_2023$area_title,
+    pattern = counties_of_interest
+  ), columns_of_interest
+]
+
+All_Ind_2022_f <- All_Ind_2022[
+  str_detect(
+    string = All_Ind_2022$area_title,
+    pattern = counties_of_interest
+  ), columns_of_interest
+]
+
+All_Ind_2021_f <- All_Ind_2021[
+  str_detect(
+    string = All_Ind_2021$area_title,
+    pattern = counties_of_interest
+  ), columns_of_interest
+]
+
+All_Ind_2020_f <- All_Ind_2020[
+  str_detect(
+    string = All_Ind_2020$area_title,
+    pattern = counties_of_interest
+  ), columns_of_interest
+]
+
+All_Ind_2019_f <- All_Ind_2019[
+  str_detect(
+    string = All_Ind_2019$area_title,
+    pattern = counties_of_interest
+  ), columns_of_interest
+]
+
+All_Ind_2018_f <- All_Ind_2018[
+  str_detect(
+    string = All_Ind_2018$area_title,
+    pattern = counties_of_interest
+  ), columns_of_interest
+]
+
+All_Ind_2017_f <- All_Ind_2017[
+  str_detect(
+    string = All_Ind_2017$area_title,
+    pattern = counties_of_interest
+  ), columns_of_interest
+]
+
+All_Ind_2016_f <- All_Ind_2016[
+  str_detect(
+    string = All_Ind_2016$area_title,
+    pattern = counties_of_interest
+  ), columns_of_interest
+]
+
+All_Ind_2015_f <- All_Ind_2015[
+  str_detect(
+    string = All_Ind_2015$area_title,
+    pattern = counties_of_interest
+  ), columns_of_interest
+]
+
+All_Ind_2014_f <- All_Ind_2014[
+  str_detect(
+    string = All_Ind_2014$area_title,
+    pattern = counties_of_interest
+  ), columns_of_interest
+]
+
+All_Ind_2013_f <- All_Ind_2013[
+  str_detect(
+    string = All_Ind_2013$area_title,
+    pattern = counties_of_interest
+  ), columns_of_interest
+]
+
+All_Ind_2012_f <- All_Ind_2012[
+  str_detect(
+    string = All_Ind_2012$area_title,
+    pattern = counties_of_interest
+  ), columns_of_interest
+]
+
+All_Ind_2011_f <- All_Ind_2011[
+  str_detect(
+    string = All_Ind_2011$area_title,
+    pattern = counties_of_interest
+  ), columns_of_interest
+]
+
+all_ind_empl_filter <- 
+  All_Ind_2011_f |> 
+  add_row(All_Ind_2012_f) |> 
+  add_row(All_Ind_2013_f) |> 
+  add_row(All_Ind_2014_f) |> 
+  add_row(All_Ind_2015_f) |> 
+  add_row(All_Ind_2016_f) |> 
+  add_row(All_Ind_2017_f) |> 
+  add_row(All_Ind_2018_f) |> 
+  add_row(All_Ind_2019_f) |> 
+  add_row(All_Ind_2020_f) |> 
+  add_row(All_Ind_2021_f) |> 
+  add_row(All_Ind_2022_f) |> 
+  add_row(All_Ind_2023_f) |> 
+  filter(own_title == "Private")
+
+
+all_ind_emp_gather <- 
+  all_ind_empl_filter |> 
+  gather(
+    key = "month", 
+    value = "emplvl",  
+    month1_emplvl, 
+    month2_emplvl, 
+    month3_emplvl
+  ) |> 
+  # Extract the numeric part from the "month" column
+  mutate(
+    month =
+      case_when( # Converting to numeric values
+        month == "month1_emplvl" ~ 1,
+        month == "month2_emplvl" ~ 2,
+        month == "month3_emplvl" ~ 3))
+
+
 
 # Do the same thing for the all industries data set
 
@@ -334,8 +373,6 @@ all_ind_empl_arrange <-
   arrange(area_title) |> 
   arrange(year)
 
-# Change the file location below to where you want to save the csv
-# This is producing a lot of NA columns
 all_ind_empl_pivot <- 
   all_ind_empl_arrange |>  
 pivot_wider(
