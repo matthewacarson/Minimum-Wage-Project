@@ -34,52 +34,52 @@ counties_of_interest <- "((Wyandotte|Johnson|Leavenworth|Jefferson|Doniphan|Atch
 filterd_columns <- c(
   "area_fips", "year", "qtr", "area_title", 
   "qtrly_estabs_count", "month1_emplvl", "month2_emplvl", 
-  "month3_emplvl"
+  "month3_emplvl", "industry_code"
 )
 
-Year_2011 <- Year_2011[
+Year_2011_f <- Year_2011[
   str_detect(
     string = Year_2011$area_title,
     pattern = counties_of_interest
   ), filterd_columns
 ]
 
-Year_2012 <- Year_2012[
+Year_2012_f <- Year_2012[
   str_detect(
     string = Year_2012$area_title,
     pattern = counties_of_interest
   ), filterd_columns
 ]
 
-Year_2013 <- Year_2013[
+Year_2013_f <- Year_2013[
   str_detect(
     string = Year_2013$area_title,
     pattern = counties_of_interest
   ), filterd_columns
 ]
 
-Year_2014 <- Year_2014[
+Year_2014_f <- Year_2014[
   str_detect(
     string = Year_2014$area_title,
     pattern = counties_of_interest
   ), filterd_columns
 ]
 
-Year_2015 <- Year_2015[
+Year_2015_f <- Year_2015[
   str_detect(
     string = Year_2015$area_title,
     pattern = counties_of_interest
   ), filterd_columns
 ]
 
-Year_2016 <- Year_2016[
+Year_2016_f <- Year_2016[
   str_detect(
     string = Year_2016$area_title,
     pattern = counties_of_interest
   ), filterd_columns
 ]
 
-Year_2017 <- Year_2017[
+Year_2017_f <- Year_2017[
   str_detect(
     string = Year_2017$area_title,
     pattern = counties_of_interest
@@ -87,42 +87,42 @@ Year_2017 <- Year_2017[
 ]
 
 
-Year_2018 <- Year_2018[
+Year_2018_f <- Year_2018[
   str_detect(
     string = Year_2018$area_title,
     pattern = counties_of_interest
   ), filterd_columns
 ]
 
-Year_2019 <- Year_2019[
+Year_2019_f <- Year_2019[
   str_detect(
     string = Year_2019$area_title,
     pattern = counties_of_interest
   ), filterd_columns
 ]
 
-Year_2020 <- Year_2020[
+Year_2020_f <- Year_2020[
   str_detect(
     string = Year_2020$area_title,
     pattern = counties_of_interest
   ), filterd_columns
 ]
 
-Year_2021 <- Year_2021[
+Year_2021_f <- Year_2021[
   str_detect(
     string = Year_2021$area_title,
     pattern = counties_of_interest
   ), filterd_columns
 ]
 
-Year_2022 <- Year_2022[
+Year_2022_f <- Year_2022[
   str_detect(
     string = Year_2022$area_title,
     pattern = counties_of_interest
   ), filterd_columns
 ]
 
-Year_2023 <- Year_2023[
+Year_2023_f <- Year_2023[
   str_detect(
     string = Year_2023$area_title,
     pattern = counties_of_interest
@@ -131,27 +131,32 @@ Year_2023 <- Year_2023[
 
 
 
+PS_170_Minimum_Wage_Master_Data_Set <- 
+  read_csv("BLS/PS 170 Minimum Wage Master Data Set.csv")
 
-Combined_Years <- Year_2011 |> 
-  add_row(Year_2012) |> 
-  add_row(Year_2013) |> 
-  add_row(Year_2014) |> 
-  add_row(Year_2015) |> 
-  add_row(Year_2016) |> 
-  add_row(Year_2017) |> 
-  add_row(Year_2018) |> 
-  add_row(Year_2019) |> 
-  add_row(Year_2020) |> 
-  add_row(Year_2021) |> 
-  add_row(Year_2022) |> 
-  add_row(Year_2023)
+Combined_Years <- 
+  Year_2011_f |> 
+  add_row(Year_2012_f) |> 
+  add_row(Year_2013_f) |> 
+  add_row(Year_2014_f) |> 
+  add_row(Year_2015_f) |> 
+  add_row(Year_2016_f) |> 
+  add_row(Year_2017_f) |> 
+  add_row(Year_2018_f) |> 
+  add_row(Year_2019_f) |> 
+  add_row(Year_2020_f) |> 
+  add_row(Year_2021_f) |> 
+  add_row(Year_2022_f) |> 
+  add_row(Year_2023_f)
 
-# write_csv(x = Combined_Years, file = "BLS_Combined_Years.csv")
+Combined_Years$area_fips <- as.numeric(Combined_Years$area_fips)
 
-Combined_Years_backup <- Combined_Years
-# Combined_Years <- Combined_Years_backup
+Combined_Years_All_Ind <- 
+  add_row(PS_170_Minimum_Wage_Master_Data_Set)
 
-Combined_Years <- Combined_Years |> 
+# Matt (11/13): Stopped here in adding the other data set
+
+Combined_Years_gather <- Combined_Years |> 
   # Gather the columns month1_emplvl, month2_emplvl, and month3_emplvl into key-value pairs
   gather(key = "month", value = "emplvl",  month1_emplvl, month2_emplvl, month3_emplvl) |> 
   # Extract the numeric part from the "month" column
@@ -164,15 +169,14 @@ Combined_Years <- Combined_Years |>
       )
   )
 
-Combined_Years <- Combined_Years |> select(
+Combined_Years_arrange <- Combined_Years |> select(
   area_fips, area_title, year, qtr, month, qtrly_estabs_count, emplvl
-)
-Combined_Years <- Combined_Years |> arrange(area_title, year, qtr)
+) |> arrange(area_title, year, qtr)
 
 
 # Change the file location below to where you want to save the csv
 
-pivot_combined <- Combined_Years |>  pivot_wider(
+Combined_Years_pivot <- Combined_Years |>  pivot_wider(
   id_cols = c("area_fips", "area_title"),
   names_from = c("year", "qtr", "month"),
   values_from = c(
@@ -182,15 +186,17 @@ pivot_combined <- Combined_Years |>  pivot_wider(
   names_sep = ""
 )
 
-pivot_combined$`201111_pct_change` <- 0
+
+
+Combined_Years_pivot$`201111_pct_change` <- 0
 
 # Calculate percent change for each pair of columns and create new columns for the results
-for (i in 3:(ncol(pivot_combined) - 2)) {
+for (i in 3:(ncol(Combined_Years_pivot) - 2)) {
   # Calculate percent change using the formula: ((new value - old value) / old value) * 100
-  col_name <- colnames(pivot_combined)[i + 1]
+  col_name <- colnames(Combined_Years_pivot)[i + 1]
   new_col_name <- paste0(col_name, "_pct_change")
   
-  pivot_combined[[new_col_name]] <- ((pivot_combined[[i + 1]] - pivot_combined[[3]]) / pivot_combined[[3]]) * 100
+  Combined_Years_pivot[[new_col_name]] <- ((Combined_Years_pivot[[i + 1]] - Combined_Years_pivot[[3]]) / Combined_Years_pivot[[3]]) * 100
 }
 
 # The new columns with percent change values have been added to the dataframe
