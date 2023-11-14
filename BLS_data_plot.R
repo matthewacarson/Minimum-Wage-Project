@@ -31,9 +31,10 @@ Year_2023 <- read_csv(file = "BLS/2023.q1-q1 722513 NAICS 722513 Limited-service
 
 counties_of_interest <- "((Wyandotte|Johnson|Leavenworth|Jefferson|Doniphan|Atchison|Miami|Linn|Bourbon|Crawford|Cherokee|Brown) County, Kansas|(Holt|Andrew|Buchanan|Platte|Clay|Jackson|Cass|Bates|Vernon|Barton|Jasper|Newton) County, Missouri)"
 
-filterd_columns <- c(
+columns_of_interest <- c(
   "area_fips", "year", "qtr", "area_title", 
-  "qtrly_estabs_count", "month1_emplvl", "month2_emplvl", 
+  # "qtrly_estabs_count", 
+  "month1_emplvl", "month2_emplvl", 
   "month3_emplvl", "industry_code"
 )
 
@@ -41,49 +42,49 @@ Year_2011_f <- Year_2011[
   str_detect(
     string = Year_2011$area_title,
     pattern = counties_of_interest
-  ), filterd_columns
+  ), columns_of_interest
 ]
 
 Year_2012_f <- Year_2012[
   str_detect(
     string = Year_2012$area_title,
     pattern = counties_of_interest
-  ), filterd_columns
+  ), columns_of_interest
 ]
 
 Year_2013_f <- Year_2013[
   str_detect(
     string = Year_2013$area_title,
     pattern = counties_of_interest
-  ), filterd_columns
+  ), columns_of_interest
 ]
 
 Year_2014_f <- Year_2014[
   str_detect(
     string = Year_2014$area_title,
     pattern = counties_of_interest
-  ), filterd_columns
+  ), columns_of_interest
 ]
 
 Year_2015_f <- Year_2015[
   str_detect(
     string = Year_2015$area_title,
     pattern = counties_of_interest
-  ), filterd_columns
+  ), columns_of_interest
 ]
 
 Year_2016_f <- Year_2016[
   str_detect(
     string = Year_2016$area_title,
     pattern = counties_of_interest
-  ), filterd_columns
+  ), columns_of_interest
 ]
 
 Year_2017_f <- Year_2017[
   str_detect(
     string = Year_2017$area_title,
     pattern = counties_of_interest
-  ), filterd_columns
+  ), columns_of_interest
 ]
 
 
@@ -91,42 +92,42 @@ Year_2018_f <- Year_2018[
   str_detect(
     string = Year_2018$area_title,
     pattern = counties_of_interest
-  ), filterd_columns
+  ), columns_of_interest
 ]
 
 Year_2019_f <- Year_2019[
   str_detect(
     string = Year_2019$area_title,
     pattern = counties_of_interest
-  ), filterd_columns
+  ), columns_of_interest
 ]
 
 Year_2020_f <- Year_2020[
   str_detect(
     string = Year_2020$area_title,
     pattern = counties_of_interest
-  ), filterd_columns
+  ), columns_of_interest
 ]
 
 Year_2021_f <- Year_2021[
   str_detect(
     string = Year_2021$area_title,
     pattern = counties_of_interest
-  ), filterd_columns
+  ), columns_of_interest
 ]
 
 Year_2022_f <- Year_2022[
   str_detect(
     string = Year_2022$area_title,
     pattern = counties_of_interest
-  ), filterd_columns
+  ), columns_of_interest
 ]
 
 Year_2023_f <- Year_2023[
   str_detect(
     string = Year_2023$area_title,
     pattern = counties_of_interest
-  ), filterd_columns
+  ), columns_of_interest
 ]
 
 Combined_Years <- 
@@ -152,7 +153,13 @@ Combined_Years$area_fips <- as.numeric(Combined_Years$area_fips)
 library(readxl)
 all_ind_empl <- read_excel("BLS/PS 170 Minimum Wage Master Data Set.xlsx")
 
-
+all_ind_empl_filter <- 
+  all_ind_empl[
+    str_detect(
+      string = all_ind_empl$area_title,
+      pattern = counties_of_interest,
+    ), columns_of_interest
+  ] |> na.omit()
 
 Combined_Years_gather <- 
   Combined_Years |> 
@@ -173,7 +180,7 @@ Combined_Years_gather <-
         month == "month3_emplvl" ~ 3))
 
 all_ind_emp_gather <- 
-  all_ind_empl |> 
+  all_ind_empl_filter |> 
   # Gather the columns month1_emplvl, month2_emplvl, and month3_emplvl into key-value pairs
   gather(
     key = "month", 
@@ -190,8 +197,9 @@ all_ind_emp_gather <-
         month == "month2_emplvl" ~ 2,
         month == "month3_emplvl" ~ 3))
 
-Combined_Years_arrange <- Combined_Years_gather |> select(
-  area_fips, area_title, year, qtr, month, qtrly_estabs_count, emplvl
+Combined_Years_arrange <- Combined_Years_gather |> 
+  select(
+  area_fips, area_title, year, qtr, month, emplvl
 ) |> arrange(area_title, year, qtr)
 
 # Change the file location below to where you want to save the csv
@@ -210,8 +218,8 @@ Combined_Years_pivot <-
 # Do the same thing for the all industries data set
 
 all_ind_empl_arrange <- all_ind_emp_gather |> select(
-  area_fips, area_title, year, qtr, month, qtrly_estabs_count, emplvl
-) |> arrange(area_title, year, qtr)
+  area_fips, area_title, year, qtr, month, emplvl
+) |> arrange(year, qtr)
 
 # Change the file location below to where you want to save the csv
 all_ind_empl_pivot <- 
@@ -225,7 +233,6 @@ all_ind_empl_pivot <-
     ),
     names_sep = "_"
   )
-
 
 Combined_Years_pivot$`201111_pct_change` <- 0
 # Calculate percent change for each pair of columns and create new columns for the results
