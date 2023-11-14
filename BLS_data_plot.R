@@ -3,43 +3,43 @@ library(tidyverse)
 # ################################################################ #
 # Importing CSVs for fast food/limited-service restaurants only ####
 # ################################################################ #
-Year_2011 <- 
+limited_2011 <- 
   read_csv(
     file = "BLS/2011.q1-q4 722513 Limited-service restaurants.csv")
-Year_2012 <- 
+limited_2012 <- 
   read_csv(
     file = "BLS/2012.q1-q4 722513 Limited-service restaurants.csv")
-Year_2013 <- 
+limited_2013 <- 
   read_csv(
     file = "BLS/2013.q1-q4 722513 Limited-service restaurants.csv")
-Year_2014 <- 
+limited_2014 <- 
   read_csv(
     file = "BLS/2014.q1-q4 722513 Limited-service restaurants.csv")
-Year_2015 <- 
+limited_2015 <- 
   read_csv(
     file = "BLS/2015.q1-q4 722513 Limited-service restaurants.csv")
-Year_2016 <- 
+limited_2016 <- 
   read_csv(
     file = "BLS/2016.q1-q4 722513 NAICS 722513 Limited-service restaurants.csv")
-Year_2017 <- 
+limited_2017 <- 
   read_csv(
     file = "BLS/2017.q1-q4 722513 NAICS 722513 Limited-service restaurants.csv")
-Year_2018 <- 
+limited_2018 <- 
   read_csv(
     file = "BLS/2018.q1-q4 722513 NAICS 722513 Limited-service restaurants.csv")
-Year_2019 <- 
+limited_2019 <- 
   read_csv(
     file = "BLS/2019.q1-q4 722513 NAICS 722513 Limited-service restaurants.csv")
-Year_2020 <- 
+limited_2020 <- 
   read_csv(
     file = "BLS/2020.q1-q4 722513 NAICS 722513 Limited-service restaurants.csv")
-Year_2021 <- 
+limited_2021 <- 
   read_csv(
     file = "BLS/2021.q1-q4 722513 NAICS 722513 Limited-service restaurants.csv")
-Year_2022 <- 
+limited_2022 <- 
   read_csv(
     file = "BLS/2022.q1-q4 722513 NAICS 722513 Limited-service restaurants.csv")
-Year_2023 <- 
+limited_2023 <- 
   read_csv(
     file = "BLS/2023.q1-q1 722513 NAICS 722513 Limited-service restaurants.csv")
 
@@ -54,119 +54,119 @@ columns_of_interest <- c(
 ## ############################################# #
 ## Filtering counties and columns of interest ####
 ## ############################################# #
-Year_2011_f <- Year_2011[
+limited_2011_f <- limited_2011[
   str_detect(
-    string = Year_2011$area_title,
+    string = limited_2011$area_title,
     pattern = counties_of_interest
   ), columns_of_interest
 ]
 
-Year_2012_f <- Year_2012[
+limited_2012_f <- limited_2012[
   str_detect(
-    string = Year_2012$area_title,
+    string = limited_2012$area_title,
     pattern = counties_of_interest
   ), columns_of_interest
 ]
 
-Year_2013_f <- Year_2013[
+limited_2013_f <- limited_2013[
   str_detect(
-    string = Year_2013$area_title,
+    string = limited_2013$area_title,
     pattern = counties_of_interest
   ), columns_of_interest
 ]
 
-Year_2014_f <- Year_2014[
+limited_2014_f <- limited_2014[
   str_detect(
-    string = Year_2014$area_title,
+    string = limited_2014$area_title,
     pattern = counties_of_interest
   ), columns_of_interest
 ]
 
-Year_2015_f <- Year_2015[
+limited_2015_f <- limited_2015[
   str_detect(
-    string = Year_2015$area_title,
+    string = limited_2015$area_title,
     pattern = counties_of_interest
   ), columns_of_interest
 ]
 
-Year_2016_f <- Year_2016[
+limited_2016_f <- limited_2016[
   str_detect(
-    string = Year_2016$area_title,
+    string = limited_2016$area_title,
     pattern = counties_of_interest
   ), columns_of_interest
 ]
 
-Year_2017_f <- Year_2017[
+limited_2017_f <- limited_2017[
   str_detect(
-    string = Year_2017$area_title,
+    string = limited_2017$area_title,
     pattern = counties_of_interest
   ), columns_of_interest
 ]
 
-Year_2018_f <- Year_2018[
+limited_2018_f <- limited_2018[
   str_detect(
-    string = Year_2018$area_title,
+    string = limited_2018$area_title,
     pattern = counties_of_interest
   ), columns_of_interest
 ]
 
-Year_2019_f <- Year_2019[
+limited_2019_f <- limited_2019[
   str_detect(
-    string = Year_2019$area_title,
+    string = limited_2019$area_title,
     pattern = counties_of_interest
   ), columns_of_interest
 ]
 
-Year_2020_f <- Year_2020[
+limited_2020_f <- limited_2020[
   str_detect(
-    string = Year_2020$area_title,
+    string = limited_2020$area_title,
     pattern = counties_of_interest
   ), columns_of_interest
 ]
 
-Year_2021_f <- Year_2021[
+limited_2021_f <- limited_2021[
   str_detect(
-    string = Year_2021$area_title,
+    string = limited_2021$area_title,
     pattern = counties_of_interest
   ), columns_of_interest
 ]
 
-Year_2022_f <- Year_2022[
+limited_2022_f <- limited_2022[
   str_detect(
-    string = Year_2022$area_title,
+    string = limited_2022$area_title,
     pattern = counties_of_interest
   ), columns_of_interest
 ]
 
-Year_2023_f <- Year_2023[
+limited_2023_f <- limited_2023[
   str_detect(
-    string = Year_2023$area_title,
+    string = limited_2023$area_title,
     pattern = counties_of_interest
   ), columns_of_interest
 ]
 
-Combined_Years <- 
-  Year_2011_f |> 
-  add_row(Year_2012_f) |> 
-  add_row(Year_2013_f) |> 
-  add_row(Year_2014_f) |> 
-  add_row(Year_2015_f) |> 
-  add_row(Year_2016_f) |> 
-  add_row(Year_2017_f) |> 
-  add_row(Year_2018_f) |> 
-  add_row(Year_2019_f) |> 
-  add_row(Year_2020_f) |> 
-  add_row(Year_2021_f) |> 
-  add_row(Year_2022_f) |> 
-  add_row(Year_2023_f)
+limited_combined <- 
+  limited_2011_f |> 
+  add_row(limited_2012_f) |> 
+  add_row(limited_2013_f) |> 
+  add_row(limited_2014_f) |> 
+  add_row(limited_2015_f) |> 
+  add_row(limited_2016_f) |> 
+  add_row(limited_2017_f) |> 
+  add_row(limited_2018_f) |> 
+  add_row(limited_2019_f) |> 
+  add_row(limited_2020_f) |> 
+  add_row(limited_2021_f) |> 
+  add_row(limited_2022_f) |> 
+  add_row(limited_2023_f)
 
-Combined_Years$area_fips <- as.numeric(Combined_Years$area_fips)
+limited_combined$area_fips <- as.numeric(limited_combined$area_fips)
 
 ### ################################################################### #
 ### Gathering monthly emplvl into one column and month into another. ####
 ### ################################################################### #
-Combined_Years_gather <- 
-  Combined_Years |> 
+limited_combined_gather <- 
+  limited_combined |> 
   gather(
     key = "month", 
     value = "emplvl",  
@@ -185,15 +185,15 @@ Combined_Years_gather <-
 ### ############################### #
 ### Arrange columns before pivot ####
 ### ############################### #
-Combined_Years_arrange <- Combined_Years_gather |> 
+limited_combined_arrange <- limited_combined_gather |> 
   select(area_fips, area_title, year, qtr, month, emplvl) |> 
   arrange(area_title, year, qtr)
 
 ### ##################################################### #
 ### Pivot_wider to prepare for looping through columns ####
 ### ##################################################### #
-Combined_Years_pivot <- 
-  Combined_Years_arrange |>  
+limited_combined_pivot <- 
+  limited_combined_arrange |>  
   pivot_wider(
     id_cols = c("area_fips", "area_title"),
     names_from = c("year", "qtr", "month"),
@@ -207,7 +207,7 @@ Combined_Years_pivot <-
 #### Changing column names to continuous values ####
 #### This will be helpful for plotting later ##### #
 #### ############################################# #
-limited_serv_colnames <- colnames(Combined_Years_pivot)[3:149]
+limited_serv_colnames <- colnames(limited_combined_pivot)[3:149]
 d1 <- as.numeric(str_split_i(string = limited_serv_colnames, pattern = "_", i = 1))
 d2 <- as.numeric(str_split_i(string = limited_serv_colnames, pattern = "_", i = 2))
 d3 <- as.numeric(str_split_i(string = limited_serv_colnames, pattern = "_", i = 3))
@@ -343,7 +343,10 @@ all_ind_empl_filter <-
   add_row(All_Ind_2023_f) |> 
   filter(own_title == "Private")
 
-
+### ######################################## #
+### Gather for all industries ################ 
+### Puts month and emplvl in separate columns 
+### ######################################## #
 all_ind_emp_gather <- 
   all_ind_empl_filter |> 
   gather(
@@ -361,10 +364,9 @@ all_ind_emp_gather <-
         month == "month2_emplvl" ~ 2,
         month == "month3_emplvl" ~ 3))
 
-
-
-# Do the same thing for the all industries data set
-
+### ############################################ #
+### Arrange in preparation for pivoting wider ####
+### ############################################ #
 all_ind_empl_arrange <- 
   all_ind_emp_gather |> 
   select(area_fips, area_title, year, qtr, month, emplvl) |> 
@@ -373,6 +375,9 @@ all_ind_empl_arrange <-
   arrange(area_title) |> 
   arrange(year)
 
+### ################################## #
+### Pivot wider to prepare for loop ####
+### ################################## #
 all_ind_empl_pivot <- 
   all_ind_empl_arrange |>  
 pivot_wider(
@@ -382,26 +387,42 @@ pivot_wider(
   names_sep = "_"
 )
 
-table(all_ind_empl_filter$area_title, all_ind_empl_filter$year, all_ind_empl_filter$qtr)
+#### ############################################# #
+#### Changing column names to continuous values ####
+#### This will be helpful for plotting later ##### #
+#### ############################################# #
+all_ind_colnames <- colnames(all_ind_empl_pivot)[3:149]
+a1 <- as.numeric(str_split_i(string = all_ind_colnames, pattern = "_", i = 1))
+a2 <- as.numeric(str_split_i(string = all_ind_colnames, pattern = "_", i = 2))
+a3 <- as.numeric(str_split_i(string = all_ind_colnames, pattern = "_", i = 3))
+all_ind_converted <- a1 + (a2 - 1) * (1/4) + (a3 - 1) * (1/12)
 
-all_ind_empl_filter %>%
-  count(area_title, year, qtr) %>%
-  arrange(desc(n))
+# Testing to make sure all intervals are consistent.
+round(diff(all_ind_converted), digits = 5) |> table()
 
+# Testing that columns as the same across both data frames
+identical(all_ind_converted, limited_serv_converted)
 
-# ########################################### #
-# 11/14 5:30 AM: I am done to this point. The all industries data are now joined together. Next I need to run calculations.
-# ########################################### #
+# Diagnostic tests/not using
+# table(all_ind_empl_filter$area_title, all_ind_empl_filter$year, all_ind_empl_filter$qtr)
+# 
+# all_ind_empl_filter %>%
+#   count(area_title, year, qtr) %>%
+#   arrange(desc(n))
 
-Combined_Years_pivot$`201111_pct_change` <- 0
+calculations_df <- data.frame(pchg_2011_1_1 = rep(0,18))
 # Calculate percent change for each pair of columns and create new columns for the results
 
-for (i in 3:(ncol(Combined_Years_pivot) - 2)) {
+for (i in 3:(ncol(limited_combined_pivot) - 3)) {
   # Calculate percent change using the formula: ((new value - old value) / old value) * 100
-  col_name <- colnames(Combined_Years_pivot)[i + 1]
-  new_col_name <- paste0(col_name, "_pct_change")
+  # Making sure that column names and column length are the same
+  if (identical(colnames(limited_combined_pivot), colnames(all_ind_empl_pivot))) {
+  col_name <- colnames(limited_combined_pivot)[i + 1]
+  new_col_name <- paste0("pchg_", col_name)
   
-  Combined_Years_pivot[[new_col_name]] <- ((Combined_Years_pivot[[i + 1]] - Combined_Years_pivot[[3]]) / Combined_Years_pivot[[3]]) * 100
+  calculations_df[[new_col_name]] <- # newer_prop - older_prop = increase/decrease since last period
+    ((limited_combined_pivot[[i + 3]] / all_ind_empl_pivot[[i + 3]]) - (limited_combined_pivot[[i + 2]] / all_ind_empl_pivot[[i + 2]])) * 100
+  }
 }
 
 # The new columns with percent change values have been added to the dataframe
