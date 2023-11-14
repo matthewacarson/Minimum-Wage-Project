@@ -152,30 +152,34 @@ Combined_Years <-
 Combined_Years$area_fips <- as.numeric(Combined_Years$area_fips)
 
 Combined_Years_All_Ind <- 
+  Combined_Years |> 
   add_row(PS_170_Minimum_Wage_Master_Data_Set)
 
 # Matt (11/13): Stopped here in adding the other data set
 
-Combined_Years_gather <- Combined_Years |> 
+Combined_Years_gather <- 
+  Combined_Years_All_Ind |> 
   # Gather the columns month1_emplvl, month2_emplvl, and month3_emplvl into key-value pairs
-  gather(key = "month", value = "emplvl",  month1_emplvl, month2_emplvl, month3_emplvl) |> 
+  gather(
+    key = "month", 
+    value = "emplvl",  
+    month1_emplvl, 
+    month2_emplvl, 
+    month3_emplvl
+  ) |> 
   # Extract the numeric part from the "month" column
   mutate(
     month =
       case_when(
         month == "month1_emplvl" ~ 1,
         month == "month2_emplvl" ~ 2,
-        month == "month3_emplvl" ~ 3
-      )
-  )
+        month == "month3_emplvl" ~ 3))
 
-Combined_Years_arrange <- Combined_Years |> select(
-  area_fips, area_title, year, qtr, month, qtrly_estabs_count, emplvl
-) |> arrange(area_title, year, qtr)
-
+# Combined_Years_arrange <- Combined_Years |> select(
+#   area_fips, area_title, year, qtr, month, qtrly_estabs_count, emplvl
+# ) |> arrange(area_title, year, qtr)
 
 # Change the file location below to where you want to save the csv
-
 Combined_Years_pivot <- Combined_Years |>  pivot_wider(
   id_cols = c("area_fips", "area_title"),
   names_from = c("year", "qtr", "month"),
@@ -183,10 +187,8 @@ Combined_Years_pivot <- Combined_Years |>  pivot_wider(
     # "qtrly_estabs_count", 
     "emplvl",
   ),
-  names_sep = ""
+  names_sep = "_"
 )
-
-
 
 Combined_Years_pivot$`201111_pct_change` <- 0
 
