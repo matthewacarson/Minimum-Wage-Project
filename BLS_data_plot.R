@@ -43,8 +43,8 @@ limited_2023 <-
   read_csv(
     file = "BLS/2023.q1-q1 722513 NAICS 722513 Limited-service restaurants.csv")
 
-counties_of_interest <- "((Wyandotte|Johnson|Leavenworth|Atchison|Bourbon|Crawford|Cherokee|Brown) County, Kansas|(Buchanan|Platte|Clay|Jackson|Cass|Bates|Vernon|Barton|Jasper|Newton) County, Missouri)"
-
+counties_of_interest <- "((Wyandotte|Johnson|Leavenworth|Atchison|Bourbon|Cherokee|Brown) County, Kansas|(Buchanan|Platte|Clay|Jackson|Cass|Bates|Vernon|Barton|Jasper|Newton) County, Missouri)"
+# 11/15: Temporarily removed Crawford
 columns_of_interest <- c(
   "area_fips", "year", "qtr", "area_title", 
   # "qtrly_estabs_count", 
@@ -392,12 +392,12 @@ limited_combined_pivot[,2] == all_ind_empl_pivot[,2]
 calculations_df <- data.frame(
   # area_fips = all_ind_empl_pivot$area_fips,
   area_title = all_ind_empl_pivot$area_title,
-  pchg_2011_1_1 = rep(0,18)
+  pchg_2011_1_1 = rep(0,nrow(all_ind_empl_pivot))
 )
 # Calculate percent change for each pair of columns and create new columns for the results
 prop_2011 <- limited_combined_pivot[[3]] / all_ind_empl_pivot[[3]]
 
-  # Making sure that column names and column length are the same
+# Making sure that column names and column length are the same
 if (identical(colnames(limited_combined_pivot), colnames(all_ind_empl_pivot))) {
   for (i in 3:(ncol(limited_combined_pivot) - 3)) {
     col_name <- colnames(limited_combined_pivot)[i + 1]
@@ -437,10 +437,10 @@ ggplot(data = transpose_gather,
     method = "lm", 
     formula = y ~ x, 
     data = transpose_gather |> 
-      filter(State == "Missouri"),
+      filter(State == "Missouri" & Year < 2019),
     # color = 'blue4', 
     linetype = "solid",
-    se = T,
+    se = F,
     # aes(color = "MO Overall")
   ) +
   geom_smooth(
@@ -450,7 +450,7 @@ ggplot(data = transpose_gather,
       filter(State == "Missouri" & Year >= 2019),
     color = 'black',
     linetype = "dashed",
-    se = T,
+    se = F,
     # aes(color = "MO After")
   ) +
   geom_smooth(
@@ -460,7 +460,7 @@ ggplot(data = transpose_gather,
       filter(State == "Kansas"),
     # color = 'red3', 
     linetype = "solid",
-    se = T,
+    se = F,
     # aes(color = "KS")
   ) +
   labs(
@@ -518,8 +518,8 @@ coeftest(lm_missouri_before, vcov = vcovHC(lm_missouri_before))
 library(lsmeans)
 
 lstrends(lm_missouri_before, lm_kansas_before, var = "Year")
-confint(lm_missouri_before, parm = "Year")
-confint(lm_kansas_before, parm = "Year")
+confint(lm_missouri_before, parm = "Year", level = 0.9)
+confint(lm_kansas_overall, parm = "Year", level = 0.9)
 
 
 
