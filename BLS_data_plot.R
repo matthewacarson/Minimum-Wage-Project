@@ -409,58 +409,149 @@ identical(all_ind_converted, limited_serv_converted)
 # all_ind_empl_filter %>%
 #   count(area_title, year, qtr) %>%
 #   arrange(desc(n))
+#   
+limited_combined_pivot[,1] == all_ind_empl_pivot[,1]
+limited_combined_pivot[,2] == all_ind_empl_pivot[,2]
 
-calculations_df <- data.frame(pchg_2011_1_1 = rep(0,18))
+calculations_df <- data.frame(
+  # area_fips = all_ind_empl_pivot$area_fips,
+  area_title = all_ind_empl_pivot$area_title,
+  pchg_2011_1_1 = rep(0,18)
+)
 # Calculate percent change for each pair of columns and create new columns for the results
+prop_2011 <- limited_combined_pivot[[3]] / all_ind_empl_pivot[[3]]
 
-for (i in 3:(ncol(limited_combined_pivot) - 3)) {
-  # Calculate percent change using the formula: ((new value - old value) / old value) * 100
+
   # Making sure that column names and column length are the same
-  if (identical(colnames(limited_combined_pivot), colnames(all_ind_empl_pivot))) {
-  col_name <- colnames(limited_combined_pivot)[i + 1]
-  new_col_name <- paste0("pchg_", col_name)
-  
-  calculations_df[[new_col_name]] <- # newer_prop - older_prop = increase/decrease since last period
-    ((limited_combined_pivot[[i + 3]] / all_ind_empl_pivot[[i + 3]]) - (limited_combined_pivot[[i + 2]] / all_ind_empl_pivot[[i + 2]])) * 100
+if (identical(colnames(limited_combined_pivot), colnames(all_ind_empl_pivot))) {
+  for (i in 3:(ncol(limited_combined_pivot) - 3)) {
+    col_name <- colnames(limited_combined_pivot)[i + 1]
+    new_col_name <- paste0("pchg_", col_name)
+    newer_prop <- limited_combined_pivot[[i + 3]] / all_ind_empl_pivot[[i + 3]]
+      # newer_prop - prop_2011 = increase/decrease since 2011
+    calculations_df[[new_col_name]] <- (newer_prop - prop_2011) #* 100
   }
 }
 
 # The new columns with percent change values have been added to the dataframe
 
-pivot_sub <- pivot_combined[,c(2,150:296)]
-
-transpose <- pivot_sub |> t() |> data.frame()
+transpose <- calculations_df |> t() |> data.frame()
 colnames(transpose) <- transpose[1,]
 transpose <- transpose[-1,]
 transpose <- cbind(
-  Year = str_split(string = rownames(transpose), pattern = "_", simplify = T)[,1] |> as.numeric(),
+  Year = str_split_i(string = rownames(transpose), pattern = "_", i = 2) |> as.numeric() + 
+    (str_split_i(string = rownames(transpose), pattern = "_", i = 3) |> as.numeric() - 1) * (1/4) +
+    (str_split_i(string = rownames(transpose), pattern = "_", i = 4) |> as.numeric() - 1) * (1/12)
+    ,
   transpose
 )
-rownames(transpose) <- NULL
 
-transpose_plot <- transpose |> gather(key = "County", value = "Employment_Change", -Year)
 
-transpose_plot$old_year <- transpose_plot$Year
+transpose_gather <- transpose |> gather(key = "County", value = "Employment_Change", -Year)
+transpose_gather$Employment_Change <- as.numeric(transpose_gather$Employment_Change)
 
-transpose_plot <- transpose_plot |>
-  mutate(
-    Year =
-      substr(transpose_plot$old_year,start = 1,stop = 4) |> 
-      as.numeric() + 
-      (substr(old_year, start = 5, stop = 5) |> 
-         as.numeric() - 1) * 0.25 +
-      (substr(old_year, start = 6, stop = 6) |> 
-         as.numeric() - 1) * (1/12)
+transpose_gather$State <- transpose_gather$County |> str_split_i(pattern = ", ", i = 2)
+
+
+
+#################################### #
+# Begin Analysis ####
+#################################### #
+
+ggplot(data = transpose_gather, 
+       aes(x = Year, y = Employment_Change, col = State)) +
+  geom_point() +
+  geom_vline(xintercept = 2019, col = 'green3', lwd = 0.9) +
+  geom_smooth(
+    method = "lm", 
+    formula = y ~ x, 
+    data = transpose_gather |> 
+      filter(State == "Missouri" & Year < 2019),
+    color = 'darkblue', 
+    se = TRUE
+  ) +
+  geom_smooth(
+    method = "lm", 
+    formula = y ~ x, 
+    data = transpose_gather |> 
+      filter(State == "Missouri" & Year >= 2019),
+    color = 'darkblue', 
+    se = TRUE
+  ) +
+  geom_smooth(
+    method = "lm", 
+    formula = y ~ x, 
+    data = transpose_gather |> 
+      filter(State == "Kansas"),
+    color = 'darkred', 
+    se = TRUE
   )
+
+
+ggplot(data = transpose_gather, 
+       aes(x = Year, y = Employment_Change, col = State)) +
+  geom_point() +
+  geom_vline(xintercept = 2019, col = 'green3', lwd = 0.9) +
+  geom_smooth(
+    method = "loess", 
+    formula = y ~ x, 
+    data = transpose_gather |> 
+      filter(State == "Missouri" & Year < 2019),
+    color = 'darkblue', 
+    se = TRUE
+  ) +
+  geom_smooth(
+    method = "loess", 
+    formula = y ~ x, 
+    data = transpose_gather |> 
+      filter(State == "Missouri" & Year >= 2019),
+    color = 'darkblue', 
+    se = TRUE
+  ) +
+  geom_smooth(
+    method = "loess", 
+    formula = y ~ x, 
+    data = transpose_gather |> 
+      filter(State == "Kansas" & Year < 2019),
+    color = 'darkred', 
+    se = TRUE
+  ) +
+  geom_smooth(
+    method = "loess", 
+    formula = y ~ x, 
+    data = transpose_gather |> 
+      filter(State == "Kansas" & Year >= 2019),
+    color = 'darkred', 
+    se = TRUE
+  )
+
+
+  # ######################################################################### #
+# ######################################################################### #
+# ################ NOT USING CODE BELOW AS OF 11/14 ####################### #
+# ######################################################################### #
+# ######################################################################### #
+# transpose_plot$old_year <- transpose_plot$Year
+# transpose_plot <- transpose_plot |>
+#   mutate(
+#     Year =
+#       substr(transpose_plot$old_year,start = 1,stop = 4) |> 
+#       as.numeric() + 
+#       (substr(old_year, start = 5, stop = 5) |> 
+#          as.numeric() - 1) * 0.25 +
+#       (substr(old_year, start = 6, stop = 6) |> 
+#          as.numeric() - 1) * (1/12)
+#   )
 
 # Filter out values < -50
 # transpose_plot <- transpose_plot |> 
   # filter(Employment_Change > -90)
 
-transpose_plot$Employment_Change <- as.numeric(transpose_plot$Employment_Change)
-#################################### #
-# Begin Analysis ####
-#################################### #
+
+
+
+
+
 ## Missouri ####
 #################################### #
 treatment_year <- 2019
@@ -631,11 +722,3 @@ legend(
   title = "Legend" # Legend title
 )
 
-ggplot(data = KS_sub, aes(x = Year, y = Employment_Change)) +
-  # Add a line for Employment Change
-  geom_point(color = 'black') +
-  geom_smooth(method = "lm", formula = y ~ x, data = KS_Before_2019, color = "blue", se = TRUE) +
-  geom_smooth(method = 'lm', formula = y ~ x, data = KS_After_2019, color = "red", se = TRUE) +
-  labs(
-    title = "KS"
-  ) + geom_vline(xintercept = 2019)
