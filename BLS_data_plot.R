@@ -160,6 +160,8 @@ limited_combined <-
   add_row(limited_2022_f) |> 
   add_row(limited_2023_f)
 
+limited_combined <- limited_combined[-which(0 == limited_combined, arr.ind = T)[1:12,1],]
+
 limited_combined$area_fips <- as.numeric(limited_combined$area_fips)
 
 ### ################################################################### #
@@ -461,76 +463,154 @@ transpose_gather$State <- transpose_gather$County |> str_split_i(pattern = ", ",
 ggplot(data = transpose_gather, 
        aes(x = Year, y = Employment_Change, col = State)) +
   geom_point() +
-  geom_vline(xintercept = 2019, col = 'green3', lwd = 0.9) +
+  geom_vline(xintercept = 2019, col = 'green4', lwd = 0.9) +
   geom_smooth(
     method = "lm", 
     formula = y ~ x, 
     data = transpose_gather |> 
-      filter(State == "Missouri" & Year < 2019),
-    color = 'darkblue', 
-    se = TRUE
+      filter(State == "Missouri"),
+    # color = 'blue4', 
+    linetype = "solid",
+    se = T,
+    # aes(color = "MO Overall")
   ) +
   geom_smooth(
     method = "lm", 
     formula = y ~ x, 
     data = transpose_gather |> 
       filter(State == "Missouri" & Year >= 2019),
-    color = 'darkblue', 
-    se = TRUE
+    color = 'black',
+    linetype = "dashed",
+    se = T,
+    # aes(color = "MO After")
   ) +
   geom_smooth(
     method = "lm", 
     formula = y ~ x, 
     data = transpose_gather |> 
       filter(State == "Kansas"),
-    color = 'darkred', 
-    se = TRUE
-  )
+    # color = 'red3', 
+    linetype = "solid",
+    se = T,
+    # aes(color = "KS")
+  ) +
+  labs(
+    title = "Limited-Service Food Industry Employment",
+    subtitle = "Change as a proportion of the total employed population",
+    x = "Year",
+    y = "Percentile Point Change Since 2011",
+    fill = "State") + 
+  theme_light()
 
+  # scale_colour_manual(
+  #   name = "States", 
+  #   values = c(2, 4)
+  # )
+
+# LM Models ####
+
+lm_missouri_before <- lm(
+  data = transpose_gather |> 
+    filter(State == "Missouri" & Year < 2019),
+  formula = Employment_Change ~ Year
+)
+
+
+lm_missouri_after <- lm(
+  data = transpose_gather |> 
+    filter(State == "Missouri" & Year >= 2019),
+  formula = Employment_Change ~ Year
+)
+
+lm_missouri_overall <- lm(
+  data = transpose_gather |> 
+    filter(State == "Missouri"),
+  formula = Employment_Change ~ Year
+)
+
+lm_kansas_before <- lm(
+  data = transpose_gather |> 
+    filter(State == "Kansas" & Year < 2019),
+  formula = Employment_Change ~ Year
+)
+
+
+lm_kansas_after <- lm(
+  data = transpose_gather |> 
+    filter(State == "Kansas" & Year >= 2019),
+  formula = Employment_Change ~ Year
+)
+
+lm_kansas_overall <- lm(
+  data = transpose_gather |> 
+    filter(State == "Kansas"),
+  formula = Employment_Change ~ Year
+)
+
+summary(lm_missouri_before)
+summary(lm_kansas_before)
+
+lm_missouri_before$coefficients[2] - lm_kansas_before$coefficients[2]
+
+
+library(sandwich)
+library(lmtest)
+
+# Perform a test for the difference in slopes
+coeftest(lm_missouri_before, vcov = vcovHC(lm_kansas_before))
+
+
+
+
+# ######################################################################### #
+# ######################################################################### #
+# ################ NOT USING CODE BELOW AS OF 11/14 ####################### #
+# ######################################################################### #
+# ######################################################################### #
 
 ggplot(data = transpose_gather, 
        aes(x = Year, y = Employment_Change, col = State)) +
   geom_point() +
   geom_vline(xintercept = 2019, col = 'green3', lwd = 0.9) +
   geom_smooth(
-    method = "loess", 
-    formula = y ~ x, 
+    method = "lm", 
+    formula = y ~ splines::ns(x, df = 10),
+    # formula = y ~ x, 
     data = transpose_gather |> 
-      filter(State == "Missouri" & Year < 2019),
-    color = 'darkblue', 
-    se = TRUE
+      filter(State == "Missouri"),
+    color = 'blue2', 
+    se = F
   ) +
   geom_smooth(
-    method = "loess", 
-    formula = y ~ x, 
+    method = "lm",
+    formula = y ~ splines::ns(x, df = 10),
+    # formula = y ~ x, 
     data = transpose_gather |> 
-      filter(State == "Missouri" & Year >= 2019),
-    color = 'darkblue', 
-    se = TRUE
-  ) +
-  geom_smooth(
-    method = "loess", 
-    formula = y ~ x, 
-    data = transpose_gather |> 
-      filter(State == "Kansas" & Year < 2019),
-    color = 'darkred', 
-    se = TRUE
-  ) +
-  geom_smooth(
-    method = "loess", 
-    formula = y ~ x, 
-    data = transpose_gather |> 
-      filter(State == "Kansas" & Year >= 2019),
-    color = 'darkred', 
-    se = TRUE
-  )
+      filter(State == "Kansas"),
+    color = 'red3', 
+    se = F
+  ) #+
+  # geom_smooth(
+  #   method = "loess", 
+  #   formula = y ~ x, 
+  #   data = transpose_gather |> 
+  #     filter(State == "Missouri"),
+  #   color = 'green', 
+  #   se = TRUE
+  # ) +
+  # geom_smooth(
+  #   method = "loess", 
+  #   formula = y ~ x, 
+  #   data = transpose_gather |> 
+  #     filter(State == "Kansas"),
+  #   color = 'purple', 
+  #   se = TRUE
+  # )
 
 
-  # ######################################################################### #
-# ######################################################################### #
-# ################ NOT USING CODE BELOW AS OF 11/14 ####################### #
-# ######################################################################### #
-# ######################################################################### #
+
+
+
 # transpose_plot$old_year <- transpose_plot$Year
 # transpose_plot <- transpose_plot |>
 #   mutate(
@@ -567,20 +647,6 @@ MO_Before_2019 <- MO_sub |> filter(Year < treatment_year)
 MO_After_2019 <- MO_sub |> filter(Year >= treatment_year)
 
 
-lm_missouri_before <- lm(
-  data = MO_Before_2019,
-  formula = Employment_Change ~ Year
-)
-
-lm_missouri_after <- lm(
-  data = MO_After_2019,
-  formula = Employment_Change ~ Year
-)
-
-lm_missouri_overall <- lm(
-  data = MO_sub,
-  formula = Employment_Change ~ Year
-)
 
 plot(
   x = MO_sub$Year,
@@ -659,20 +725,6 @@ KS_After_2019 <- KS_sub[KS_sub$Year >= treatment_year,]
 # Edit everything below before running so that it is for KS instrad of MO
 # 
 
-lm_kansas_before <- lm(
-  data = KS_Before_2019,
-  formula = Employment_Change ~ Year
-)
-
-lm_kansas_after <- lm(
-  data = KS_After_2019,
-  formula = Employment_Change ~ Year
-)
-
-lm_kansas_overall <- lm(
-  data = KS_sub,
-  formula = Employment_Change ~ Year
-)
 
 plot(
   x = KS_sub$Year,
