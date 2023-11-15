@@ -58,92 +58,79 @@ limited_2011_f <- limited_2011[
   str_detect(
     string = limited_2011$area_title,
     pattern = counties_of_interest
-  ), columns_of_interest
-]
+  ), columns_of_interest]
 
 limited_2012_f <- limited_2012[
   str_detect(
     string = limited_2012$area_title,
     pattern = counties_of_interest
-  ), columns_of_interest
-]
+  ), columns_of_interest]
 
 limited_2013_f <- limited_2013[
   str_detect(
     string = limited_2013$area_title,
     pattern = counties_of_interest
-  ), columns_of_interest
-]
+  ), columns_of_interest]
 
 limited_2014_f <- limited_2014[
   str_detect(
     string = limited_2014$area_title,
     pattern = counties_of_interest
-  ), columns_of_interest
-]
+  ), columns_of_interest]
 
 limited_2015_f <- limited_2015[
   str_detect(
     string = limited_2015$area_title,
     pattern = counties_of_interest
-  ), columns_of_interest
-]
+  ), columns_of_interest]
 
 limited_2016_f <- limited_2016[
   str_detect(
     string = limited_2016$area_title,
     pattern = counties_of_interest
-  ), columns_of_interest
-]
+  ), columns_of_interest]
 
 limited_2017_f <- limited_2017[
   str_detect(
     string = limited_2017$area_title,
     pattern = counties_of_interest
-  ), columns_of_interest
-]
+  ), columns_of_interest]
 
 limited_2018_f <- limited_2018[
   str_detect(
     string = limited_2018$area_title,
     pattern = counties_of_interest
-  ), columns_of_interest
-]
+  ), columns_of_interest]
 
 limited_2019_f <- limited_2019[
   str_detect(
     string = limited_2019$area_title,
     pattern = counties_of_interest
-  ), columns_of_interest
-]
+  ), columns_of_interest]
 
 limited_2020_f <- limited_2020[
   str_detect(
     string = limited_2020$area_title,
     pattern = counties_of_interest
-  ), columns_of_interest
-]
+  ), columns_of_interest]
 
 limited_2021_f <- limited_2021[
   str_detect(
     string = limited_2021$area_title,
     pattern = counties_of_interest
-  ), columns_of_interest
-]
+  ), columns_of_interest]
 
 limited_2022_f <- limited_2022[
   str_detect(
     string = limited_2022$area_title,
     pattern = counties_of_interest
-  ), columns_of_interest
-]
+  ), columns_of_interest]
 
 limited_2023_f <- limited_2023[
   str_detect(
     string = limited_2023$area_title,
     pattern = counties_of_interest
-  ), columns_of_interest
-]
+  ), columns_of_interest]
 
 limited_combined <- 
   limited_2011_f |> 
@@ -242,92 +229,79 @@ All_Ind_2023_f <- All_Ind_2023[
   str_detect(
     string = All_Ind_2023$area_title,
     pattern = counties_of_interest
-  ), columns_of_interest
-]
+  ), columns_of_interest]
 
 All_Ind_2022_f <- All_Ind_2022[
   str_detect(
     string = All_Ind_2022$area_title,
     pattern = counties_of_interest
-  ), columns_of_interest
-]
+  ), columns_of_interest]
 
 All_Ind_2021_f <- All_Ind_2021[
   str_detect(
     string = All_Ind_2021$area_title,
     pattern = counties_of_interest
-  ), columns_of_interest
-]
+  ), columns_of_interest]
 
 All_Ind_2020_f <- All_Ind_2020[
   str_detect(
     string = All_Ind_2020$area_title,
     pattern = counties_of_interest
-  ), columns_of_interest
-]
+  ), columns_of_interest]
 
 All_Ind_2019_f <- All_Ind_2019[
   str_detect(
     string = All_Ind_2019$area_title,
     pattern = counties_of_interest
-  ), columns_of_interest
-]
+  ), columns_of_interest]
 
 All_Ind_2018_f <- All_Ind_2018[
   str_detect(
     string = All_Ind_2018$area_title,
     pattern = counties_of_interest
-  ), columns_of_interest
-]
+  ), columns_of_interest]
 
 All_Ind_2017_f <- All_Ind_2017[
   str_detect(
     string = All_Ind_2017$area_title,
     pattern = counties_of_interest
-  ), columns_of_interest
-]
+  ), columns_of_interest]
 
 All_Ind_2016_f <- All_Ind_2016[
   str_detect(
     string = All_Ind_2016$area_title,
     pattern = counties_of_interest
-  ), columns_of_interest
-]
+  ), columns_of_interest]
 
 All_Ind_2015_f <- All_Ind_2015[
   str_detect(
     string = All_Ind_2015$area_title,
     pattern = counties_of_interest
-  ), columns_of_interest
-]
+  ), columns_of_interest]
 
 All_Ind_2014_f <- All_Ind_2014[
   str_detect(
     string = All_Ind_2014$area_title,
     pattern = counties_of_interest
-  ), columns_of_interest
-]
+  ), columns_of_interest]
 
 All_Ind_2013_f <- All_Ind_2013[
   str_detect(
     string = All_Ind_2013$area_title,
     pattern = counties_of_interest
-  ), columns_of_interest
-]
+  ), columns_of_interest]
 
 All_Ind_2012_f <- All_Ind_2012[
   str_detect(
     string = All_Ind_2012$area_title,
     pattern = counties_of_interest
-  ), columns_of_interest
-]
+  ), columns_of_interest]
 
 All_Ind_2011_f <- All_Ind_2011[
   str_detect(
     string = All_Ind_2011$area_title,
     pattern = counties_of_interest
-  ), columns_of_interest
-]
+  ), columns_of_interest]
 
 all_ind_empl_filter <- 
   All_Ind_2011_f |> 
@@ -423,7 +397,6 @@ calculations_df <- data.frame(
 # Calculate percent change for each pair of columns and create new columns for the results
 prop_2011 <- limited_combined_pivot[[3]] / all_ind_empl_pivot[[3]]
 
-
   # Making sure that column names and column length are the same
 if (identical(colnames(limited_combined_pivot), colnames(all_ind_empl_pivot))) {
   for (i in 3:(ncol(limited_combined_pivot) - 3)) {
@@ -448,13 +421,9 @@ transpose <- cbind(
   transpose
 )
 
-
 transpose_gather <- transpose |> gather(key = "County", value = "Employment_Change", -Year)
 transpose_gather$Employment_Change <- as.numeric(transpose_gather$Employment_Change)
-
 transpose_gather$State <- transpose_gather$County |> str_split_i(pattern = ", ", i = 2)
-
-
 
 #################################### #
 # Begin Analysis ####
@@ -501,72 +470,65 @@ ggplot(data = transpose_gather,
     y = "Percentile Point Change Since 2011",
     fill = "State") + 
   theme_light()
-
-  # scale_colour_manual(
-  #   name = "States", 
-  #   values = c(2, 4)
-  # )
-
 # LM Models ####
 
 lm_missouri_before <- lm(
   data = transpose_gather |> 
     filter(State == "Missouri" & Year < 2019),
-  formula = Employment_Change ~ Year
-)
-
+  formula = Employment_Change ~ Year)
 
 lm_missouri_after <- lm(
   data = transpose_gather |> 
     filter(State == "Missouri" & Year >= 2019),
-  formula = Employment_Change ~ Year
-)
+  formula = Employment_Change ~ Year)
 
 lm_missouri_overall <- lm(
   data = transpose_gather |> 
     filter(State == "Missouri"),
-  formula = Employment_Change ~ Year
-)
+  formula = Employment_Change ~ Year)
 
 lm_kansas_before <- lm(
   data = transpose_gather |> 
     filter(State == "Kansas" & Year < 2019),
-  formula = Employment_Change ~ Year
-)
-
+  formula = Employment_Change ~ Year)
 
 lm_kansas_after <- lm(
   data = transpose_gather |> 
     filter(State == "Kansas" & Year >= 2019),
-  formula = Employment_Change ~ Year
-)
+  formula = Employment_Change ~ Year)
 
 lm_kansas_overall <- lm(
   data = transpose_gather |> 
     filter(State == "Kansas"),
-  formula = Employment_Change ~ Year
-)
+  formula = Employment_Change ~ Year)
 
 summary(lm_missouri_before)
 summary(lm_kansas_before)
 
+# Difference in slopes
 lm_missouri_before$coefficients[2] - lm_kansas_before$coefficients[2]
-
 
 library(sandwich)
 library(lmtest)
 
 # Perform a test for the difference in slopes
-coeftest(lm_missouri_before, vcov = vcovHC(lm_kansas_before))
+# (I don't think this is the right test.)
+coeftest(lm_missouri_before, vcov = vcovHC(lm_missouri_before))
+
+library(lsmeans)
+
+lstrends(lm_missouri_before, lm_kansas_before, var = "Year")
+confint(lm_missouri_before, parm = "Year")
+confint(lm_kansas_before, parm = "Year")
 
 
 
 
-# ######################################################################### #
-# ######################################################################### #
-# ################ NOT USING CODE BELOW AS OF 11/14 ####################### #
-# ######################################################################### #
-# ######################################################################### #
+# ##################################################################### #
+# ##################################################################### #
+# ################ NOT USING CODE BELOW AS OF 11/14 #####################
+# ##################################################################### #
+# ##################################################################### #
 
 ggplot(data = transpose_gather, 
        aes(x = Year, y = Employment_Change, col = State)) +
@@ -607,10 +569,6 @@ ggplot(data = transpose_gather,
   #   se = TRUE
   # )
 
-
-
-
-
 # transpose_plot$old_year <- transpose_plot$Year
 # transpose_plot <- transpose_plot |>
 #   mutate(
@@ -627,26 +585,13 @@ ggplot(data = transpose_gather,
 # transpose_plot <- transpose_plot |> 
   # filter(Employment_Change > -90)
 
-
-
-
-
-
-## Missouri ####
 #################################### #
 treatment_year <- 2019
 # Subset for MO
-# 
-
 
 MO_sub <- transpose_plot[str_detect(string = transpose_plot$County, pattern = "Missouri"),]
-
 MO_Before_2019 <- MO_sub |> filter(Year < treatment_year)
-
-
 MO_After_2019 <- MO_sub |> filter(Year >= treatment_year)
-
-
 
 plot(
   x = MO_sub$Year,
@@ -711,7 +656,6 @@ ggplot(data = MO_sub, aes(x = Year, y = Employment_Change)) +
   ) + geom_vline(xintercept = 2019)
 
 ############################## #
-# Begin Kansas Analysis ####
 ############################## #
 
 KS_sub <- transpose_plot[str_detect(string = transpose_plot$County, pattern = "Kansas"),]
@@ -742,9 +686,9 @@ abline(lm_kansas_after, col = 'green', lwd = 2) # After
 # Creating manually
 line_difference <- predict(lm_kansas_before, newdata = data.frame(Year = treatment_year)) - predict(lm_kansas_after, newdata = data.frame(Year = treatment_year))
 
-##################
+################## #
 # Segments aren't plotting right
-##################
+################## #
 
 # segments(
 #   x0 = treatment_year,
