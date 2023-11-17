@@ -49,7 +49,8 @@ limited_2022 <-
 limited_2023 <- 
   read_csv(
     file = "BLS/2023.q1-q1 722513 NAICS 722513 Limited-service restaurants.csv")
-counties_of_interest <- "((Wyandotte|Johnson|Leavenworth|Atchison|Bourbon|Cherokee|Brown) County, Kansas|(Buchanan|Platte|Clay|Jackson|Cass|Bates|Vernon|Barton|Jasper|Newton) County, Missouri)"
+counties_of_interest <- 
+  "((Wyandotte|Johnson|Leavenworth|Atchison|Bourbon|Cherokee|Brown) County, Kansas|(Buchanan|Platte|Clay|Jackson|Cass|Bates|Vernon|Barton|Jasper|Newton) County, Missouri)"
 # 11/15: Temporarily removed Crawford
 columns_of_interest <- c(
   "area_fips", "year", "qtr", "area_title", 
@@ -152,7 +153,8 @@ limited_combined <-
   add_row(limited_2022_f) |> 
   add_row(limited_2023_f)
 
-limited_combined <- limited_combined[-which(0 == limited_combined, arr.ind = T)[1:12,1],]
+limited_combined <- 
+  limited_combined[-which(0 == limited_combined, arr.ind = T)[1:12,1],]
 
 limited_combined$area_fips <- as.numeric(limited_combined$area_fips)
 
@@ -460,6 +462,38 @@ transpose_gather$area_fips <-
   all_ind_empl_pivot$area_fips[
     match(transpose_gather$County, all_ind_empl_pivot$area_title)
   ]
+
+# ############## #
+# Diagnostics ####
+# ############## #
+# 
+# Make sure that there is not more than one observation per county per period.
+diagnostic_tbl_all_ind <- 
+  all_ind_empl_arrange |> 
+  count(area_title, year, qtr, month) 
+any(is.na(diagnostic_tbl_all_ind)) # Issues with this approach
+any(diagnostic_tbl_all_ind == 0) # Issues with this approach
+
+# diagnostic_tbl_all_ind <-
+# table(
+#   all_ind_empl_arrange$area_title, 
+#   all_ind_empl_arrange$year, 
+#   all_ind_empl_arrange$qtr, 
+#   all_ind_empl_arrange$month) |> 
+#   as.data.frame()
+
+# diagnostic_tbl_limited_serv <- 
+# table(
+#   limited_combined_arrange$area_title, 
+#   limited_combined_arrange$year, 
+#   limited_combined_arrange$qtr, 
+#   limited_combined_arrange$month)
+
+diagnostic_count_limited_serv <- 
+  limited_combined_arrange |> 
+  count(area_title, year, qtr, month) 
+any(is.na(diagnostic_count_limited_serv)) # Issues with this approach
+any(diagnostic_count_limited_serv == 0) # Issues with this approach
 
 # Add Post Treatment Variable ####
 transpose_gather$Post2019 <- transpose_gather$Year >= 2019
