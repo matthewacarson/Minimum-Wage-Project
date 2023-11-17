@@ -1,3 +1,8 @@
+# to-do list
+# 1) Check that the calculations between limited-service and all industries
+# are matching by county and time period so that the proportions are correct
+
+
 # setwd("C:/Users/madou/OneDrive - UCLA IT Services/2)_2023_Fall/PS-170A/Minimum-Wage-Project")
 file_loc <- dirname(rstudioapi::getActiveDocumentContext()$path)
 setwd(file_loc)
