@@ -1,4 +1,6 @@
 # setwd("C:/Users/madou/OneDrive - UCLA IT Services/2)_2023_Fall/PS-170A/Minimum-Wage-Project")
+file_loc <- dirname(rstudioapi::getActiveDocumentContext()$path)
+setwd(file_loc)
 library(tidyverse)
 # ################################################################ #
 # Importing CSVs for fast food/limited-service restaurants only ####
