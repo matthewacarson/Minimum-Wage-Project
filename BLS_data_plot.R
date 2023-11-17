@@ -42,15 +42,13 @@ limited_2022 <-
 limited_2023 <- 
   read_csv(
     file = "BLS/2023.q1-q1 722513 NAICS 722513 Limited-service restaurants.csv")
-
 counties_of_interest <- "((Wyandotte|Johnson|Leavenworth|Atchison|Bourbon|Cherokee|Brown) County, Kansas|(Buchanan|Platte|Clay|Jackson|Cass|Bates|Vernon|Barton|Jasper|Newton) County, Missouri)"
 # 11/15: Temporarily removed Crawford
 columns_of_interest <- c(
   "area_fips", "year", "qtr", "area_title", 
   # "qtrly_estabs_count", 
   "month1_emplvl", "month2_emplvl", 
-  "month3_emplvl", "industry_code", "own_title"
-)
+  "month3_emplvl", "industry_code", "own_title")
 ## ############################################# #
 ## Filtering counties and columns of interest ####
 ## ############################################# #
@@ -377,7 +375,7 @@ all_ind_converted <- a1 + (a2 - 1) * (1/4) + (a3 - 1) * (1/12)
 round(diff(all_ind_converted), digits = 5) |> table()
 
 # Testing that columns as the same across both data frames
-identical(all_ind_converted, limited_serv_converted)
+# identical(all_ind_converted, limited_serv_converted)
 
 # Diagnostic tests/not using
 # table(all_ind_empl_filter$area_title, all_ind_empl_filter$year, all_ind_empl_filter$qtr)
@@ -386,63 +384,161 @@ identical(all_ind_converted, limited_serv_converted)
 #   count(area_title, year, qtr) %>%
 #   arrange(desc(n))
 #   
-limited_combined_pivot[,1] == all_ind_empl_pivot[,1]
-limited_combined_pivot[,2] == all_ind_empl_pivot[,2]
+# limited_combined_pivot[,1] == all_ind_empl_pivot[,1]
+# limited_combined_pivot[,2] == all_ind_empl_pivot[,2]
 
-calculations_df <- data.frame(
-  # area_fips = all_ind_empl_pivot$area_fips,
-  area_title = all_ind_empl_pivot$area_title,
-  pchg_2011_1_1 = rep(0,nrow(all_ind_empl_pivot))
+# chg_since_2011 <- data.frame(
+#   # area_fips = all_ind_empl_pivot$area_fips,
+#   area_title = all_ind_empl_pivot$area_title,
+#   pchg_2011_1_1 = rep(0,nrow(all_ind_empl_pivot))
+# )
+# Calculate percent change for each pair of columns and create new columns for the results
+# prop_2011 <- limited_combined_pivot[[3]] / all_ind_empl_pivot[[3]]
+
+# Making sure that column names and column length are the same
+# if (identical(colnames(limited_combined_pivot), colnames(all_ind_empl_pivot))) {
+#   for (i in 3:(ncol(limited_combined_pivot) - 3)) {
+#     col_name <- colnames(limited_combined_pivot)[i + 1]
+#     new_col_name <- paste0("pchg_", col_name)
+#     newer_prop <- limited_combined_pivot[[i + 3]] / all_ind_empl_pivot[[i + 3]]
+#       # newer_prop - prop_2011 = increase/decrease since 2011
+#     chg_since_2011[[new_col_name]] <- (newer_prop - prop_2011) #* 100
+#   }
+# }
+
+
+prop_per_month <- data.frame(
+# area_fips = all_ind_empl_pivot$area_fips
+area_title = all_ind_empl_pivot$area_title
+# pchg_2011_1_1 = rep(0,nrow(all_ind_empl_pivot))
 )
 # Calculate percent change for each pair of columns and create new columns for the results
-prop_2011 <- limited_combined_pivot[[3]] / all_ind_empl_pivot[[3]]
+prop_2011 <- limited_combined_pivot[["2011_1_1"]] / all_ind_empl_pivot[["2011_1_1"]]
 
 # Making sure that column names and column length are the same
 if (identical(colnames(limited_combined_pivot), colnames(all_ind_empl_pivot))) {
   for (i in 3:(ncol(limited_combined_pivot) - 3)) {
     col_name <- colnames(limited_combined_pivot)[i + 1]
-    new_col_name <- paste0("pchg_", col_name)
-    newer_prop <- limited_combined_pivot[[i + 3]] / all_ind_empl_pivot[[i + 3]]
-      # newer_prop - prop_2011 = increase/decrease since 2011
-    calculations_df[[new_col_name]] <- (newer_prop - prop_2011) #* 100
+    new_col_name <- paste0("prop_", col_name)
+    prop_per_month[[new_col_name]] <- 
+      limited_combined_pivot[[i + 3]] / all_ind_empl_pivot[[i + 3]] #* 100
+    # prop_per_month[[new_col_name]] <- (newer_prop - prop_2011) #* 100
   }
 }
 
 # The new columns with percent change values have been added to the dataframe
 
-transpose <- calculations_df |> t() |> data.frame()
+transpose <- prop_per_month |> t() |> data.frame()
 colnames(transpose) <- transpose[1,]
-transpose <- transpose[-1,]
-transpose <- cbind(
-  Year = str_split_i(string = rownames(transpose), pattern = "_", i = 2) |> as.numeric() + 
-    (str_split_i(string = rownames(transpose), pattern = "_", i = 3) |> as.numeric() - 1) * (1/4) +
-    (str_split_i(string = rownames(transpose), pattern = "_", i = 4) |> as.numeric() - 1) * (1/12)
-    ,
-  transpose
-)
+transpose_sub <- transpose[-1,]
+transpose_cbind <- cbind(
+  Year = str_split_i(string = rownames(transpose_sub), pattern = "_", i = 2) |> 
+    as.numeric() + 
+    (str_split_i(string = rownames(transpose_sub), pattern = "_", i = 3) |> 
+       as.numeric() - 1) * (1/4) +
+    (str_split_i(string = rownames(transpose_sub), pattern = "_", i = 4) |> 
+       as.numeric() - 1) * (1/12)
+    , transpose_sub)
 
-transpose_gather <- transpose |> gather(key = "County", value = "Employment_Change", -Year)
-transpose_gather$Employment_Change <- as.numeric(transpose_gather$Employment_Change)
-transpose_gather$State <- transpose_gather$County |> str_split_i(pattern = ", ", i = 2)
+transpose_gather <- 
+  transpose_cbind |> 
+  gather(key = "County", value = "Employment", -Year)
+transpose_gather$Employment <- 
+  as.numeric(transpose_gather$Employment)
+transpose_gather$State <- 
+  transpose_gather$County |> 
+  str_split_i(pattern = ", ", i = 2)
+
+transpose_gather$area_fips <- 
+  all_ind_empl_pivot$area_fips[
+    match(transpose_gather$County, all_ind_empl_pivot$area_title)
+  ]
+
+# Add Post Treatment Variable ####
+transpose_gather$Post2019 <- transpose_gather$Year >= 2019
+
+## Begin Regressions ####
+
+lm_missouri_before <- lm(
+  data = transpose_gather |> 
+    filter(State == "Missouri" & Year < 2019),
+  formula = Employment ~ Year)
+
+lm_missouri_after <- lm(
+  data = transpose_gather |> 
+    filter(State == "Missouri" & Year >= 2019),
+  formula = Employment ~ Year)
+
+lm_missouri_overall <- lm(
+  data = transpose_gather |> 
+    filter(State == "Missouri"),
+  formula = Employment ~ Year)
+
+lm_kansas_before <- lm(
+  data = transpose_gather |> 
+    filter(State == "Kansas" & Year < 2019),
+  formula = Employment ~ Year)
+
+lm_kansas_after <- lm(
+  data = transpose_gather |> 
+    filter(State == "Kansas" & Year >= 2019),
+  formula = Employment ~ Year)
+
+lm_kansas_overall <- lm(
+  data = transpose_gather |> 
+    filter(State == "Kansas"),
+  formula = Employment ~ Year)
+
+summary(lm_missouri_before)
+summary(lm_kansas_before)
+
+# Difference in slopes
+lm_missouri_before$coefficients[2] - lm_kansas_before$coefficients[2]
+
+# Trying out the lm model from office hour (11/15)
+
+lm_full <- lm(
+  formula = Employment ~ 
+    Year + 
+    Post2019 + 
+    State + 
+    State:Post2019 +
+    factor(County),
+  data = transpose_gather
+)
+summary(lm_full)
+
+# library(sandwich)
+# library(lmtest)
+# 
+# # Perform a test for the difference in slopes
+# # (I don't think this is the right test.)
+# coeftest(lm_full, vcov = vcovHC(lm_full))
+# 
+# library(lsmeans)
+# 
+# lstrends(lm_missouri_before, lm_kansas_before, var = "Year")
+# confint(lm_missouri_before, parm = "Year", level = 0.9)
+# confint(lm_kansas_overall, parm = "Year", level = 0.9)
 
 #################################### #
 # Begin Analysis ####
 #################################### #
-
+coefficients_lm_missouri_before <- 
+  coef(lm_missouri_before)
+# main_plot <- 
 ggplot(data = transpose_gather, 
-       aes(x = Year, y = Employment_Change, col = State)) +
+       aes(x = Year, y = Employment, col = State)) +
   geom_point() +
-  geom_vline(xintercept = 2019, col = 'green4', lwd = 0.9) +
-  geom_smooth(
-    method = "lm", 
-    formula = y ~ x, 
-    data = transpose_gather |> 
-      filter(State == "Missouri" & Year < 2019),
-    # color = 'blue4', 
-    linetype = "solid",
-    se = F,
-    # aes(color = "MO Overall")
-  ) +
+  geom_vline(aes(xintercept = 2019, linetype = "$0.8 Increase"), 
+             col = 'green4', lwd = 0.9) +
+  geom_abline(
+    aes(slope = coefficients_lm_missouri_before[2],
+        intercept = coefficients_lm_missouri_before[1],
+        color = "Missouri"),
+    lwd = 0.9,
+    show.legend = F
+    ) +
   geom_smooth(
     method = "lm", 
     formula = y ~ x, 
@@ -451,6 +547,7 @@ ggplot(data = transpose_gather,
     color = 'black',
     linetype = "dashed",
     se = F,
+    lwd = 0.9
     # aes(color = "MO After")
   ) +
   geom_smooth(
@@ -461,67 +558,43 @@ ggplot(data = transpose_gather,
     # color = 'red3', 
     linetype = "solid",
     se = F,
+    lwd = 0.9,
     # aes(color = "KS")
   ) +
   labs(
-    title = "Limited-Service Food Industry Employment",
-    subtitle = "Change as a proportion of the total employed population",
-    x = "Year",
-    y = "Percentile Point Change Since 2011",
-    fill = "State") + 
+    title = 
+      "Limited-Service Food Industry Employment",
+    subtitle = 
+      "Proportion of total employed working in limited-service restaurants.",
+    x = 
+      "Year", 
+    y = 
+      "Proportion working in limited-service restaurants",
+    fill = 
+      "State",
+    linetype = "") + 
+  # scale_color_manual(values = c("Missouri" = "black", "Kansas" = "red3", "Vertical Line" = "green4")) +
+  scale_linetype_manual(values = c("$0.8 Increase" = "solid")) +
   theme_light()
+
+ggsave(
+  filename = "Rplot08.png",
+  plot = main_plot,
+  height = 800 * 3,
+  width = 1400 * 3,
+  units = 'px'
+)
+  # geom_smooth(
+  #   method = "lm", 
+  #   formula = y ~ x, 
+  #   data = transpose_gather |> 
+  #     filter(State == "Missouri" & Year < 2019),
+  #   # color = 'blue4', 
+  #   linetype = "solid",
+  #   se = F,
+  #   # aes(color = "MO Overall")
+  # ) +
 # LM Models ####
-
-lm_missouri_before <- lm(
-  data = transpose_gather |> 
-    filter(State == "Missouri" & Year < 2019),
-  formula = Employment_Change ~ Year)
-
-lm_missouri_after <- lm(
-  data = transpose_gather |> 
-    filter(State == "Missouri" & Year >= 2019),
-  formula = Employment_Change ~ Year)
-
-lm_missouri_overall <- lm(
-  data = transpose_gather |> 
-    filter(State == "Missouri"),
-  formula = Employment_Change ~ Year)
-
-lm_kansas_before <- lm(
-  data = transpose_gather |> 
-    filter(State == "Kansas" & Year < 2019),
-  formula = Employment_Change ~ Year)
-
-lm_kansas_after <- lm(
-  data = transpose_gather |> 
-    filter(State == "Kansas" & Year >= 2019),
-  formula = Employment_Change ~ Year)
-
-lm_kansas_overall <- lm(
-  data = transpose_gather |> 
-    filter(State == "Kansas"),
-  formula = Employment_Change ~ Year)
-
-summary(lm_missouri_before)
-summary(lm_kansas_before)
-
-# Difference in slopes
-lm_missouri_before$coefficients[2] - lm_kansas_before$coefficients[2]
-
-library(sandwich)
-library(lmtest)
-
-# Perform a test for the difference in slopes
-# (I don't think this is the right test.)
-coeftest(lm_missouri_before, vcov = vcovHC(lm_missouri_before))
-
-library(lsmeans)
-
-lstrends(lm_missouri_before, lm_kansas_before, var = "Year")
-confint(lm_missouri_before, parm = "Year", level = 0.9)
-confint(lm_kansas_overall, parm = "Year", level = 0.9)
-
-
 
 
 # ##################################################################### #
@@ -530,28 +603,28 @@ confint(lm_kansas_overall, parm = "Year", level = 0.9)
 # ##################################################################### #
 # ##################################################################### #
 
-ggplot(data = transpose_gather, 
-       aes(x = Year, y = Employment_Change, col = State)) +
-  geom_point() +
-  geom_vline(xintercept = 2019, col = 'green3', lwd = 0.9) +
-  geom_smooth(
-    method = "lm", 
-    formula = y ~ splines::ns(x, df = 10),
-    # formula = y ~ x, 
-    data = transpose_gather |> 
-      filter(State == "Missouri"),
-    color = 'blue2', 
-    se = F
-  ) +
-  geom_smooth(
-    method = "lm",
-    formula = y ~ splines::ns(x, df = 10),
-    # formula = y ~ x, 
-    data = transpose_gather |> 
-      filter(State == "Kansas"),
-    color = 'red3', 
-    se = F
-  ) #+
+# ggplot(data = transpose_gather, 
+#        aes(x = Year, y = Employment, col = State)) +
+#   geom_point() +
+#   geom_vline(xintercept = 2019, col = 'green3', lwd = 0.9) +
+#   geom_smooth(
+#     method = "lm", 
+#     formula = y ~ splines::ns(x, df = 10),
+#     # formula = y ~ x, 
+#     data = transpose_gather |> 
+#       filter(State == "Missouri"),
+#     color = 'blue2', 
+#     se = F
+#   ) +
+#   geom_smooth(
+#     method = "lm",
+#     formula = y ~ splines::ns(x, df = 10),
+#     # formula = y ~ x, 
+#     data = transpose_gather |> 
+#       filter(State == "Kansas"),
+#     color = 'red3', 
+#     se = F
+#   ) #+
   # geom_smooth(
   #   method = "loess", 
   #   formula = y ~ x, 
@@ -583,7 +656,7 @@ ggplot(data = transpose_gather,
 
 # Filter out values < -50
 # transpose_plot <- transpose_plot |> 
-  # filter(Employment_Change > -90)
+  # filter(Employment > -90)
 
 #################################### #
 treatment_year <- 2019
@@ -595,7 +668,7 @@ MO_After_2019 <- MO_sub |> filter(Year >= treatment_year)
 
 plot(
   x = MO_sub$Year,
-  y = MO_sub$Employment_Change,
+  y = MO_sub$Employment,
   xlab = "Year",
   ylab = "Employment level change since 2011 (%)",
   ylim = c(-70, 80),
@@ -646,7 +719,7 @@ abline(lm_missouri_overall, col = 'green', lwd = 2)
 
 # Plotting after 2018 only
 
-ggplot(data = MO_sub, aes(x = Year, y = Employment_Change)) +
+ggplot(data = MO_sub, aes(x = Year, y = Employment)) +
   # Add a line for Employment Change
   geom_point(color = 'black') +
   geom_smooth(method = "lm", formula = y ~ x, data = MO_Before_2019, color = "blue", se = TRUE) +
@@ -659,7 +732,7 @@ ggplot(data = MO_sub, aes(x = Year, y = Employment_Change)) +
 ############################## #
 
 KS_sub <- transpose_plot[str_detect(string = transpose_plot$County, pattern = "Kansas"),]
-KS_sub$Employment_Change[is.infinite(KS_sub$Employment_Change)] <- 100
+KS_sub$Employment[is.infinite(KS_sub$Employment)] <- 100
 
 KS_Before_2019 <- KS_sub[KS_sub$Year < treatment_year,]
 
@@ -672,7 +745,7 @@ KS_After_2019 <- KS_sub[KS_sub$Year >= treatment_year,]
 
 plot(
   x = KS_sub$Year,
-  y = KS_sub$Employment_Change,
+  y = KS_sub$Employment,
   xlab = "Year",
   ylab = "Employment level change since 2011 (%)",
   # ylim = c(-70, 80),
