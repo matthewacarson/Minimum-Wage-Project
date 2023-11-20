@@ -499,6 +499,12 @@ any(diagnostic_count_limited_serv == 0) # Issues with this approach
 transpose_gather$Post2019 <- transpose_gather$Year >= 2019
 
 ## Begin Regressions ####
+# Regression from Eve
+
+lm_1 <- lmer(
+  Employment ~ State + Year + Min_Wage + State:Year | as.factor(County),
+  data = transpose_gather
+)
 
 lm_missouri_before <- lm(
   data = transpose_gather |> 
