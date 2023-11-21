@@ -213,7 +213,7 @@ limited_combined_pivot <-
 # Minimum wage data ####
 # ###################### #
 Min_Wage_backup <- read_csv(
-  file = "min-wage-over-time.csv")
+  file = "min-wage.csv")
 
 Min_Wage <-
   Min_Wage_backup |> 
@@ -225,15 +225,14 @@ Min_Wage <-
 min_wage_limited <- 
   left_join(
     x = limited_combined_pivot,
-    y = Min_Wage |> select(-increase, -date),
-    by = c("year", "region"))
+    y = Min_Wage |> select(-mw_increase, -date))
 
-min_wage_limited_increase <- 
+min_wage_limited_increase <-
   left_join(
     x = min_wage_limited,
-    y = Min_Wage)
+    y = Min_Wage )
 
-min_wage_limited_increase$increase[is.na(min_wage_limited_increase$increase)] <- 
+min_wage_limited_increase$mw_increase[is.na(min_wage_limited_increase$mw_increase)] <-
   0
 
 # # ##################################################### #
@@ -387,8 +386,12 @@ joined_data <-
 
 joined_data <- 
   joined_data |> 
-  mutate(prop = emplvl_limited / emplvl_all) |> 
+  mutate(proportion = emplvl_limited / emplvl_all) |> 
   na.omit()
+
+# ################################################################### #
+# All code below needs to be modified because of changes made above
+# ################################################################### #
 
 ## Begin Regressions ####
 # Regression from Eve
@@ -396,8 +399,7 @@ transpose_gather$Post2019 <- transpose_gather$Year >= 2019
 
 lm_1 <- lmer(
   Employment ~ State + Year + Min_Wage + State:Year | as.factor(County),
-  data = transpose_gather
-)
+  data = transpose_gather)
 
 lm_missouri_before <- lm(
   data = transpose_gather |>
@@ -444,8 +446,8 @@ lm_full <- lm(
     State +
     State:Post2019 +
     factor(County),
-  data = transpose_gather
-)
+  data = transpose_gather)
+
 summary(lm_full)
 
 # library(sandwich)
@@ -534,7 +536,9 @@ ggsave(
   #   se = F,
   #   # aes(color = "MO Overall")
   # ) +
-# LM Models ####
+
+
+
 
 
 # ##################################################################### #
