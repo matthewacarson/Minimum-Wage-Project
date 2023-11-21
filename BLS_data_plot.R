@@ -4,51 +4,52 @@
 
 
 # setwd("C:/Users/madou/OneDrive - UCLA IT Services/2)_2023_Fall/PS-170A/Minimum-Wage-Project")
-file_loc <- dirname(rstudioapi::getActiveDocumentContext()$path)
-setwd(file_loc)
+# file_loc <- dirname(rstudioapi::getActiveDocumentContext()$path)
+# setwd(file_loc)
 library(tidyverse)
 # ################################################################ #
 # Importing CSVs for fast food/limited-service restaurants only ####
 # ################################################################ #
-limited_2011 <- 
-  read_csv(
-    file = "BLS/2011.q1-q4 722513 Limited-service restaurants.csv")
-limited_2012 <- 
-  read_csv(
-    file = "BLS/2012.q1-q4 722513 Limited-service restaurants.csv")
-limited_2013 <- 
-  read_csv(
-    file = "BLS/2013.q1-q4 722513 Limited-service restaurants.csv")
-limited_2014 <- 
-  read_csv(
-    file = "BLS/2014.q1-q4 722513 Limited-service restaurants.csv")
-limited_2015 <- 
-  read_csv(
-    file = "BLS/2015.q1-q4 722513 Limited-service restaurants.csv")
-limited_2016 <- 
-  read_csv(
-    file = "BLS/2016.q1-q4 722513 NAICS 722513 Limited-service restaurants.csv")
-limited_2017 <- 
-  read_csv(
-    file = "BLS/2017.q1-q4 722513 NAICS 722513 Limited-service restaurants.csv")
-limited_2018 <- 
-  read_csv(
-    file = "BLS/2018.q1-q4 722513 NAICS 722513 Limited-service restaurants.csv")
-limited_2019 <- 
-  read_csv(
-    file = "BLS/2019.q1-q4 722513 NAICS 722513 Limited-service restaurants.csv")
-limited_2020 <- 
-  read_csv(
-    file = "BLS/2020.q1-q4 722513 NAICS 722513 Limited-service restaurants.csv")
-limited_2021 <- 
-  read_csv(
-    file = "BLS/2021.q1-q4 722513 NAICS 722513 Limited-service restaurants.csv")
-limited_2022 <- 
-  read_csv(
-    file = "BLS/2022.q1-q4 722513 NAICS 722513 Limited-service restaurants.csv")
-limited_2023 <- 
-  read_csv(
-    file = "BLS/2023.q1-q1 722513 NAICS 722513 Limited-service restaurants.csv")
+# limited_2011 <-
+#   read_csv(
+#     file = "BLS/2011.q1-q4 722513 Limited-service restaurants.csv")
+# limited_2012 <-
+#   read_csv(
+#     file = "BLS/2012.q1-q4 722513 Limited-service restaurants.csv")
+# limited_2013 <-
+#   read_csv(
+#     file = "BLS/2013.q1-q4 722513 Limited-service restaurants.csv")
+# limited_2014 <-
+#   read_csv(
+#     file = "BLS/2014.q1-q4 722513 Limited-service restaurants.csv")
+# limited_2015 <-
+#   read_csv(
+#     file = "BLS/2015.q1-q4 722513 Limited-service restaurants.csv")
+# limited_2016 <-
+#   read_csv(
+#     file = "BLS/2016.q1-q4 722513 NAICS 722513 Limited-service restaurants.csv")
+# limited_2017 <-
+#   read_csv(
+#     file = "BLS/2017.q1-q4 722513 NAICS 722513 Limited-service restaurants.csv")
+# limited_2018 <-
+#   read_csv(
+#     file = "BLS/2018.q1-q4 722513 NAICS 722513 Limited-service restaurants.csv")
+# limited_2019 <-
+#   read_csv(
+#     file = "BLS/2019.q1-q4 722513 NAICS 722513 Limited-service restaurants.csv")
+# limited_2020 <-
+#   read_csv(
+#     file = "BLS/2020.q1-q4 722513 NAICS 722513 Limited-service restaurants.csv")
+# limited_2021 <-
+#   read_csv(
+#     file = "BLS/2021.q1-q4 722513 NAICS 722513 Limited-service restaurants.csv")
+# limited_2022 <-
+#   read_csv(
+#     file = "BLS/2022.q1-q4 722513 NAICS 722513 Limited-service restaurants.csv")
+# limited_2023 <-
+#   read_csv(
+#     file = "BLS/2023.q1-q1 722513 NAICS 722513 Limited-service restaurants.csv")
+load("BLS_limited-service_rest.RData")
 counties_of_interest <- 
   "((Wyandotte|Johnson|Leavenworth|Atchison|Bourbon|Cherokee|Brown) County, Kansas|(Buchanan|Platte|Clay|Jackson|Cass|Bates|Vernon|Barton|Jasper|Newton) County, Missouri)"
 # 11/15: Temporarily removed Crawford
@@ -137,7 +138,10 @@ limited_2023_f <- limited_2023[
     string = limited_2023$area_title,
     pattern = counties_of_interest
   ), columns_of_interest]
-
+# ####################################################### #
+## Combining all data frames for all years of interest ####
+# Limited Food Service ################################## #
+# ####################################################### #
 limited_combined <- 
   limited_2011_f |> 
   add_row(limited_2012_f) |> 
@@ -152,11 +156,13 @@ limited_combined <-
   add_row(limited_2021_f) |> 
   add_row(limited_2022_f) |> 
   add_row(limited_2023_f)
-
+# ############################################################ #
+### Removing observations with zeros (non-reported values). ####
+# ############################################################ #
 limited_combined <- 
   limited_combined[-which(0 == limited_combined, arr.ind = T)[1:12,1],]
 
-limited_combined$area_fips <- as.numeric(limited_combined$area_fips)
+# limited_combined$area_fips <- as.numeric(limited_combined$area_fips)
 
 ### ################################################################### #
 ### Gathering monthly emplvl into one column and month into another. ####
@@ -177,664 +183,565 @@ limited_combined_gather <-
         month == "month1_emplvl" ~ 1,
         month == "month2_emplvl" ~ 2,
         month == "month3_emplvl" ~ 3))
+## ############################# #
+## Combine year, qtr, month ####
+## ############################# #
+limited_combined_gather$date <- 
+  paste(
+    limited_combined_gather$month + 
+      (limited_combined_gather$qtr - 1) * 3, 
+    1, 
+    limited_combined_gather$year, sep = "/")
 
-### ############################### #
-### Arrange columns before pivot ####
-### ############################### #
-limited_combined_arrange <- limited_combined_gather |> 
-  select(area_fips, area_title, year, qtr, month, emplvl) |> 
-  arrange(area_title, year, qtr)
+limited_combined_gather$date <- 
+  as.Date(limited_combined_gather$date, format = "%m/%d/%Y")
 
-### ##################################################### #
-### Pivot_wider to prepare for looping through columns ####
-### ##################################################### #
+limited_combined_converted <- 
+  limited_combined_gather |> 
+  mutate(year_digit = (year + (qtr - 1) * (1/4) + (month - 1) * (1/12))) |> 
+  select(-qtr, -month, -own_title)
+
 limited_combined_pivot <- 
-  limited_combined_arrange |>  
-  pivot_wider(
-    id_cols = c("area_fips", "area_title"),
-    names_from = c("year", "qtr", "month"),
-    values_from = c(
-      # "qtrly_estabs_count", 
-      "emplvl",
-    ),
-    names_sep = "_"
-  )
-#### ############################################# #
-#### Changing column names to continuous values ####
-#### This will be helpful for plotting later ##### #
-#### ############################################# #
-limited_serv_colnames <- colnames(limited_combined_pivot)[3:149]
-d1 <- as.numeric(str_split_i(string = limited_serv_colnames, pattern = "_", i = 1))
-d2 <- as.numeric(str_split_i(string = limited_serv_colnames, pattern = "_", i = 2))
-d3 <- as.numeric(str_split_i(string = limited_serv_colnames, pattern = "_", i = 3))
-limited_serv_converted <- d1 + (d2 - 1) * (1/4) + (d3 - 1) * (1/12)
-
-# Testing to make sure all intervals are consistent.
-round(diff(limited_serv_converted), digits = 5) |> table()
-
-# ##################################################### #
-# Begin importing CSVs for emp lvl in ALL industries ####
-# ##################################################### #
-All_Ind_2023 <- read_csv("BLS/2023.q1-q1 10 10 Total, all industries.csv")
-All_Ind_2022 <- read_csv("BLS/2022.q1-q4 10 10 Total, all industries.csv")
-All_Ind_2021 <- read_csv("BLS/2021.q1-q4 10 10 Total, all industries.csv")
-All_Ind_2020 <- read_csv("BLS/2020.q1-q4 10 10 Total, all industries.csv")
-All_Ind_2019 <- read_csv("BLS/2019.q1-q4 10 10 Total, all industries.csv")
-All_Ind_2018 <- read_csv("BLS/2018.q1-q4 10 10 Total, all industries.csv")
-All_Ind_2017 <- read_csv("BLS/2017.q1-q4 10 10 Total, all industries.csv")
-All_Ind_2016 <- read_csv("BLS/2016.q1-q4 10 10 Total, all industries.csv")
-All_Ind_2015 <- read_csv("BLS/2015.q1-q4 10 Total, all industries.csv")
-All_Ind_2014 <- read_csv("BLS/2014.q1-q4 10 Total, all industries.csv")
-All_Ind_2013 <- read_csv("BLS/2013.q1-q4 10 Total, all industries.csv")
-All_Ind_2012 <- read_csv("BLS/2012.q1-q4 10 Total, all industries.csv")
-All_Ind_2011 <- read_csv("BLS/2011.q1-q4 10 Total, all industries.csv")
-
-## ############################################# #
-## Filtering columns and counties of interest ####
-## ############################################# #
-All_Ind_2023_f <- All_Ind_2023[
-  str_detect(
-    string = All_Ind_2023$area_title,
-    pattern = counties_of_interest
-  ), columns_of_interest]
-
-All_Ind_2022_f <- All_Ind_2022[
-  str_detect(
-    string = All_Ind_2022$area_title,
-    pattern = counties_of_interest
-  ), columns_of_interest]
-
-All_Ind_2021_f <- All_Ind_2021[
-  str_detect(
-    string = All_Ind_2021$area_title,
-    pattern = counties_of_interest
-  ), columns_of_interest]
-
-All_Ind_2020_f <- All_Ind_2020[
-  str_detect(
-    string = All_Ind_2020$area_title,
-    pattern = counties_of_interest
-  ), columns_of_interest]
-
-All_Ind_2019_f <- All_Ind_2019[
-  str_detect(
-    string = All_Ind_2019$area_title,
-    pattern = counties_of_interest
-  ), columns_of_interest]
-
-All_Ind_2018_f <- All_Ind_2018[
-  str_detect(
-    string = All_Ind_2018$area_title,
-    pattern = counties_of_interest
-  ), columns_of_interest]
-
-All_Ind_2017_f <- All_Ind_2017[
-  str_detect(
-    string = All_Ind_2017$area_title,
-    pattern = counties_of_interest
-  ), columns_of_interest]
-
-All_Ind_2016_f <- All_Ind_2016[
-  str_detect(
-    string = All_Ind_2016$area_title,
-    pattern = counties_of_interest
-  ), columns_of_interest]
-
-All_Ind_2015_f <- All_Ind_2015[
-  str_detect(
-    string = All_Ind_2015$area_title,
-    pattern = counties_of_interest
-  ), columns_of_interest]
-
-All_Ind_2014_f <- All_Ind_2014[
-  str_detect(
-    string = All_Ind_2014$area_title,
-    pattern = counties_of_interest
-  ), columns_of_interest]
-
-All_Ind_2013_f <- All_Ind_2013[
-  str_detect(
-    string = All_Ind_2013$area_title,
-    pattern = counties_of_interest
-  ), columns_of_interest]
-
-All_Ind_2012_f <- All_Ind_2012[
-  str_detect(
-    string = All_Ind_2012$area_title,
-    pattern = counties_of_interest
-  ), columns_of_interest]
-
-All_Ind_2011_f <- All_Ind_2011[
-  str_detect(
-    string = All_Ind_2011$area_title,
-    pattern = counties_of_interest
-  ), columns_of_interest]
-
-all_ind_empl_filter <- 
-  All_Ind_2011_f |> 
-  add_row(All_Ind_2012_f) |> 
-  add_row(All_Ind_2013_f) |> 
-  add_row(All_Ind_2014_f) |> 
-  add_row(All_Ind_2015_f) |> 
-  add_row(All_Ind_2016_f) |> 
-  add_row(All_Ind_2017_f) |> 
-  add_row(All_Ind_2018_f) |> 
-  add_row(All_Ind_2019_f) |> 
-  add_row(All_Ind_2020_f) |> 
-  add_row(All_Ind_2021_f) |> 
-  add_row(All_Ind_2022_f) |> 
-  add_row(All_Ind_2023_f) |> 
-  filter(own_title == "Private")
-
-### ######################################## #
-### Gather for all industries ################ 
-### Puts month and emplvl in separate columns 
-### ######################################## #
-all_ind_emp_gather <- 
-  all_ind_empl_filter |> 
-  gather(
-    key = "month", 
-    value = "emplvl",  
-    month1_emplvl, 
-    month2_emplvl, 
-    month3_emplvl
-  ) |> 
-  # Extract the numeric part from the "month" column
+  limited_combined_converted |> 
   mutate(
-    month =
-      case_when( # Converting to numeric values
-        month == "month1_emplvl" ~ 1,
-        month == "month2_emplvl" ~ 2,
-        month == "month3_emplvl" ~ 3))
+    emplvl_limited = emplvl,
+    region = case_when(
+      grepl(pattern = "Missouri", x = area_title) ~ "MO",
+      grepl(pattern = "Kansas", x = area_title) ~ "KS")) |> 
+  select(-industry_code, -emplvl)
+# ###################### #
+# Minimum wage data ####
+# ###################### #
+Min_Wage_backup <- read_csv(
+  file = "min-wage-over-time.csv")
 
-### ############################################ #
-### Arrange in preparation for pivoting wider ####
-### ############################################ #
-all_ind_empl_arrange <- 
-  all_ind_emp_gather |> 
-  select(area_fips, area_title, year, qtr, month, emplvl) |> 
-  arrange(month) |> 
-  arrange(qtr) |> 
-  arrange(area_title) |> 
-  arrange(year)
+Min_Wage <-
+  Min_Wage_backup |> 
+  mutate(date = as.Date(Date, format = "%m/%d/%Y")) |> 
+  filter(year(date) >= 2011) |>
+  mutate(year = year(date)) |> 
+  select(-Date)
 
-### ################################## #
-### Pivot wider to prepare for loop ####
-### ################################## #
-all_ind_empl_pivot <- 
-  all_ind_empl_arrange |>  
-pivot_wider(
-  id_cols = c("area_fips", "area_title"),
-  names_from = c("year", "qtr", "month"),
-  values_from = "emplvl",
-  names_sep = "_"
-)
+min_wage_limited <- 
+  left_join(
+    x = limited_combined_pivot,
+    y = Min_Wage |> select(-increase, -date),
+    by = c("year", "region"))
 
-#### ############################################# #
-#### Changing column names to continuous values ####
-#### This will be helpful for plotting later ##### #
-#### ############################################# #
-all_ind_colnames <- colnames(all_ind_empl_pivot)[3:149]
-a1 <- as.numeric(str_split_i(string = all_ind_colnames, pattern = "_", i = 1))
-a2 <- as.numeric(str_split_i(string = all_ind_colnames, pattern = "_", i = 2))
-a3 <- as.numeric(str_split_i(string = all_ind_colnames, pattern = "_", i = 3))
-all_ind_converted <- a1 + (a2 - 1) * (1/4) + (a3 - 1) * (1/12)
+min_wage_limited_increase <- 
+  left_join(
+    x = min_wage_limited,
+    y = Min_Wage)
 
-# Testing to make sure all intervals are consistent.
-round(diff(all_ind_converted), digits = 5) |> table()
+min_wage_limited_increase$increase[is.na(min_wage_limited_increase$increase)] <- 
+  0
 
-# Testing that columns as the same across both data frames
-# identical(all_ind_converted, limited_serv_converted)
-
-# Diagnostic tests/not using
-# table(all_ind_empl_filter$area_title, all_ind_empl_filter$year, all_ind_empl_filter$qtr)
+# ####################################################### #
+# Stop here because we are not using all employment
+# ####################################################### #
 # 
-# all_ind_empl_filter %>%
-#   count(area_title, year, qtr) %>%
-#   arrange(desc(n))
-#   
-# limited_combined_pivot[,1] == all_ind_empl_pivot[,1]
-# limited_combined_pivot[,2] == all_ind_empl_pivot[,2]
-
-# chg_since_2011 <- data.frame(
-#   # area_fips = all_ind_empl_pivot$area_fips,
-#   area_title = all_ind_empl_pivot$area_title,
-#   pchg_2011_1_1 = rep(0,nrow(all_ind_empl_pivot))
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# # ##################################################### #
+# # Begin importing CSVs for emp lvl in ALL industries ####
+# # ##################################################### #
+# All_Ind_2023 <- read_csv("BLS/2023.q1-q1 10 10 Total, all industries.csv")
+# All_Ind_2022 <- read_csv("BLS/2022.q1-q4 10 10 Total, all industries.csv")
+# All_Ind_2021 <- read_csv("BLS/2021.q1-q4 10 10 Total, all industries.csv")
+# All_Ind_2020 <- read_csv("BLS/2020.q1-q4 10 10 Total, all industries.csv")
+# All_Ind_2019 <- read_csv("BLS/2019.q1-q4 10 10 Total, all industries.csv")
+# All_Ind_2018 <- read_csv("BLS/2018.q1-q4 10 10 Total, all industries.csv")
+# All_Ind_2017 <- read_csv("BLS/2017.q1-q4 10 10 Total, all industries.csv")
+# All_Ind_2016 <- read_csv("BLS/2016.q1-q4 10 10 Total, all industries.csv")
+# All_Ind_2015 <- read_csv("BLS/2015.q1-q4 10 Total, all industries.csv")
+# All_Ind_2014 <- read_csv("BLS/2014.q1-q4 10 Total, all industries.csv")
+# All_Ind_2013 <- read_csv("BLS/2013.q1-q4 10 Total, all industries.csv")
+# All_Ind_2012 <- read_csv("BLS/2012.q1-q4 10 Total, all industries.csv")
+# All_Ind_2011 <- read_csv("BLS/2011.q1-q4 10 Total, all industries.csv")
+# 
+# ## ############################################# #
+# ## Filtering columns and counties of interest ####
+# ## ############################################# #
+# All_Ind_2023_f <- All_Ind_2023[
+#   str_detect(
+#     string = All_Ind_2023$area_title,
+#     pattern = counties_of_interest
+#   ), columns_of_interest]
+# 
+# All_Ind_2022_f <- All_Ind_2022[
+#   str_detect(
+#     string = All_Ind_2022$area_title,
+#     pattern = counties_of_interest
+#   ), columns_of_interest]
+# 
+# All_Ind_2021_f <- All_Ind_2021[
+#   str_detect(
+#     string = All_Ind_2021$area_title,
+#     pattern = counties_of_interest
+#   ), columns_of_interest]
+# 
+# All_Ind_2020_f <- All_Ind_2020[
+#   str_detect(
+#     string = All_Ind_2020$area_title,
+#     pattern = counties_of_interest
+#   ), columns_of_interest]
+# 
+# All_Ind_2019_f <- All_Ind_2019[
+#   str_detect(
+#     string = All_Ind_2019$area_title,
+#     pattern = counties_of_interest
+#   ), columns_of_interest]
+# 
+# All_Ind_2018_f <- All_Ind_2018[
+#   str_detect(
+#     string = All_Ind_2018$area_title,
+#     pattern = counties_of_interest
+#   ), columns_of_interest]
+# 
+# All_Ind_2017_f <- All_Ind_2017[
+#   str_detect(
+#     string = All_Ind_2017$area_title,
+#     pattern = counties_of_interest
+#   ), columns_of_interest]
+# 
+# All_Ind_2016_f <- All_Ind_2016[
+#   str_detect(
+#     string = All_Ind_2016$area_title,
+#     pattern = counties_of_interest
+#   ), columns_of_interest]
+# 
+# All_Ind_2015_f <- All_Ind_2015[
+#   str_detect(
+#     string = All_Ind_2015$area_title,
+#     pattern = counties_of_interest
+#   ), columns_of_interest]
+# 
+# All_Ind_2014_f <- All_Ind_2014[
+#   str_detect(
+#     string = All_Ind_2014$area_title,
+#     pattern = counties_of_interest
+#   ), columns_of_interest]
+# 
+# All_Ind_2013_f <- All_Ind_2013[
+#   str_detect(
+#     string = All_Ind_2013$area_title,
+#     pattern = counties_of_interest
+#   ), columns_of_interest]
+# 
+# All_Ind_2012_f <- All_Ind_2012[
+#   str_detect(
+#     string = All_Ind_2012$area_title,
+#     pattern = counties_of_interest
+#   ), columns_of_interest]
+# 
+# All_Ind_2011_f <- All_Ind_2011[
+#   str_detect(
+#     string = All_Ind_2011$area_title,
+#     pattern = counties_of_interest
+#   ), columns_of_interest]
+# ## ################################################# #
+# ## Combining employment for all years of interest ####
+# ## All employment; all industries ################## #
+# ## ################################################# #
+# all_ind_empl_filter <- 
+#   All_Ind_2011_f |> 
+#   add_row(All_Ind_2012_f) |> 
+#   add_row(All_Ind_2013_f) |> 
+#   add_row(All_Ind_2014_f) |> 
+#   add_row(All_Ind_2015_f) |> 
+#   add_row(All_Ind_2016_f) |> 
+#   add_row(All_Ind_2017_f) |> 
+#   add_row(All_Ind_2018_f) |> 
+#   add_row(All_Ind_2019_f) |> 
+#   add_row(All_Ind_2020_f) |> 
+#   add_row(All_Ind_2021_f) |> 
+#   add_row(All_Ind_2022_f) |> 
+#   add_row(All_Ind_2023_f) |> 
+#   dplyr::filter(own_title == "Private")
+# 
+# ### ######################################## #
+# ### Gather for all industries ################ 
+# ### Puts month and emplvl in separate columns 
+# ### ######################################## #
+# all_ind_empl_gather <- 
+#   all_ind_empl_filter |> 
+#   gather(
+#     key = "month", 
+#     value = "emplvl",  
+#     month1_emplvl, 
+#     month2_emplvl, 
+#     month3_emplvl
+#   ) |> 
+#   # Extract the numeric part from the "month" column
+#   mutate(
+#     month =
+#       case_when( # Converting to numeric values
+#         month == "month1_emplvl" ~ 1,
+#         month == "month2_emplvl" ~ 2,
+#         month == "month3_emplvl" ~ 3))
+# 
+# ## ############################# #
+# ## Combine year, qtr, month ####
+# ## ############################# #
+# all_ind_empl_converted <- 
+#   all_ind_empl_gather |> 
+#   mutate(year = (year + (qtr - 1) * (1/4) + (month - 1) * (1/12))) |> 
+#   select(-qtr, -month, -own_title)
+# 
+# 
+# # Add Post Treatment Variable ####
+# transpose_gather$Post2019 <- transpose_gather$Year >= 2019
+# 
+# ## Begin Regressions ####
+# # Regression from Eve
+# 
+# lm_1 <- lmer(
+#   Employment ~ State + Year + Min_Wage + State:Year | as.factor(County),
+#   data = transpose_gather
 # )
-# Calculate percent change for each pair of columns and create new columns for the results
-# prop_2011 <- limited_combined_pivot[[3]] / all_ind_empl_pivot[[3]]
-
-# Making sure that column names and column length are the same
-# if (identical(colnames(limited_combined_pivot), colnames(all_ind_empl_pivot))) {
-#   for (i in 3:(ncol(limited_combined_pivot) - 3)) {
-#     col_name <- colnames(limited_combined_pivot)[i + 1]
-#     new_col_name <- paste0("pchg_", col_name)
-#     newer_prop <- limited_combined_pivot[[i + 3]] / all_ind_empl_pivot[[i + 3]]
-#       # newer_prop - prop_2011 = increase/decrease since 2011
-#     chg_since_2011[[new_col_name]] <- (newer_prop - prop_2011) #* 100
-#   }
-# }
-
-
-prop_per_month <- data.frame(
-# area_fips = all_ind_empl_pivot$area_fips
-area_title = all_ind_empl_pivot$area_title
-# pchg_2011_1_1 = rep(0,nrow(all_ind_empl_pivot))
-)
-# Calculate percent change for each pair of columns and create new columns for the results
-prop_2011 <- limited_combined_pivot[["2011_1_1"]] / all_ind_empl_pivot[["2011_1_1"]]
-
-# Making sure that column names and column length are the same
-if (identical(colnames(limited_combined_pivot), colnames(all_ind_empl_pivot))) {
-  for (i in 3:(ncol(limited_combined_pivot) - 3)) {
-    col_name <- colnames(limited_combined_pivot)[i + 1]
-    new_col_name <- paste0("prop_", col_name)
-    prop_per_month[[new_col_name]] <- 
-      limited_combined_pivot[[i + 3]] / all_ind_empl_pivot[[i + 3]] #* 100
-    # prop_per_month[[new_col_name]] <- (newer_prop - prop_2011) #* 100
-  }
-}
-
-# The new columns with percent change values have been added to the dataframe
-
-transpose <- prop_per_month |> t() |> data.frame()
-colnames(transpose) <- transpose[1,]
-transpose_sub <- transpose[-1,]
-transpose_cbind <- cbind(
-  Year = str_split_i(string = rownames(transpose_sub), pattern = "_", i = 2) |> 
-    as.numeric() + 
-    (str_split_i(string = rownames(transpose_sub), pattern = "_", i = 3) |> 
-       as.numeric() - 1) * (1/4) +
-    (str_split_i(string = rownames(transpose_sub), pattern = "_", i = 4) |> 
-       as.numeric() - 1) * (1/12)
-    , transpose_sub)
-
-transpose_gather <- 
-  transpose_cbind |> 
-  gather(key = "County", value = "Employment", -Year)
-transpose_gather$Employment <- 
-  as.numeric(transpose_gather$Employment)
-transpose_gather$State <- 
-  transpose_gather$County |> 
-  str_split_i(pattern = ", ", i = 2)
-
-transpose_gather$area_fips <- 
-  all_ind_empl_pivot$area_fips[
-    match(transpose_gather$County, all_ind_empl_pivot$area_title)
-  ]
-
-# ############## #
-# Diagnostics ####
-# ############## #
 # 
-# Make sure that there is not more than one observation per county per period.
-diagnostic_tbl_all_ind <- 
-  all_ind_empl_arrange |> 
-  count(area_title, year, qtr, month) 
-any(is.na(diagnostic_tbl_all_ind)) # Issues with this approach
-any(diagnostic_tbl_all_ind == 0) # Issues with this approach
-
-# diagnostic_tbl_all_ind <-
-# table(
-#   all_ind_empl_arrange$area_title, 
-#   all_ind_empl_arrange$year, 
-#   all_ind_empl_arrange$qtr, 
-#   all_ind_empl_arrange$month) |> 
-#   as.data.frame()
-
-# diagnostic_tbl_limited_serv <- 
-# table(
-#   limited_combined_arrange$area_title, 
-#   limited_combined_arrange$year, 
-#   limited_combined_arrange$qtr, 
-#   limited_combined_arrange$month)
-
-diagnostic_count_limited_serv <- 
-  limited_combined_arrange |> 
-  count(area_title, year, qtr, month) 
-any(is.na(diagnostic_count_limited_serv)) # Issues with this approach
-any(diagnostic_count_limited_serv == 0) # Issues with this approach
-
-# Add Post Treatment Variable ####
-transpose_gather$Post2019 <- transpose_gather$Year >= 2019
-
-## Begin Regressions ####
-# Regression from Eve
-
-lm_1 <- lmer(
-  Employment ~ State + Year + Min_Wage + State:Year | as.factor(County),
-  data = transpose_gather
-)
-
-lm_missouri_before <- lm(
-  data = transpose_gather |> 
-    filter(State == "Missouri" & Year < 2019),
-  formula = Employment ~ Year)
-
-lm_missouri_after <- lm(
-  data = transpose_gather |> 
-    filter(State == "Missouri" & Year >= 2019),
-  formula = Employment ~ Year)
-
-lm_missouri_overall <- lm(
-  data = transpose_gather |> 
-    filter(State == "Missouri"),
-  formula = Employment ~ Year)
-
-lm_kansas_before <- lm(
-  data = transpose_gather |> 
-    filter(State == "Kansas" & Year < 2019),
-  formula = Employment ~ Year)
-
-lm_kansas_after <- lm(
-  data = transpose_gather |> 
-    filter(State == "Kansas" & Year >= 2019),
-  formula = Employment ~ Year)
-
-lm_kansas_overall <- lm(
-  data = transpose_gather |> 
-    filter(State == "Kansas"),
-  formula = Employment ~ Year)
-
-summary(lm_missouri_before)
-summary(lm_kansas_before)
-
-# Difference in slopes
-lm_missouri_before$coefficients[2] - lm_kansas_before$coefficients[2]
-
-# Trying out the lm model from office hour (11/15)
-
-lm_full <- lm(
-  formula = Employment ~ 
-    Year + 
-    Post2019 + 
-    State + 
-    State:Post2019 +
-    factor(County),
-  data = transpose_gather
-)
-summary(lm_full)
-
-# library(sandwich)
-# library(lmtest)
+# lm_missouri_before <- lm(
+#   data = transpose_gather |> 
+#     filter(State == "Missouri" & Year < 2019),
+#   formula = Employment ~ Year)
 # 
-# # Perform a test for the difference in slopes
-# # (I don't think this is the right test.)
-# coeftest(lm_full, vcov = vcovHC(lm_full))
+# lm_missouri_after <- lm(
+#   data = transpose_gather |> 
+#     filter(State == "Missouri" & Year >= 2019),
+#   formula = Employment ~ Year)
 # 
-# library(lsmeans)
+# lm_missouri_overall <- lm(
+#   data = transpose_gather |> 
+#     filter(State == "Missouri"),
+#   formula = Employment ~ Year)
 # 
-# lstrends(lm_missouri_before, lm_kansas_before, var = "Year")
-# confint(lm_missouri_before, parm = "Year", level = 0.9)
-# confint(lm_kansas_overall, parm = "Year", level = 0.9)
-
-#################################### #
-# Begin Analysis ####
-#################################### #
-coefficients_lm_missouri_before <- 
-  coef(lm_missouri_before)
-# main_plot <- 
-ggplot(data = transpose_gather, 
-       aes(x = Year, y = Employment, col = State)) +
-  geom_point() +
-  geom_vline(aes(xintercept = 2019, linetype = "$0.8 Increase"), 
-             col = 'green4', lwd = 0.9) +
-  geom_abline(
-    aes(slope = coefficients_lm_missouri_before[2],
-        intercept = coefficients_lm_missouri_before[1],
-        color = "Missouri"),
-    lwd = 0.9,
-    show.legend = F
-    ) +
-  geom_smooth(
-    method = "lm", 
-    formula = y ~ x, 
-    data = transpose_gather |> 
-      filter(State == "Missouri" & Year >= 2019),
-    color = 'black',
-    linetype = "dashed",
-    se = F,
-    lwd = 0.9
-    # aes(color = "MO After")
-  ) +
-  geom_smooth(
-    method = "lm", 
-    formula = y ~ x, 
-    data = transpose_gather |> 
-      filter(State == "Kansas"),
-    # color = 'red3', 
-    linetype = "solid",
-    se = F,
-    lwd = 0.9,
-    # aes(color = "KS")
-  ) +
-  labs(
-    title = 
-      "Limited-Service Food Industry Employment",
-    subtitle = 
-      "Proportion of total employed working in limited-service restaurants.",
-    x = 
-      "Year", 
-    y = 
-      "Proportion working in limited-service restaurants",
-    fill = 
-      "State",
-    linetype = "") + 
-  # scale_color_manual(values = c("Missouri" = "black", "Kansas" = "red3", "Vertical Line" = "green4")) +
-  scale_linetype_manual(values = c("$0.8 Increase" = "solid")) +
-  theme_light()
-
-ggsave(
-  filename = "Rplot08.png",
-  plot = main_plot,
-  height = 800 * 3,
-  width = 1400 * 3,
-  units = 'px'
-)
-  # geom_smooth(
-  #   method = "lm", 
-  #   formula = y ~ x, 
-  #   data = transpose_gather |> 
-  #     filter(State == "Missouri" & Year < 2019),
-  #   # color = 'blue4', 
-  #   linetype = "solid",
-  #   se = F,
-  #   # aes(color = "MO Overall")
-  # ) +
-# LM Models ####
-
-
-# ##################################################################### #
-# ##################################################################### #
-# ################ NOT USING CODE BELOW AS OF 11/14 #####################
-# ##################################################################### #
-# ##################################################################### #
-
+# lm_kansas_before <- lm(
+#   data = transpose_gather |> 
+#     filter(State == "Kansas" & Year < 2019),
+#   formula = Employment ~ Year)
+# 
+# lm_kansas_after <- lm(
+#   data = transpose_gather |> 
+#     filter(State == "Kansas" & Year >= 2019),
+#   formula = Employment ~ Year)
+# 
+# lm_kansas_overall <- lm(
+#   data = transpose_gather |> 
+#     filter(State == "Kansas"),
+#   formula = Employment ~ Year)
+# 
+# summary(lm_missouri_before)
+# summary(lm_kansas_before)
+# 
+# # Difference in slopes
+# lm_missouri_before$coefficients[2] - lm_kansas_before$coefficients[2]
+# 
+# # Trying out the lm model from office hour (11/15)
+# 
+# lm_full <- lm(
+#   formula = Employment ~ 
+#     Year + 
+#     Post2019 + 
+#     State + 
+#     State:Post2019 +
+#     factor(County),
+#   data = transpose_gather
+# )
+# summary(lm_full)
+# 
+# # library(sandwich)
+# # library(lmtest)
+# # 
+# # # Perform a test for the difference in slopes
+# # # (I don't think this is the right test.)
+# # coeftest(lm_full, vcov = vcovHC(lm_full))
+# # 
+# # library(lsmeans)
+# # 
+# # lstrends(lm_missouri_before, lm_kansas_before, var = "Year")
+# # confint(lm_missouri_before, parm = "Year", level = 0.9)
+# # confint(lm_kansas_overall, parm = "Year", level = 0.9)
+# 
+# #################################### #
+# # Begin Analysis ####
+# #################################### #
+# coefficients_lm_missouri_before <- 
+#   coef(lm_missouri_before)
+# # main_plot <- 
 # ggplot(data = transpose_gather, 
 #        aes(x = Year, y = Employment, col = State)) +
 #   geom_point() +
-#   geom_vline(xintercept = 2019, col = 'green3', lwd = 0.9) +
+#   geom_vline(aes(xintercept = 2019, linetype = "$0.8 Increase"), 
+#              col = 'green4', lwd = 0.9) +
+#   geom_abline(
+#     aes(slope = coefficients_lm_missouri_before[2],
+#         intercept = coefficients_lm_missouri_before[1],
+#         color = "Missouri"),
+#     lwd = 0.9,
+#     show.legend = F
+#     ) +
 #   geom_smooth(
 #     method = "lm", 
-#     formula = y ~ splines::ns(x, df = 10),
-#     # formula = y ~ x, 
+#     formula = y ~ x, 
 #     data = transpose_gather |> 
-#       filter(State == "Missouri"),
-#     color = 'blue2', 
-#     se = F
+#       filter(State == "Missouri" & Year >= 2019),
+#     color = 'black',
+#     linetype = "dashed",
+#     se = F,
+#     lwd = 0.9
+#     # aes(color = "MO After")
 #   ) +
 #   geom_smooth(
-#     method = "lm",
-#     formula = y ~ splines::ns(x, df = 10),
-#     # formula = y ~ x, 
+#     method = "lm", 
+#     formula = y ~ x, 
 #     data = transpose_gather |> 
 #       filter(State == "Kansas"),
-#     color = 'red3', 
-#     se = F
-#   ) #+
-  # geom_smooth(
-  #   method = "loess", 
-  #   formula = y ~ x, 
-  #   data = transpose_gather |> 
-  #     filter(State == "Missouri"),
-  #   color = 'green', 
-  #   se = TRUE
-  # ) +
-  # geom_smooth(
-  #   method = "loess", 
-  #   formula = y ~ x, 
-  #   data = transpose_gather |> 
-  #     filter(State == "Kansas"),
-  #   color = 'purple', 
-  #   se = TRUE
-  # )
-
-# transpose_plot$old_year <- transpose_plot$Year
-# transpose_plot <- transpose_plot |>
-#   mutate(
-#     Year =
-#       substr(transpose_plot$old_year,start = 1,stop = 4) |> 
-#       as.numeric() + 
-#       (substr(old_year, start = 5, stop = 5) |> 
-#          as.numeric() - 1) * 0.25 +
-#       (substr(old_year, start = 6, stop = 6) |> 
-#          as.numeric() - 1) * (1/12)
-#   )
-
-# Filter out values < -50
-# transpose_plot <- transpose_plot |> 
-  # filter(Employment > -90)
-
-#################################### #
-treatment_year <- 2019
-# Subset for MO
-
-MO_sub <- transpose_plot[str_detect(string = transpose_plot$County, pattern = "Missouri"),]
-MO_Before_2019 <- MO_sub |> filter(Year < treatment_year)
-MO_After_2019 <- MO_sub |> filter(Year >= treatment_year)
-
-plot(
-  x = MO_sub$Year,
-  y = MO_sub$Employment,
-  xlab = "Year",
-  ylab = "Employment level change since 2011 (%)",
-  ylim = c(-70, 80),
-  las = 1,
-  main = "Missouri"
-)
-
-abline(lm_missouri_before, col = 'red', lwd = 2) # Before Min Wage Increase
-abline(lm_missouri_after, col = 'blue', lwd = 2) # After
+#     # color = 'red3', 
+#     linetype = "solid",
+#     se = F,
+#     lwd = 0.9,
+#     # aes(color = "KS")
+#   ) +
+#   labs(
+#     title = 
+#       "Limited-Service Food Industry Employment",
+#     subtitle = 
+#       "Proportion of total employed working in limited-service restaurants.",
+#     x = 
+#       "Year", 
+#     y = 
+#       "Proportion working in limited-service restaurants",
+#     fill = 
+#       "State",
+#     linetype = "") + 
+#   # scale_color_manual(values = c("Missouri" = "black", "Kansas" = "red3", "Vertical Line" = "green4")) +
+#   scale_linetype_manual(values = c("$0.8 Increase" = "solid")) +
+#   theme_light()
 # 
-# Creating manually
-line_difference <- predict(lm_missouri_before, newdata = data.frame(Year = treatment_year)) - predict(lm_missouri_after, newdata = data.frame(Year = treatment_year))
-
-################## #
-# Segments aren't plotting right
-################## #
-
-# segments(
-#   x0 = treatment_year,
-#   y0 = predict(lm_missouri_before, newdata = data.frame(Year = treatment_year)),
-#   x1 = 2025,
-#   y1 = predict(lm_missouri_after, newdata = data.frame(Year = max(MO_After_2019$Year))) + line_difference,
-#   col = 'blue',
-#   lwd = 2,
-#   lty = 2
+# ggsave(
+#   filename = "Rplot08.png",
+#   plot = main_plot,
+#   height = 800 * 3,
+#   width = 1400 * 3,
+#   units = 'px'
 # )
-
-abline(
-  a = coef(lm_missouri_after)[1] + line_difference,
-  b = coef(lm_missouri_after)[2],
-  col = 'blue',
-  lwd = 2
-)
-
-abline(v = treatment_year, col = 'orange', lwd = 2) # Min wage Increase
-
-legend(
-  "bottomleft", # Position of the legend on the plot
-  legend = c("Regression Line (Before)", "Regression Line (After)", "Min Wage Increase"),
-  col = c("red", "blue", "orange"), # Colors corresponding to the lines
-  lwd = 2, # Line width
-  # pch = 16, # Point type
-  title = "Legend" # Legend title
-)
-
-
-abline(lm_missouri_overall, col = 'green', lwd = 2)
-
-# Plotting after 2018 only
-
-ggplot(data = MO_sub, aes(x = Year, y = Employment)) +
-  # Add a line for Employment Change
-  geom_point(color = 'black') +
-  geom_smooth(method = "lm", formula = y ~ x, data = MO_Before_2019, color = "blue", se = TRUE) +
-  geom_smooth(method = "lm", formula = y ~ x, data = MO_After_2019, color = "red", se = TRUE) +
-  labs(
-    title = "MO"
-  ) + geom_vline(xintercept = 2019)
-
-############################## #
-############################## #
-
-KS_sub <- transpose_plot[str_detect(string = transpose_plot$County, pattern = "Kansas"),]
-KS_sub$Employment[is.infinite(KS_sub$Employment)] <- 100
-
-KS_Before_2019 <- KS_sub[KS_sub$Year < treatment_year,]
-
-KS_After_2019 <- KS_sub[KS_sub$Year >= treatment_year,]
-
-
-# Edit everything below before running so that it is for KS instrad of MO
+#   # geom_smooth(
+#   #   method = "lm", 
+#   #   formula = y ~ x, 
+#   #   data = transpose_gather |> 
+#   #     filter(State == "Missouri" & Year < 2019),
+#   #   # color = 'blue4', 
+#   #   linetype = "solid",
+#   #   se = F,
+#   #   # aes(color = "MO Overall")
+#   # ) +
+# # LM Models ####
 # 
-
-
-plot(
-  x = KS_sub$Year,
-  y = KS_sub$Employment,
-  xlab = "Year",
-  ylab = "Employment level change since 2011 (%)",
-  # ylim = c(-70, 80),
-  las = 1,
-  main = "Kansas"
-)
-
-abline(lm_kansas_before, col = 'red', lwd = 2) # Before Min Wage Increase
-abline(lm_kansas_after, col = 'green', lwd = 2) # After
 # 
-# Creating manually
-line_difference <- predict(lm_kansas_before, newdata = data.frame(Year = treatment_year)) - predict(lm_kansas_after, newdata = data.frame(Year = treatment_year))
-
-################## #
-# Segments aren't plotting right
-################## #
-
-# segments(
-#   x0 = treatment_year,
-#   y0 = predict(lm_kansas_before, newdata = data.frame(Year = treatment_year)),
-#   x1 = 2025,
-#   y1 = predict(lm_kansas_after, newdata = data.frame(Year = max(KS_After_2019$Year))) + line_difference,
-#   col = 'blue',
-#   lwd = 2,
-#   lty = 2
+# # ##################################################################### #
+# # ##################################################################### #
+# # ################ NOT USING CODE BELOW AS OF 11/14 #####################
+# # ##################################################################### #
+# # ##################################################################### #
+# 
+# # ggplot(data = transpose_gather, 
+# #        aes(x = Year, y = Employment, col = State)) +
+# #   geom_point() +
+# #   geom_vline(xintercept = 2019, col = 'green3', lwd = 0.9) +
+# #   geom_smooth(
+# #     method = "lm", 
+# #     formula = y ~ splines::ns(x, df = 10),
+# #     # formula = y ~ x, 
+# #     data = transpose_gather |> 
+# #       filter(State == "Missouri"),
+# #     color = 'blue2', 
+# #     se = F
+# #   ) +
+# #   geom_smooth(
+# #     method = "lm",
+# #     formula = y ~ splines::ns(x, df = 10),
+# #     # formula = y ~ x, 
+# #     data = transpose_gather |> 
+# #       filter(State == "Kansas"),
+# #     color = 'red3', 
+# #     se = F
+# #   ) #+
+#   # geom_smooth(
+#   #   method = "loess", 
+#   #   formula = y ~ x, 
+#   #   data = transpose_gather |> 
+#   #     filter(State == "Missouri"),
+#   #   color = 'green', 
+#   #   se = TRUE
+#   # ) +
+#   # geom_smooth(
+#   #   method = "loess", 
+#   #   formula = y ~ x, 
+#   #   data = transpose_gather |> 
+#   #     filter(State == "Kansas"),
+#   #   color = 'purple', 
+#   #   se = TRUE
+#   # )
+# 
+# # transpose_plot$old_year <- transpose_plot$Year
+# # transpose_plot <- transpose_plot |>
+# #   mutate(
+# #     Year =
+# #       substr(transpose_plot$old_year,start = 1,stop = 4) |> 
+# #       as.numeric() + 
+# #       (substr(old_year, start = 5, stop = 5) |> 
+# #          as.numeric() - 1) * 0.25 +
+# #       (substr(old_year, start = 6, stop = 6) |> 
+# #          as.numeric() - 1) * (1/12)
+# #   )
+# 
+# # Filter out values < -50
+# # transpose_plot <- transpose_plot |> 
+#   # filter(Employment > -90)
+# 
+# #################################### #
+# treatment_year <- 2019
+# # Subset for MO
+# 
+# MO_sub <- transpose_plot[str_detect(string = transpose_plot$County, pattern = "Missouri"),]
+# MO_Before_2019 <- MO_sub |> filter(Year < treatment_year)
+# MO_After_2019 <- MO_sub |> filter(Year >= treatment_year)
+# 
+# plot(
+#   x = MO_sub$Year,
+#   y = MO_sub$Employment,
+#   xlab = "Year",
+#   ylab = "Employment level change since 2011 (%)",
+#   ylim = c(-70, 80),
+#   las = 1,
+#   main = "Missouri"
 # )
-
-abline(
-  a = coef(lm_kansas_after)[1] + line_difference,
-  b = coef(lm_kansas_after)[2],
-  col = 'blue',
-  lwd = 2
-)
-
-abline(v = treatment_year, col = 'orange', lwd = 2) # Min wage Increase
-
-legend(
-  "bottomleft", # Position of the legend on the plot
-  legend = c("Regression Line (Before)", "Regression Line (After)", "Min Wage Increase"),
-  col = c("red", "blue", "orange"), # Colors corresponding to the lines
-  lwd = 2, # Line width
-  # pch = 16, # Point type
-  title = "Legend" # Legend title
-)
-
+# 
+# abline(lm_missouri_before, col = 'red', lwd = 2) # Before Min Wage Increase
+# abline(lm_missouri_after, col = 'blue', lwd = 2) # After
+# # 
+# # Creating manually
+# line_difference <- predict(lm_missouri_before, newdata = data.frame(Year = treatment_year)) - predict(lm_missouri_after, newdata = data.frame(Year = treatment_year))
+# 
+# ################## #
+# # Segments aren't plotting right
+# ################## #
+# 
+# # segments(
+# #   x0 = treatment_year,
+# #   y0 = predict(lm_missouri_before, newdata = data.frame(Year = treatment_year)),
+# #   x1 = 2025,
+# #   y1 = predict(lm_missouri_after, newdata = data.frame(Year = max(MO_After_2019$Year))) + line_difference,
+# #   col = 'blue',
+# #   lwd = 2,
+# #   lty = 2
+# # )
+# 
+# abline(
+#   a = coef(lm_missouri_after)[1] + line_difference,
+#   b = coef(lm_missouri_after)[2],
+#   col = 'blue',
+#   lwd = 2
+# )
+# 
+# abline(v = treatment_year, col = 'orange', lwd = 2) # Min wage Increase
+# 
+# legend(
+#   "bottomleft", # Position of the legend on the plot
+#   legend = c("Regression Line (Before)", "Regression Line (After)", "Min Wage Increase"),
+#   col = c("red", "blue", "orange"), # Colors corresponding to the lines
+#   lwd = 2, # Line width
+#   # pch = 16, # Point type
+#   title = "Legend" # Legend title
+# )
+# 
+# 
+# abline(lm_missouri_overall, col = 'green', lwd = 2)
+# 
+# # Plotting after 2018 only
+# 
+# ggplot(data = MO_sub, aes(x = Year, y = Employment)) +
+#   # Add a line for Employment Change
+#   geom_point(color = 'black') +
+#   geom_smooth(method = "lm", formula = y ~ x, data = MO_Before_2019, color = "blue", se = TRUE) +
+#   geom_smooth(method = "lm", formula = y ~ x, data = MO_After_2019, color = "red", se = TRUE) +
+#   labs(
+#     title = "MO"
+#   ) + geom_vline(xintercept = 2019)
+# 
+# ############################## #
+# ############################## #
+# 
+# KS_sub <- transpose_plot[str_detect(string = transpose_plot$County, pattern = "Kansas"),]
+# KS_sub$Employment[is.infinite(KS_sub$Employment)] <- 100
+# 
+# KS_Before_2019 <- KS_sub[KS_sub$Year < treatment_year,]
+# 
+# KS_After_2019 <- KS_sub[KS_sub$Year >= treatment_year,]
+# 
+# 
+# # Edit everything below before running so that it is for KS instrad of MO
+# # 
+# 
+# 
+# plot(
+#   x = KS_sub$Year,
+#   y = KS_sub$Employment,
+#   xlab = "Year",
+#   ylab = "Employment level change since 2011 (%)",
+#   # ylim = c(-70, 80),
+#   las = 1,
+#   main = "Kansas"
+# )
+# 
+# abline(lm_kansas_before, col = 'red', lwd = 2) # Before Min Wage Increase
+# abline(lm_kansas_after, col = 'green', lwd = 2) # After
+# # 
+# # Creating manually
+# line_difference <- predict(lm_kansas_before, newdata = data.frame(Year = treatment_year)) - predict(lm_kansas_after, newdata = data.frame(Year = treatment_year))
+# 
+# ################## #
+# # Segments aren't plotting right
+# ################## #
+# 
+# # segments(
+# #   x0 = treatment_year,
+# #   y0 = predict(lm_kansas_before, newdata = data.frame(Year = treatment_year)),
+# #   x1 = 2025,
+# #   y1 = predict(lm_kansas_after, newdata = data.frame(Year = max(KS_After_2019$Year))) + line_difference,
+# #   col = 'blue',
+# #   lwd = 2,
+# #   lty = 2
+# # )
+# 
+# abline(
+#   a = coef(lm_kansas_after)[1] + line_difference,
+#   b = coef(lm_kansas_after)[2],
+#   col = 'blue',
+#   lwd = 2
+# )
+# 
+# abline(v = treatment_year, col = 'orange', lwd = 2) # Min wage Increase
+# 
+# legend(
+#   "bottomleft", # Position of the legend on the plot
+#   legend = c("Regression Line (Before)", "Regression Line (After)", "Min Wage Increase"),
+#   col = c("red", "blue", "orange"), # Colors corresponding to the lines
+#   lwd = 2, # Line width
+#   # pch = 16, # Point type
+#   title = "Legend" # Legend title
+# )
+# 
