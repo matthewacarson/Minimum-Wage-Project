@@ -43,8 +43,12 @@ library(tidyverse)
 # limited_2023 <-
 #   read_csv(
 #     file = "BLS/2023.q1-q1 722513 NAICS 722513 Limited-service restaurants.csv")
-limited_serv_orig <- new.env()
-load(file = "BLS_limited-service_rest.RData", envir = limited_serv_orig)
+
+# All the "Limited-service restaurants" CSVs can be 
+# loaded with the .RData file below:
+load(file = "BLS_limited-service_rest.RData", 
+    envir = limited_serv_orig <- new.env())
+
 counties_of_interest <- 
   "((Wyandotte|Johnson|Leavenworth|Atchison|Bourbon|Cherokee|Brown) County, Kansas|(Buchanan|Platte|Clay|Jackson|Cass|Bates|Vernon|Barton|Jasper|Newton) County, Missouri)"
 # 11/15: Temporarily removed Crawford
@@ -69,7 +73,7 @@ limited_serv_filtered$limited_2012_f <- limited_serv_orig$limited_2012[
     pattern = counties_of_interest
   ), columns_of_interest]
 
-limited_serv_filtered$limited_2013_f <- limited_2013[
+limited_serv_filtered$limited_2013_f <- limited_serv_orig$limited_2013[
   str_detect(
     string = limited_serv_orig$limited_2013$area_title,
     pattern = counties_of_interest
@@ -168,8 +172,7 @@ limited_combined_gather <-
     value = "emplvl",  
     month1_emplvl, 
     month2_emplvl, 
-    month3_emplvl
-  ) |> 
+    month3_emplvl) |> 
   # Extract the numeric part from the "month" column
   mutate(
     month =
@@ -183,8 +186,7 @@ limited_combined_gather <-
 limited_combined_gather$date <- 
   paste(
     limited_combined_gather$month + 
-      (limited_combined_gather$qtr - 1) * 3, 
-    1, 
+      (limited_combined_gather$qtr - 1) * 3, 1, 
     limited_combined_gather$year, sep = "/")
 
 limited_combined_gather$date <- 
@@ -226,8 +228,8 @@ min_wage_limited_increase <-
     x = min_wage_limited,
     y = Min_Wage )
 
-min_wage_limited_increase$mw_increase[is.na(min_wage_limited_increase$mw_increase)] <-
-  0
+min_wage_limited_increase$mw_increase[
+  is.na(min_wage_limited_increase$mw_increase)] <- 0
 
 # # ##################################################### #
 # # Begin importing CSVs for emp lvl in ALL industries ####
@@ -245,105 +247,110 @@ min_wage_limited_increase$mw_increase[is.na(min_wage_limited_increase$mw_increas
 # All_Ind_2013 <- read_csv("BLS/2013.q1-q4 10 Total, all industries.csv")
 # All_Ind_2012 <- read_csv("BLS/2012.q1-q4 10 Total, all industries.csv")
 # All_Ind_2011 <- read_csv("BLS/2011.q1-q4 10 Total, all industries.csv")
-load(file = "BLS_all_industries.RData")
+
+# All the "all industries" CSVs can be loaded with the .RData file below:
+load(
+  file = "BLS_all_industries.RData",
+  envir = all_industries_orig <- new.env())
 # ## ############################################# #
 # ## Filtering columns and counties of interest ####
 # ## ############################################# #
-All_Ind_2023_f <- All_Ind_2023[
+all_industries_filtered <- new.env()
+all_industries_filtered$All_Ind_2023_f <- all_industries_orig$All_Ind_2023[
   str_detect(
-    string = All_Ind_2023$area_title,
+    string = all_industries_orig$All_Ind_2023$area_title,
     pattern = counties_of_interest
   ), columns_of_interest]
 
-All_Ind_2022_f <- All_Ind_2022[
+all_industries_filtered$All_Ind_2022_f <- all_industries_orig$All_Ind_2022[
   str_detect(
-    string = All_Ind_2022$area_title,
+    string = all_industries_orig$All_Ind_2022$area_title,
     pattern = counties_of_interest
   ), columns_of_interest]
 
-All_Ind_2021_f <- All_Ind_2021[
+all_industries_filtered$All_Ind_2021_f <- all_industries_orig$All_Ind_2021[
   str_detect(
-    string = All_Ind_2021$area_title,
+    string = all_industries_orig$All_Ind_2021$area_title,
     pattern = counties_of_interest
   ), columns_of_interest]
 
-All_Ind_2020_f <- All_Ind_2020[
+all_industries_filtered$All_Ind_2020_f <- all_industries_orig$All_Ind_2020[
   str_detect(
-    string = All_Ind_2020$area_title,
+    string = all_industries_orig$All_Ind_2020$area_title,
     pattern = counties_of_interest
   ), columns_of_interest]
 
-All_Ind_2019_f <- All_Ind_2019[
+all_industries_filtered$All_Ind_2019_f <- all_industries_orig$All_Ind_2019[
   str_detect(
-    string = All_Ind_2019$area_title,
+    string = all_industries_orig$All_Ind_2019$area_title,
     pattern = counties_of_interest
   ), columns_of_interest]
 
-All_Ind_2018_f <- All_Ind_2018[
+all_industries_filtered$All_Ind_2018_f <- all_industries_orig$All_Ind_2018[
   str_detect(
-    string = All_Ind_2018$area_title,
+    string = all_industries_orig$All_Ind_2018$area_title,
     pattern = counties_of_interest
   ), columns_of_interest]
 
-All_Ind_2017_f <- All_Ind_2017[
+all_industries_filtered$All_Ind_2017_f <- all_industries_orig$All_Ind_2017[
   str_detect(
-    string = All_Ind_2017$area_title,
+    string = all_industries_orig$All_Ind_2017$area_title,
     pattern = counties_of_interest
   ), columns_of_interest]
 
-All_Ind_2016_f <- All_Ind_2016[
+all_industries_filtered$All_Ind_2016_f <- all_industries_orig$All_Ind_2016[
   str_detect(
-    string = All_Ind_2016$area_title,
+    string = all_industries_orig$All_Ind_2016$area_title,
     pattern = counties_of_interest
   ), columns_of_interest]
 
-All_Ind_2015_f <- All_Ind_2015[
+all_industries_filtered$All_Ind_2015_f <- all_industries_orig$All_Ind_2015[
   str_detect(
-    string = All_Ind_2015$area_title,
+    string = all_industries_orig$All_Ind_2015$area_title,
     pattern = counties_of_interest
   ), columns_of_interest]
 
-All_Ind_2014_f <- All_Ind_2014[
+all_industries_filtered$All_Ind_2014_f <- all_industries_orig$All_Ind_2014[
   str_detect(
-    string = All_Ind_2014$area_title,
+    string = all_industries_orig$All_Ind_2014$area_title,
     pattern = counties_of_interest
   ), columns_of_interest]
 
-All_Ind_2013_f <- All_Ind_2013[
+all_industries_filtered$All_Ind_2013_f <- all_industries_orig$All_Ind_2013[
   str_detect(
-    string = All_Ind_2013$area_title,
+    string = all_industries_orig$All_Ind_2013$area_title,
     pattern = counties_of_interest
   ), columns_of_interest]
 
-All_Ind_2012_f <- All_Ind_2012[
+all_industries_filtered$All_Ind_2012_f <- all_industries_orig$All_Ind_2012[
   str_detect(
-    string = All_Ind_2012$area_title,
+    string = all_industries_orig$All_Ind_2012$area_title,
     pattern = counties_of_interest
   ), columns_of_interest]
 
-All_Ind_2011_f <- All_Ind_2011[
+all_industries_filtered$All_Ind_2011_f <- all_industries_orig$All_Ind_2011[
   str_detect(
-    string = All_Ind_2011$area_title,
+    string = all_industries_orig$All_Ind_2011$area_title,
     pattern = counties_of_interest
   ), columns_of_interest]
 ## ################################################# #
 ## Combining employment for all years of interest ####
 ## All employment; all industries ################## #
 ## ################################################# #
-all_ind_empl_filter <-
-  All_Ind_2011_f |>
-  add_row(All_Ind_2012_f) |>
-  add_row(All_Ind_2013_f) |>
-  add_row(All_Ind_2014_f) |>
-  add_row(All_Ind_2015_f) |>
-  add_row(All_Ind_2016_f) |>
-  add_row(All_Ind_2017_f) |>
-  add_row(All_Ind_2018_f) |>
-  add_row(All_Ind_2019_f) |>
-  add_row(All_Ind_2020_f) |>
-  add_row(All_Ind_2021_f) |>
-  add_row(All_Ind_2022_f) |>
-  add_row(All_Ind_2023_f) |>
+all_ind_empl_combined <-
+  all_industries_filtered$All_Ind_2011_f |>
+  add_row(all_industries_filtered$All_Ind_2012_f) |>
+  add_row(all_industries_filtered$All_Ind_2013_f) |>
+  add_row(all_industries_filtered$All_Ind_2014_f) |>
+  add_row(all_industries_filtered$All_Ind_2015_f) |>
+  add_row(all_industries_filtered$All_Ind_2016_f) |>
+  add_row(all_industries_filtered$All_Ind_2017_f) |>
+  add_row(all_industries_filtered$All_Ind_2018_f) |>
+  add_row(all_industries_filtered$All_Ind_2019_f) |>
+  add_row(all_industries_filtered$All_Ind_2020_f) |>
+  add_row(all_industries_filtered$All_Ind_2021_f) |>
+  add_row(all_industries_filtered$All_Ind_2022_f) |>
+  add_row(all_industries_filtered$All_Ind_2023_f) |>
   dplyr::filter(own_title == "Private")
 
 # ### ######################################## #
@@ -351,14 +358,13 @@ all_ind_empl_filter <-
 # ### Puts month and emplvl in separate columns 
 # ### ######################################## #
 all_ind_empl_gather <-
-  all_ind_empl_filter |>
+  all_ind_empl_combined |>
   gather(
     key = "month",
     value = "emplvl",
     month1_emplvl,
     month2_emplvl,
-    month3_emplvl
-  ) |>
+    month3_emplvl) |>
   # Extract the numeric part from the "month" column
   mutate(
     month =
@@ -367,8 +373,7 @@ all_ind_empl_gather <-
         month == "month2_emplvl" ~ 2,
         month == "month3_emplvl" ~ 3))
 
-all_ind_empl_gather$emplvl_all <- 
-  all_ind_empl_gather$emplvl
+all_ind_empl_gather$emplvl_all <- all_ind_empl_gather$emplvl
 
 all_ind_empl_gather$emplvl <- NULL
 all_ind_empl_gather$industry_code <- NULL
@@ -389,7 +394,6 @@ joined_data <-
 
 ## Begin Regressions ####
 # Regression from Eve
-transpose_gather$Post2019 <- transpose_gather$Year >= 2019
 
 lm_1 <- lmer(
   Employment ~ State + Year + Min_Wage + State:Year | as.factor(County),
