@@ -1,11 +1,5 @@
-# to-do list
-# 1) Check that the calculations between limited-service and all industries
-# are matching by county and time period so that the proportions are correct
-
-
 # setwd("C:/Users/madou/OneDrive - UCLA IT Services/2)_2023_Fall/PS-170A/Minimum-Wage-Project")
-# file_loc <- dirname(rstudioapi::getActiveDocumentContext()$path)
-# setwd(file_loc)
+setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 library(tidyverse)
 # ################################################################ #
 # Importing CSVs for fast food/limited-service restaurants only ####
@@ -49,7 +43,8 @@ library(tidyverse)
 # limited_2023 <-
 #   read_csv(
 #     file = "BLS/2023.q1-q1 722513 NAICS 722513 Limited-service restaurants.csv")
-load("BLS_limited-service_rest.RData")
+limited_serv_orig <- new.env()
+load(file = "BLS_limited-service_rest.RData", envir = limited_serv_orig)
 counties_of_interest <- 
   "((Wyandotte|Johnson|Leavenworth|Atchison|Bourbon|Cherokee|Brown) County, Kansas|(Buchanan|Platte|Clay|Jackson|Cass|Bates|Vernon|Barton|Jasper|Newton) County, Missouri)"
 # 11/15: Temporarily removed Crawford
@@ -61,81 +56,82 @@ columns_of_interest <- c(
 ## ############################################# #
 ## Filtering counties and columns of interest ####
 ## ############################################# #
-limited_2011_f <- limited_2011[
+limited_serv_filtered <- new.env()
+limited_serv_filtered$limited_2011_f <- limited_serv_orig$limited_2011[
   str_detect(
-    string = limited_2011$area_title,
+    string = limited_serv_orig$limited_2011$area_title,
     pattern = counties_of_interest
   ), columns_of_interest]
 
-limited_2012_f <- limited_2012[
+limited_serv_filtered$limited_2012_f <- limited_serv_orig$limited_2012[
   str_detect(
-    string = limited_2012$area_title,
+    string = limited_serv_orig$limited_2012$area_title,
     pattern = counties_of_interest
   ), columns_of_interest]
 
-limited_2013_f <- limited_2013[
+limited_serv_filtered$limited_2013_f <- limited_2013[
   str_detect(
-    string = limited_2013$area_title,
+    string = limited_serv_orig$limited_2013$area_title,
     pattern = counties_of_interest
   ), columns_of_interest]
 
-limited_2014_f <- limited_2014[
+limited_serv_filtered$limited_2014_f <- limited_serv_orig$limited_2014[
   str_detect(
-    string = limited_2014$area_title,
+    string = limited_serv_orig$limited_2014$area_title,
     pattern = counties_of_interest
   ), columns_of_interest]
 
-limited_2015_f <- limited_2015[
+limited_serv_filtered$limited_2015_f <- limited_serv_orig$limited_2015[
   str_detect(
-    string = limited_2015$area_title,
+    string = limited_serv_orig$limited_2015$area_title,
     pattern = counties_of_interest
   ), columns_of_interest]
 
-limited_2016_f <- limited_2016[
+limited_serv_filtered$limited_2016_f <- limited_serv_orig$limited_2016[
   str_detect(
-    string = limited_2016$area_title,
+    string = limited_serv_orig$limited_2016$area_title,
     pattern = counties_of_interest
   ), columns_of_interest]
 
-limited_2017_f <- limited_2017[
+limited_serv_filtered$limited_2017_f <- limited_serv_orig$limited_2017[
   str_detect(
-    string = limited_2017$area_title,
+    string = limited_serv_orig$limited_2017$area_title,
     pattern = counties_of_interest
   ), columns_of_interest]
 
-limited_2018_f <- limited_2018[
+limited_serv_filtered$limited_2018_f <- limited_serv_orig$limited_2018[
   str_detect(
-    string = limited_2018$area_title,
+    string = limited_serv_orig$limited_2018$area_title,
     pattern = counties_of_interest
   ), columns_of_interest]
 
-limited_2019_f <- limited_2019[
+limited_serv_filtered$limited_2019_f <- limited_serv_orig$limited_2019[
   str_detect(
-    string = limited_2019$area_title,
+    string = limited_serv_orig$limited_2019$area_title,
     pattern = counties_of_interest
   ), columns_of_interest]
 
-limited_2020_f <- limited_2020[
+limited_serv_filtered$limited_2020_f <- limited_serv_orig$limited_2020[
   str_detect(
-    string = limited_2020$area_title,
+    string = limited_serv_orig$limited_2020$area_title,
     pattern = counties_of_interest
   ), columns_of_interest]
 
-limited_2021_f <- limited_2021[
+limited_serv_filtered$limited_2021_f <- limited_serv_orig$limited_2021[
   str_detect(
-    string = limited_2021$area_title,
+    string = limited_serv_orig$limited_2021$area_title,
     pattern = counties_of_interest
   ), columns_of_interest]
 
-limited_2022_f <- limited_2022[
+limited_serv_filtered$limited_2022_f <- limited_serv_orig$limited_2022[
   str_detect(
-    string = limited_2022$area_title,
+    string = limited_serv_orig$limited_2022$area_title,
     pattern = counties_of_interest
   ), columns_of_interest]
 
-limited_2023_f <- limited_2023[
+limited_serv_filtered$limited_2023_f <- limited_serv_orig$limited_2023[
   str_detect(
-    string = limited_2023$area_title,
+    string = limited_serv_orig$limited_2023$area_title,
     pattern = counties_of_interest
   ), columns_of_interest]
 # ####################################################### #
@@ -143,26 +139,24 @@ limited_2023_f <- limited_2023[
 # Limited Food Service ################################## #
 # ####################################################### #
 limited_combined <- 
-  limited_2011_f |> 
-  add_row(limited_2012_f) |> 
-  add_row(limited_2013_f) |> 
-  add_row(limited_2014_f) |> 
-  add_row(limited_2015_f) |> 
-  add_row(limited_2016_f) |> 
-  add_row(limited_2017_f) |> 
-  add_row(limited_2018_f) |> 
-  add_row(limited_2019_f) |> 
-  add_row(limited_2020_f) |> 
-  add_row(limited_2021_f) |> 
-  add_row(limited_2022_f) |> 
-  add_row(limited_2023_f)
+  limited_serv_filtered$limited_2011_f |> 
+  add_row(limited_serv_filtered$limited_2012_f) |> 
+  add_row(limited_serv_filtered$limited_2013_f) |> 
+  add_row(limited_serv_filtered$limited_2014_f) |> 
+  add_row(limited_serv_filtered$limited_2015_f) |> 
+  add_row(limited_serv_filtered$limited_2016_f) |> 
+  add_row(limited_serv_filtered$limited_2017_f) |> 
+  add_row(limited_serv_filtered$limited_2018_f) |> 
+  add_row(limited_serv_filtered$limited_2019_f) |> 
+  add_row(limited_serv_filtered$limited_2020_f) |> 
+  add_row(limited_serv_filtered$limited_2021_f) |> 
+  add_row(limited_serv_filtered$limited_2022_f) |> 
+  add_row(limited_serv_filtered$limited_2023_f)
 # ############################################################ #
 ### Removing observations with zeros (non-reported values). ####
 # ############################################################ #
 limited_combined <- 
   limited_combined[-which(0 == limited_combined, arr.ind = T)[1:12,1],]
-
-# limited_combined$area_fips <- as.numeric(limited_combined$area_fips)
 
 ### ################################################################### #
 ### Gathering monthly emplvl into one column and month into another. ####
@@ -238,20 +232,20 @@ min_wage_limited_increase$mw_increase[is.na(min_wage_limited_increase$mw_increas
 # # ##################################################### #
 # # Begin importing CSVs for emp lvl in ALL industries ####
 # # ##################################################### #
-All_Ind_2023 <- read_csv("BLS/2023.q1-q1 10 10 Total, all industries.csv")
-All_Ind_2022 <- read_csv("BLS/2022.q1-q4 10 10 Total, all industries.csv")
-All_Ind_2021 <- read_csv("BLS/2021.q1-q4 10 10 Total, all industries.csv")
-All_Ind_2020 <- read_csv("BLS/2020.q1-q4 10 10 Total, all industries.csv")
-All_Ind_2019 <- read_csv("BLS/2019.q1-q4 10 10 Total, all industries.csv")
-All_Ind_2018 <- read_csv("BLS/2018.q1-q4 10 10 Total, all industries.csv")
-All_Ind_2017 <- read_csv("BLS/2017.q1-q4 10 10 Total, all industries.csv")
-All_Ind_2016 <- read_csv("BLS/2016.q1-q4 10 10 Total, all industries.csv")
-All_Ind_2015 <- read_csv("BLS/2015.q1-q4 10 Total, all industries.csv")
-All_Ind_2014 <- read_csv("BLS/2014.q1-q4 10 Total, all industries.csv")
-All_Ind_2013 <- read_csv("BLS/2013.q1-q4 10 Total, all industries.csv")
-All_Ind_2012 <- read_csv("BLS/2012.q1-q4 10 Total, all industries.csv")
-All_Ind_2011 <- read_csv("BLS/2011.q1-q4 10 Total, all industries.csv")
-# 
+# All_Ind_2023 <- read_csv("BLS/2023.q1-q1 10 10 Total, all industries.csv")
+# All_Ind_2022 <- read_csv("BLS/2022.q1-q4 10 10 Total, all industries.csv")
+# All_Ind_2021 <- read_csv("BLS/2021.q1-q4 10 10 Total, all industries.csv")
+# All_Ind_2020 <- read_csv("BLS/2020.q1-q4 10 10 Total, all industries.csv")
+# All_Ind_2019 <- read_csv("BLS/2019.q1-q4 10 10 Total, all industries.csv")
+# All_Ind_2018 <- read_csv("BLS/2018.q1-q4 10 10 Total, all industries.csv")
+# All_Ind_2017 <- read_csv("BLS/2017.q1-q4 10 10 Total, all industries.csv")
+# All_Ind_2016 <- read_csv("BLS/2016.q1-q4 10 10 Total, all industries.csv")
+# All_Ind_2015 <- read_csv("BLS/2015.q1-q4 10 Total, all industries.csv")
+# All_Ind_2014 <- read_csv("BLS/2014.q1-q4 10 Total, all industries.csv")
+# All_Ind_2013 <- read_csv("BLS/2013.q1-q4 10 Total, all industries.csv")
+# All_Ind_2012 <- read_csv("BLS/2012.q1-q4 10 Total, all industries.csv")
+# All_Ind_2011 <- read_csv("BLS/2011.q1-q4 10 Total, all industries.csv")
+load(file = "BLS_all_industries.RData")
 # ## ############################################# #
 # ## Filtering columns and counties of interest ####
 # ## ############################################# #
