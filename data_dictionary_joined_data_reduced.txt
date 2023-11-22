@@ -1,0 +1,25 @@
+Data dictionary for joined_data_reduced
+
+area_title = county name, state.
+
+state = the state that the county is located in,
+
+date = the month that the employment levels were measured.
+
+year_decimal = the month that the employment levels were 
+measured expressed in terms of year. Numbers to the right of the decimal
+indicate the month. Ex: January is the first month, so it is 1/12 of a 
+year or 0.083.
+
+min_wage = the minimum wage in effect at the time of employment level
+measurement.
+
+mw_increase = how much minimum wage increased from the previous month.
+
+emplvl_limited = the number of persons employed in limited service
+restaurants.
+
+emplvl_all = the total number of persons employed.
+
+proportion_limited = the proportion of persons working in limited
+service restaurants (emplvl_limited / emplvl_all).

@@ -194,14 +194,15 @@ limited_combined_gather$date <-
 
 limited_combined_converted <- 
   limited_combined_gather |> 
-  mutate(year_deci = (year + (qtr - 1) * (1/4) + (month - 1) * (1/12)))
+  mutate(
+    year_decimal = (year + (qtr - 1) * (1/4) + (month - 1) * (1/12)))
   # select(-qtr, -month, -own_title)
 
 limited_combined_pivot <- 
   limited_combined_converted |> 
   mutate(
     emplvl_limited = emplvl,
-    region = case_when(
+    state = case_when(
       grepl(pattern = "Missouri", x = area_title) ~ "MO",
       grepl(pattern = "Kansas", x = area_title) ~ "KS")) |> 
   select(-industry_code, -emplvl)
@@ -216,6 +217,7 @@ Min_Wage <-
   mutate(date = as.Date(Date, format = "%m/%d/%Y")) |> 
   filter(year(date) >= 2011) |>
   mutate(year = year(date)) |> 
+  rename(state = region) |> 
   select(-Date)
 
 min_wage_limited <- 
@@ -385,8 +387,23 @@ joined_data <-
 
 joined_data <- 
   joined_data |> 
-  mutate(proportion = emplvl_limited / emplvl_all) |> 
+  mutate(proportion_limited = emplvl_limited / emplvl_all) |> 
+  arrange(date) |> 
+  # mutate(month = (year(date) - 2011) * 12 + month(date)) |> 
   na.omit()
+
+joined_data_reduced <- 
+  joined_data |> 
+  select(
+    area_title,
+    state,
+    date,
+    year_decimal,
+    min_wage,
+    mw_increase,
+    emplvl_limited,
+    emplvl_all,
+    proportion_limited)
 
 # ################################################################### #
 # All code below needs to be modified because of changes made above
