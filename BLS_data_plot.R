@@ -1,5 +1,5 @@
 # setwd("C:/Users/madou/OneDrive - UCLA IT Services/2)_2023_Fall/PS-170A/Minimum-Wage-Project")
-setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+# setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 library(tidyverse)
 # ################################################################ #
 # Importing CSVs for fast food/limited-service restaurants only ####
@@ -49,9 +49,10 @@ library(tidyverse)
 load(file = "BLS_limited-service_rest.RData", 
     envir = limited_serv_orig <- new.env())
 
-counties_of_interest <- 
-  "((Wyandotte|Johnson|Leavenworth|Atchison|Bourbon|Cherokee|Brown) County, Kansas|(Buchanan|Platte|Clay|Jackson|Cass|Bates|Vernon|Barton|Jasper|Newton) County, Missouri)"
-# 11/15: Temporarily removed Crawford
+counties_of_interest <- "((Wyandotte|Johnson|Leavenworth|Atchison|Bourbon|Cherokee|Brown|Linn|Miami|Doniphan) County, Kansas|(Buchanan|Platte|Clay|Jackson|Cass|Bates|Barton|Jasper|Newton|Vernon) County, Missouri)"
+# counties_of_interest <- "Kansas|Missouri"
+
+
 columns_of_interest <- c(
   "area_fips", "year", "qtr", "area_title", 
   # "qtrly_estabs_count", 
@@ -60,6 +61,7 @@ columns_of_interest <- c(
 ## ############################################# #
 ## Filtering counties and columns of interest ####
 ## ############################################# #
+
 limited_serv_filtered <- new.env()
 limited_serv_filtered$limited_2011_f <- limited_serv_orig$limited_2011[
   str_detect(
@@ -156,11 +158,6 @@ limited_combined <-
   add_row(limited_serv_filtered$limited_2021_f) |> 
   add_row(limited_serv_filtered$limited_2022_f) |> 
   add_row(limited_serv_filtered$limited_2023_f)
-# ############################################################ #
-### Removing observations with zeros (non-reported values). ####
-# ############################################################ #
-limited_combined <- 
-  limited_combined[-which(0 == limited_combined, arr.ind = T)[1:12,1],]
 
 ### ################################################################### #
 ### Gathering monthly emplvl into one column and month into another. ####
@@ -383,20 +380,27 @@ all_ind_empl_gather$industry_code <- NULL
 joined_data <- 
   full_join(
     x = min_wage_limited_increase,
-    y = all_ind_empl_gather)
-
-joined_data <- 
-  joined_data |> 
-  mutate(proportion_limited = emplvl_limited / emplvl_all) |> 
+    y = all_ind_empl_gather) |> 
+  mutate(
+    year_2018 = ifelse(year(date) == 2018, 1, 0),
+    proportion_limited = emplvl_limited / emplvl_all) |> 
+  rename(State = state) |> 
   arrange(date) |> 
-  # mutate(month = (year(date) - 2011) * 12 + month(date)) |> 
+  filter(proportion_limited > 0 & proportion_limited < Inf) |> 
+  # dummy_columns(select_columns = c("State", "year")) |> 
   na.omit()
+
+# Convert to factors
+joined_data$area_fips <- factor(joined_data$area_fips)
+joined_data$year <- factor(joined_data$year)
+joined_data$area_title <- factor(joined_data$area_title)
+joined_data$State <- factor(joined_data$State)
 
 joined_data_reduced <- 
   joined_data |> 
   select(
     area_title,
-    state,
+    State,
     date,
     year_decimal,
     min_wage,
@@ -405,14 +409,100 @@ joined_data_reduced <-
     emplvl_all,
     proportion_limited)
 
+# scatter plot
+ggplot() +
+  geom_point(
+    data = joined_data |> filter(year %in% 2017:2018),
+    aes(x = year_decimal, y = proportion_limited, color = State))
+
+# Filter June values
+
+joined_data_1718 <- 
+  joined_data |> 
+  # mutate(proportion_limited = proportion_limited * 100) |> 
+  select(
+    proportion_limited, area_title, area_fips, year, date, State) |>
+  filter(
+    # month(date) == 1 &
+      year(date) %in% 2017:2018) |> 
+   mutate(month = month(date)) |> 
+  select(-date) |> 
+  pivot_wider(
+    names_from = c(year, month),
+    names_prefix = "prop_",
+    values_from = proportion_limited) |> 
+  # mutate(prop_change = prop_2018 - prop_2017) |> 
+  na.omit()
+
+# #################### #
+# D-i-D 2017-2018 ####
+# #################### #
+library(lfe)
+
+# felm_2017_2018 <- 
+  # joined_data_july_1718 |>
+  # felm(formula = prop_change ~ 0 + State | area_title)
+
+# summary(felm_2017_2018)
+
+felm_2017_2018 <- 
+  joined_data_jan_1718 |> 
+  lm(formula = prop_change ~ 0 + State)
+
+summary(felm_2017_2018)
+
+deci_period_of_int <- seq(2017, 2019 + 11/12, by = 1/12)
+
+joined_data |> filter(year_decimal %in% deci_period_of_int & State == "KS") |> 
+  aggregate(proportion_limited ~ State + year_decimal, FUN = mean) |> 
+  arrange(State) |> 
+  mutate(change = c(NA, diff(proportion_limited))) |> 
+  add_row(
+    joined_data |> filter(year_decimal %in% deci_period_of_int & State == "MO") |> 
+      aggregate(proportion_limited ~ State + year_decimal, FUN = mean) |> 
+      arrange(State) |> 
+      mutate(change = c(NA, diff(proportion_limited))))
+  # select(-proportion_limited) |> 
+  # pivot_wider(
+  #   names_from = State,
+  #   values_from = change
+  # )
+
+
+
+
+# Plotting means to check of parallel trends
+ggplot(data = joined_data |> filter(year_decimal %in% deci_period_of_int), 
+       aes(x = year_decimal, y = proportion_limited, color = State)) +
+  stat_summary(
+    fun = mean,
+    geom = "point"
+  ) +
+  geom_line(
+    aes(group = State),
+    stat = "summary",
+    fun = mean
+  ) +
+  # scale_x_continuous(
+    # breaks = seq(2016, 2020, by = 0.25),
+    # limits = c(2011, 2023.25)
+  # ) +
+  labs(title = "Means Plot") + 
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+
 # ################################################################### #
-# All code below needs to be modified because of changes made above
+# ################################################################### #
+# ################################################################### #
+# All code below needs to be modified because of changes made above # #
+# ################################################################### #
+# ################################################################### #
 # ################################################################### #
 
 ## Begin Regressions ####
 # Regression from Eve
 
-lm_1 <- lmer(
+lm_1 <- felm(
   Employment ~ State + Year + Min_Wage + State:Year | as.factor(County),
   data = transpose_gather)
 
