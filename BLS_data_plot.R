@@ -56,8 +56,9 @@ counties_of_interest <- "((Wyandotte|Johnson|Leavenworth|Atchison|Bourbon|Cherok
 columns_of_interest <- c(
   "area_fips", "year", "qtr", "area_title", 
   # "qtrly_estabs_count", 
-  "month1_emplvl", "month2_emplvl", 
-  "month3_emplvl", "industry_code", "own_title")
+  "month1_emplvl", "month2_emplvl", "month3_emplvl",  "total_qtrly_wages", 
+  "taxable_qtrly_wages", "qtrly_contributions", "avg_wkly_wage", 
+  "industry_code", "own_title")
 ## ############################################# #
 ## Filtering counties and columns of interest ####
 ## ############################################# #
@@ -202,7 +203,12 @@ limited_combined_pivot <-
     state = case_when(
       grepl(pattern = "Missouri", x = area_title) ~ "MO",
       grepl(pattern = "Kansas", x = area_title) ~ "KS")) |> 
-  select(-industry_code, -emplvl)
+  select(-industry_code, -emplvl) |> 
+  rename(
+    ltd_total_qtrly_wages = total_qtrly_wages,
+    ltd_taxable_qtrly_wages = taxable_qtrly_wages,
+    ltd_qtrly_contributions = qtrly_contributions,
+    ltd_avg_wkly_wage = avg_wkly_wage)
 # ###################### #
 # Minimum wage data ####
 # ###################### #
@@ -350,7 +356,12 @@ all_ind_empl_combined <-
   add_row(all_industries_filtered$All_Ind_2021_f) |>
   add_row(all_industries_filtered$All_Ind_2022_f) |>
   add_row(all_industries_filtered$All_Ind_2023_f) |>
-  dplyr::filter(own_title == "Private")
+  dplyr::filter(own_title == "Private") |> 
+  rename(
+    all_total_qtrly_wages = total_qtrly_wages,
+    all_taxable_qtrly_wages = taxable_qtrly_wages,
+    all_qtrly_contributions = qtrly_contributions,
+    all_avg_wkly_wage = avg_wkly_wage)
 
 # ### ######################################## #
 # ### Gather for all industries ################ 
@@ -420,19 +431,34 @@ ggplot() +
 joined_data_1718 <- 
   joined_data |> 
   # mutate(proportion_limited = proportion_limited * 100) |> 
-  select(area_title, year, date, State, proportion_limited) |>
-  filter(month(date) == 6 & year(date) %in% 2017:2018) |> 
+  select(area_title, area_fips, year, date, State, proportion_limited) |>
+  # filter(
+    # month(date) == 6 &
+      # year(date) %in% 2011:2019) |> 
   mutate(
-    Post_Treatment = case_when(year == 2018 ~ 1, TRUE ~ 0),
-    Treatment_Group = case_when(State == "MO" ~ 1, TRUE ~ 0)) |> 
-   # mutate(month = month(date)) # |>
-  select(-date, -State)
+    proportion_limited = proportion_limited * 10000) |> 
+  #  mutate(month = month(date)) |> 
+  # select(-date, -month) |> 
   # pivot_wider(
-  #   names_from = c(year, month),
+  #   names_from = c(year),
   #   names_prefix = "prop_",
-  #   values_from = proportion_limited) |> 
-  # # mutate(prop_change = prop_2018 - prop_2017) |> 
-  # na.omit()
+  #   values_from = proportion_limited) |>
+  mutate(
+    Post_Treatment = case_when(year == 2019 ~ 1, TRUE ~ 0),
+    Treatment_Group = case_when(State == "MO" ~ 1, TRUE ~ 0),
+    # proportion_change = prop_2019 - prop_2018
+    ) |>
+  na.omit()
+# Run panel data model with area_title as a fixed effect
+# panel_model <- 
+#   joined_data_1718 |> 
+#   plm(proportion_limited ~  Treatment_Group + Post_Treatment+ date + area_title, 
+#       model = "within",
+#       index = c("area_title", "date"),
+#       effect = "twoways",
+#       data = _)
+# 
+# summary(panel_model)
 
 # #################### #
 # D-i-D 2017-2018 ####
@@ -441,11 +467,11 @@ library(lfe)
 
 felm_2017_2018 <- 
   joined_data_1718 |> 
-  lm(formula = proportion_limited ~ Post_Treatment * Treatment_Group + area_title)
+  lm(formula = proportion_limited ~  Treatment_Group + Post_Treatment + area_fips)
 
 summary(felm_2017_2018)
 
-deci_period_of_int <- seq(2016.5, 2019.5, by = 1/12)
+deci_period_of_int <- seq(2016.5, 2022.5, by = 1)
 
 joined_data |> filter(year_decimal %in% deci_period_of_int & State == "KS") |> 
   aggregate(proportion_limited ~ State + year_decimal, FUN = mean) |> 
@@ -482,8 +508,7 @@ ggplot(data = joined_data |> filter(year_decimal %in% deci_period_of_int),
 
 ggsave(
   filename = "means_plot_16_19.png",
-  dpi = 'retina'
-)
+  dpi = 'retina')
 
 # ################################################################### #
 # ################################################################### #
