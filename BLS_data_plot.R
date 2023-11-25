@@ -145,7 +145,8 @@ limited_serv_filtered$limited_2023_f <- limited_serv_orig$limited_2023[
 ## Combining all data frames for all years of interest ####
 # Limited Food Service ################################## #
 # ####################################################### #
-limited_combined <- 
+limited_combined <- new.env()
+limited_combined$combined <- 
   limited_serv_filtered$limited_2011_f |> 
   add_row(limited_serv_filtered$limited_2012_f) |> 
   add_row(limited_serv_filtered$limited_2013_f) |> 
@@ -163,8 +164,8 @@ limited_combined <-
 ### ################################################################### #
 ### Gathering monthly emplvl into one column and month into another. ####
 ### ################################################################### #
-limited_combined_gather <- 
-  limited_combined |> 
+limited_combined$gather <- 
+  limited_combined$combined |> 
   gather(
     key = "month", 
     value = "emplvl",  
@@ -181,23 +182,23 @@ limited_combined_gather <-
 ## ############################# #
 ## Combine year, qtr, month ####
 ## ############################# #
-limited_combined_gather$date <- 
+limited_combined$gather$date <- 
   paste(
-    limited_combined_gather$month + 
-      (limited_combined_gather$qtr - 1) * 3, 1, 
-    limited_combined_gather$year, sep = "/")
+    limited_combined$gather$month + 
+      (limited_combined$gather$qtr - 1) * 3, 1, 
+    limited_combined$gather$year, sep = "/")
 
-limited_combined_gather$date <- 
-  as.Date(limited_combined_gather$date, format = "%m/%d/%Y")
+limited_combined$gather$date <- 
+  as.Date(limited_combined$gather$date, format = "%m/%d/%Y")
 
-limited_combined_converted <- 
-  limited_combined_gather |> 
+limited_combined$converted <- 
+  limited_combined$gather |> 
   mutate(
     year_decimal = (year + (qtr - 1) * (1/4) + (month - 1) * (1/12)))
   # select(-qtr, -month, -own_title)
 
-limited_combined_pivot <- 
-  limited_combined_converted |> 
+limited_combined$pivot <- 
+  limited_combined$converted |> 
   mutate(
     emplvl_limited = emplvl,
     state = case_when(
@@ -212,29 +213,29 @@ limited_combined_pivot <-
 # ###################### #
 # Minimum wage data ####
 # ###################### #
-Min_Wage_backup <- read_csv(
-  file = "min-wage.csv")
+min_wage <- new.env()
+min_wage$backup <- read_csv(file = "min-wage.csv")
 
-Min_Wage <-
-  Min_Wage_backup |> 
+min_wage$filtered <-
+  min_wage$backup |> 
   mutate(date = as.Date(Date, format = "%m/%d/%Y")) |> 
   filter(year(date) >= 2011) |>
   mutate(year = year(date)) |> 
   rename(state = region) |> 
   select(-Date)
 
-min_wage_limited <- 
+min_wage$limited <- 
   left_join(
-    x = limited_combined_pivot,
-    y = Min_Wage |> select(-mw_increase, -date))
+    x = limited_combined$pivot,
+    y = min_wage$filtered |> select(-mw_increase, -date))
 
-min_wage_limited_increase <-
+min_wage$limited_increase <-
   left_join(
-    x = min_wage_limited,
-    y = Min_Wage )
+    x = min_wage$limited,
+    y = min_wage$filtered)
 
-min_wage_limited_increase$mw_increase[
-  is.na(min_wage_limited_increase$mw_increase)] <- 0
+min_wage$limited_increase$mw_increase[
+  is.na(min_wage$limited_increase$mw_increase)] <- 0
 
 # # ##################################################### #
 # # Begin importing CSVs for emp lvl in ALL industries ####
@@ -342,7 +343,8 @@ all_industries_filtered$All_Ind_2011_f <- all_industries_orig$All_Ind_2011[
 ## Combining employment for all years of interest ####
 ## All employment; all industries ################## #
 ## ################################################# #
-all_ind_empl_combined <-
+all_ind_combined <- new.env()
+all_ind_combined$combined <-
   all_industries_filtered$All_Ind_2011_f |>
   add_row(all_industries_filtered$All_Ind_2012_f) |>
   add_row(all_industries_filtered$All_Ind_2013_f) |>
@@ -367,8 +369,8 @@ all_ind_empl_combined <-
 # ### Gather for all industries ################ 
 # ### Puts month and emplvl in separate columns 
 # ### ######################################## #
-all_ind_empl_gather <-
-  all_ind_empl_combined |>
+all_ind_combined$gather <-
+  all_ind_combined$combined |>
   gather(
     key = "month",
     value = "emplvl",
@@ -383,72 +385,76 @@ all_ind_empl_gather <-
         month == "month2_emplvl" ~ 2,
         month == "month3_emplvl" ~ 3))
 
-all_ind_empl_gather$emplvl_all <- all_ind_empl_gather$emplvl
+all_ind_combined$gather$emplvl_all <- all_ind_combined$gather$emplvl
 
-all_ind_empl_gather$emplvl <- NULL
-all_ind_empl_gather$industry_code <- NULL
+all_ind_combined$gather$emplvl <- NULL
+all_ind_combined$gather$industry_code <- NULL
 
 joined_data <- 
   full_join(
-    x = min_wage_limited_increase,
-    y = all_ind_empl_gather) |> 
+    x = min_wage$limited_increase,
+    y = all_ind_combined$gather) |> 
   mutate(
     # year_2018 = ifelse(year(date) == 2018, 1, 0),
     proportion_limited = emplvl_limited / emplvl_all) |> 
   rename(State = state) |> 
   arrange(date) |> 
   filter(proportion_limited > 0 & proportion_limited < Inf) |> 
+  mutate(proportion_limited = proportion_limited * 100) |> 
+  mutate(
+    area_fips = factor(area_fips),
+    area_title = factor(area_title),
+    Post_Treatment = year >= 2019,
+    Treatment_Group = State == "MO") |> 
   # dummy_columns(select_columns = c("State", "year")) |> 
   na.omit()
 
-# Convert to factors
-joined_data$area_fips <- factor(joined_data$area_fips)
-# joined_data$year <- factor(joined_data$year)
-joined_data$area_title <- factor(joined_data$area_title)
-# joined_data$State <- factor(joined_data$State)
-
-joined_data_reduced <- 
-  joined_data |> 
+joined_data_reduced <-
+  joined_data |>
   select(
-    area_title,
-    State,
-    date,
-    year_decimal,
-    min_wage,
-    mw_increase,
-    emplvl_limited,
-    emplvl_all,
-    proportion_limited)
-
-# scatter plot
-ggplot() +
-  geom_point(
-    data = joined_data |> filter(year %in% 2017:2018),
-    aes(x = year_decimal, y = proportion_limited, color = State))
+    "area_fips", 
+     # "year",
+     # "qtr", 
+     "area_title", 
+     # "ltd_total_qtrly_wages",  
+     # "ltd_taxable_qtrly_wages", 
+     # "ltd_qtrly_contributions", 
+     # "ltd_avg_wkly_wage",  
+     # "own_title", 
+     # "month", 
+     "date", 
+     # "year_decimal", 
+     # "emplvl_limited",  
+     "State", 
+     # "min_wage", 
+     # "mw_increase", 
+     # "all_total_qtrly_wages", 
+     # "all_taxable_qtrly_wages", 
+     # "all_qtrly_contributions", 
+     # "all_avg_wkly_wage", 
+     # "emplvl_all", 
+     "proportion_limited", 
+     "Post_Treatment", 
+     "Treatment_Group"
+  )
 
 # Filter June values
 
-joined_data_1718 <- 
-  joined_data |> 
-  # mutate(proportion_limited = proportion_limited * 100) |> 
-  select(area_title, area_fips, year, date, State, proportion_limited) |>
-  # filter(
-    # month(date) == 6 &
-      # year(date) %in% 2011:2019) |> 
-  mutate(
-    proportion_limited = proportion_limited * 10000) |> 
-  #  mutate(month = month(date)) |> 
-  # select(-date, -month) |> 
+joined_data_18_19 <- 
+  joined_data_reduced |>
+  filter(
+    month(date) == 6 &
+      year(date) %in% 2018:2019) |>
+  na.omit() # |> 
+   # mutate(month = month(date)) |>
+  # select(-date, -month) |>
   # pivot_wider(
   #   names_from = c(year),
   #   names_prefix = "prop_",
   #   values_from = proportion_limited) |>
-  mutate(
-    Post_Treatment = case_when(year == 2019 ~ 1, TRUE ~ 0),
-    Treatment_Group = case_when(State == "MO" ~ 1, TRUE ~ 0),
+
     # proportion_change = prop_2019 - prop_2018
-    ) |>
-  na.omit()
+    # ) |>
 # Run panel data model with area_title as a fixed effect
 # panel_model <- 
 #   joined_data_1718 |> 
@@ -464,14 +470,14 @@ joined_data_1718 <-
 # D-i-D 2017-2018 ####
 # #################### #
 library(lfe)
-
-felm_2017_2018 <- 
-  joined_data_1718 |> 
+models <- new.env()
+models$felm <- 
+  joined_data_18_19 |> 
   lm(formula = proportion_limited ~  Treatment_Group + Post_Treatment + area_fips)
 
-summary(felm_2017_2018)
+summary(models$felm)
 
-deci_period_of_int <- seq(2016.5, 2022.5, by = 1)
+deci_period_of_int <- seq(2011.5, 2022.5, by = 1/12)
 
 joined_data |> filter(year_decimal %in% deci_period_of_int & State == "KS") |> 
   aggregate(proportion_limited ~ State + year_decimal, FUN = mean) |> 
@@ -481,12 +487,34 @@ joined_data |> filter(year_decimal %in% deci_period_of_int & State == "KS") |>
     joined_data |> filter(year_decimal %in% deci_period_of_int & State == "MO") |> 
       aggregate(proportion_limited ~ State + year_decimal, FUN = mean) |> 
       arrange(State) |> 
-      mutate(change = c(NA, diff(proportion_limited))))
+      mutate(change = c(NA, diff(proportion_limited)))) |> 
+  write_csv(file = "prop_chg.csv")
   # select(-proportion_limited) |> 
   # pivot_wider(
   #   names_from = State,
   #   values_from = change
   # )
+# scatter plot
+ggplot(data = joined_data |> filter(year_decimal %in% deci_period_of_int), 
+       aes(x = year_decimal, y = proportion_limited, color = State)) +
+  # geom_point(position = position_dodge(width = 0.02)) +
+  geom_smooth(method = "loess", se = FALSE, span = 0.1) +
+  geom_line(
+    aes(group = State),
+    stat = "summary",
+    fun = mean,
+    lwd = 1) +
+  labs(title = "Means Plot") + 
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+  # stat_summary(
+  #   fun = mean,
+  #   geom = "point",
+  #   size = 2) +
+  # scale_x_continuous(
+  # breaks = seq(2016, 2020, by = 0.25),
+  # limits = c(2011, 2023.25)
+  # ) +
 
 # Plotting means to check of parallel trends
 ggplot(data = joined_data |> filter(year_decimal %in% deci_period_of_int), 
