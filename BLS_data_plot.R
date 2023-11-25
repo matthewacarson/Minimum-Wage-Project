@@ -382,7 +382,7 @@ joined_data <-
     x = min_wage_limited_increase,
     y = all_ind_empl_gather) |> 
   mutate(
-    year_2018 = ifelse(year(date) == 2018, 1, 0),
+    # year_2018 = ifelse(year(date) == 2018, 1, 0),
     proportion_limited = emplvl_limited / emplvl_all) |> 
   rename(State = state) |> 
   arrange(date) |> 
@@ -392,9 +392,9 @@ joined_data <-
 
 # Convert to factors
 joined_data$area_fips <- factor(joined_data$area_fips)
-joined_data$year <- factor(joined_data$year)
+# joined_data$year <- factor(joined_data$year)
 joined_data$area_title <- factor(joined_data$area_title)
-joined_data$State <- factor(joined_data$State)
+# joined_data$State <- factor(joined_data$State)
 
 joined_data_reduced <- 
   joined_data |> 
@@ -420,38 +420,32 @@ ggplot() +
 joined_data_1718 <- 
   joined_data |> 
   # mutate(proportion_limited = proportion_limited * 100) |> 
-  select(
-    proportion_limited, area_title, area_fips, year, date, State) |>
-  filter(
-    # month(date) == 1 &
-      year(date) %in% 2017:2018) |> 
-   mutate(month = month(date)) |> 
-  select(-date) |> 
-  pivot_wider(
-    names_from = c(year, month),
-    names_prefix = "prop_",
-    values_from = proportion_limited) |> 
-  # mutate(prop_change = prop_2018 - prop_2017) |> 
-  na.omit()
+  select(area_title, year, date, State, proportion_limited) |>
+  filter(month(date) == 6 & year(date) %in% 2017:2018) |> 
+  mutate(
+    Post_Treatment = case_when(year == 2018 ~ 1, TRUE ~ 0),
+    Treatment_Group = case_when(State == "MO" ~ 1, TRUE ~ 0)) |> 
+   # mutate(month = month(date)) # |>
+  select(-date, -State)
+  # pivot_wider(
+  #   names_from = c(year, month),
+  #   names_prefix = "prop_",
+  #   values_from = proportion_limited) |> 
+  # # mutate(prop_change = prop_2018 - prop_2017) |> 
+  # na.omit()
 
 # #################### #
 # D-i-D 2017-2018 ####
 # #################### #
 library(lfe)
 
-# felm_2017_2018 <- 
-  # joined_data_july_1718 |>
-  # felm(formula = prop_change ~ 0 + State | area_title)
-
-# summary(felm_2017_2018)
-
 felm_2017_2018 <- 
-  joined_data_jan_1718 |> 
-  lm(formula = prop_change ~ 0 + State)
+  joined_data_1718 |> 
+  lm(formula = proportion_limited ~ Post_Treatment * Treatment_Group + area_title)
 
 summary(felm_2017_2018)
 
-deci_period_of_int <- seq(2017, 2019 + 11/12, by = 1/12)
+deci_period_of_int <- seq(2016.5, 2019.5, by = 1/12)
 
 joined_data |> filter(year_decimal %in% deci_period_of_int & State == "KS") |> 
   aggregate(proportion_limited ~ State + year_decimal, FUN = mean) |> 
@@ -468,21 +462,16 @@ joined_data |> filter(year_decimal %in% deci_period_of_int & State == "KS") |>
   #   values_from = change
   # )
 
-
-
-
 # Plotting means to check of parallel trends
 ggplot(data = joined_data |> filter(year_decimal %in% deci_period_of_int), 
        aes(x = year_decimal, y = proportion_limited, color = State)) +
   stat_summary(
     fun = mean,
-    geom = "point"
-  ) +
+    geom = "point") +
   geom_line(
     aes(group = State),
     stat = "summary",
-    fun = mean
-  ) +
+    fun = mean) +
   # scale_x_continuous(
     # breaks = seq(2016, 2020, by = 0.25),
     # limits = c(2011, 2023.25)
@@ -490,6 +479,11 @@ ggplot(data = joined_data |> filter(year_decimal %in% deci_period_of_int),
   labs(title = "Means Plot") + 
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+
+ggsave(
+  filename = "means_plot_16_19.png",
+  dpi = 'retina'
+)
 
 # ################################################################### #
 # ################################################################### #
