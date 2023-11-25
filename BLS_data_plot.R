@@ -390,7 +390,10 @@ all_ind_combined$gather$emplvl_all <- all_ind_combined$gather$emplvl
 all_ind_combined$gather$emplvl <- NULL
 all_ind_combined$gather$industry_code <- NULL
 
-joined_data <- 
+# Joining all industries and limited service
+joined <- new.env()
+
+joined$data <- 
   full_join(
     x = min_wage$limited_increase,
     y = all_ind_combined$gather) |> 
@@ -409,8 +412,8 @@ joined_data <-
   # dummy_columns(select_columns = c("State", "year")) |> 
   na.omit()
 
-joined_data_reduced <-
-  joined_data |>
+joined$data_reduced <-
+  joined$data |>
   select(
     "area_fips", 
      # "year",
@@ -440,8 +443,8 @@ joined_data_reduced <-
 
 # Filter June values
 
-joined_data_18_19 <- 
-  joined_data_reduced |>
+joined$data_18_19 <- 
+  joined$data_reduced |>
   filter(
     month(date) == 6 &
       year(date) %in% 2018:2019) |>
@@ -472,30 +475,34 @@ joined_data_18_19 <-
 library(lfe)
 models <- new.env()
 models$felm <- 
-  joined_data_18_19 |> 
+  joined$data_18_19 |> 
   lm(formula = proportion_limited ~  Treatment_Group + Post_Treatment + area_fips)
 
 summary(models$felm)
 
-deci_period_of_int <- seq(2011.5, 2022.5, by = 1/12)
+deci_period_prop_chg <- seq(2011.5, 2022.5, by = 1)
 
-joined_data |> filter(year_decimal %in% deci_period_of_int & State == "KS") |> 
+joined$data |> filter(year_decimal %in% deci_period_prop_chg & State == "KS") |> 
   aggregate(proportion_limited ~ State + year_decimal, FUN = mean) |> 
   arrange(State) |> 
   mutate(change = c(NA, diff(proportion_limited))) |> 
   add_row(
-    joined_data |> filter(year_decimal %in% deci_period_of_int & State == "MO") |> 
+    joined$data |> filter(year_decimal %in% deci_period_prop_chg & State == "MO") |> 
       aggregate(proportion_limited ~ State + year_decimal, FUN = mean) |> 
       arrange(State) |> 
       mutate(change = c(NA, diff(proportion_limited)))) |> 
-  write_csv(file = "prop_chg.csv")
+  pivot_wider(
+    names_from = State,
+    values_from = c('proportion_limited', 'change')) #|> 
+  # write_csv(file = "prop_chg.csv")
   # select(-proportion_limited) |> 
   # pivot_wider(
   #   names_from = State,
   #   values_from = change
   # )
 # scatter plot
-ggplot(data = joined_data |> filter(year_decimal %in% deci_period_of_int), 
+deci_period_means_trend <- seq(2011.5, 2022.5, by = 1/12)
+ggplot(data = joined$data |> filter(year_decimal %in% deci_period_means_trend), 
        aes(x = year_decimal, y = proportion_limited, color = State)) +
   # geom_point(position = position_dodge(width = 0.02)) +
   geom_smooth(method = "loess", se = FALSE, span = 0.1) +
@@ -516,8 +523,8 @@ ggplot(data = joined_data |> filter(year_decimal %in% deci_period_of_int),
   # limits = c(2011, 2023.25)
   # ) +
 
-# Plotting means to check of parallel trends
-ggplot(data = joined_data |> filter(year_decimal %in% deci_period_of_int), 
+# Plotting means to check for parallel trends
+ggplot(data = joined$data |> filter(year_decimal %in% deci_period_means_trend), 
        aes(x = year_decimal, y = proportion_limited, color = State)) +
   stat_summary(
     fun = mean,
@@ -534,9 +541,7 @@ ggplot(data = joined_data |> filter(year_decimal %in% deci_period_of_int),
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
 
-ggsave(
-  filename = "means_plot_16_19.png",
-  dpi = 'retina')
+# ggsave(filename = "means_plot_16_19.png", dpi = 'retina')
 
 # ################################################################### #
 # ################################################################### #
@@ -549,58 +554,58 @@ ggsave(
 ## Begin Regressions ####
 # Regression from Eve
 
-lm_1 <- felm(
-  Employment ~ State + Year + Min_Wage + State:Year | as.factor(County),
-  data = transpose_gather)
-
-lm_missouri_before <- lm(
-  data = transpose_gather |>
-    filter(State == "Missouri" & Year < 2019),
-  formula = Employment ~ Year)
-
-lm_missouri_after <- lm(
-  data = transpose_gather |>
-    filter(State == "Missouri" & Year >= 2019),
-  formula = Employment ~ Year)
-
-lm_missouri_overall <- lm(
-  data = transpose_gather |>
-    filter(State == "Missouri"),
-  formula = Employment ~ Year)
-
-lm_kansas_before <- lm(
-  data = transpose_gather |>
-    filter(State == "Kansas" & Year < 2019),
-  formula = Employment ~ Year)
-
-lm_kansas_after <- lm(
-  data = transpose_gather |>
-    filter(State == "Kansas" & Year >= 2019),
-  formula = Employment ~ Year)
-
-lm_kansas_overall <- lm(
-  data = transpose_gather |>
-    filter(State == "Kansas"),
-  formula = Employment ~ Year)
-
-summary(lm_missouri_before)
-summary(lm_kansas_before)
-
-# Difference in slopes
-lm_missouri_before$coefficients[2] - lm_kansas_before$coefficients[2]
-
-# Trying out the lm model from office hour (11/15)
-
-lm_full <- lm(
-  formula = Employment ~
-    Year +
-    Post2019 +
-    State +
-    State:Post2019 +
-    factor(County),
-  data = transpose_gather)
-
-summary(lm_full)
+# lm_1 <- felm(
+#   Employment ~ State + Year + Min_Wage + State:Year | as.factor(County),
+#   data = transpose_gather)
+# 
+# lm_missouri_before <- lm(
+#   data = transpose_gather |>
+#     filter(State == "Missouri" & Year < 2019),
+#   formula = Employment ~ Year)
+# 
+# lm_missouri_after <- lm(
+#   data = transpose_gather |>
+#     filter(State == "Missouri" & Year >= 2019),
+#   formula = Employment ~ Year)
+# 
+# lm_missouri_overall <- lm(
+#   data = transpose_gather |>
+#     filter(State == "Missouri"),
+#   formula = Employment ~ Year)
+# 
+# lm_kansas_before <- lm(
+#   data = transpose_gather |>
+#     filter(State == "Kansas" & Year < 2019),
+#   formula = Employment ~ Year)
+# 
+# lm_kansas_after <- lm(
+#   data = transpose_gather |>
+#     filter(State == "Kansas" & Year >= 2019),
+#   formula = Employment ~ Year)
+# 
+# lm_kansas_overall <- lm(
+#   data = transpose_gather |>
+#     filter(State == "Kansas"),
+#   formula = Employment ~ Year)
+# 
+# summary(lm_missouri_before)
+# summary(lm_kansas_before)
+# 
+# # Difference in slopes
+# lm_missouri_before$coefficients[2] - lm_kansas_before$coefficients[2]
+# 
+# # Trying out the lm model from office hour (11/15)
+# 
+# lm_full <- lm(
+#   formula = Employment ~
+#     Year +
+#     Post2019 +
+#     State +
+#     State:Post2019 +
+#     factor(County),
+#   data = transpose_gather)
+# 
+# summary(lm_full)
 
 # library(sandwich)
 # library(lmtest)
@@ -618,66 +623,66 @@ summary(lm_full)
 #################################### #
 # Begin Analysis ####
 #################################### #
-coefficients_lm_missouri_before <-
-  coef(lm_missouri_before)
-# main_plot <-
-ggplot(data = transpose_gather,
-       aes(x = Year, y = Employment, col = State)) +
-  geom_point() +
-  geom_vline(aes(xintercept = 2019, linetype = "$0.8 Increase"),
-             col = 'green4', lwd = 0.9) +
-  geom_abline(
-    aes(slope = coefficients_lm_missouri_before[2],
-        intercept = coefficients_lm_missouri_before[1],
-        color = "Missouri"),
-    lwd = 0.9,
-    show.legend = F
-    ) +
-  geom_smooth(
-    method = "lm",
-    formula = y ~ x,
-    data = transpose_gather |>
-      filter(State == "Missouri" & Year >= 2019),
-    color = 'black',
-    linetype = "dashed",
-    se = F,
-    lwd = 0.9
-    # aes(color = "MO After")
-  ) +
-  geom_smooth(
-    method = "lm",
-    formula = y ~ x,
-    data = transpose_gather |>
-      filter(State == "Kansas"),
-    # color = 'red3',
-    linetype = "solid",
-    se = F,
-    lwd = 0.9,
-    # aes(color = "KS")
-  ) +
-  labs(
-    title =
-      "Limited-Service Food Industry Employment",
-    subtitle =
-      "Proportion of total employed working in limited-service restaurants.",
-    x =
-      "Year",
-    y =
-      "Proportion working in limited-service restaurants",
-    fill =
-      "State",
-    linetype = "") +
-  # scale_color_manual(values = c("Missouri" = "black", "Kansas" = "red3", "Vertical Line" = "green4")) +
-  scale_linetype_manual(values = c("$0.8 Increase" = "solid")) +
-  theme_light()
-
-ggsave(
-  filename = "Rplot08.png",
-  plot = main_plot,
-  height = 800 * 3,
-  width = 1400 * 3,
-  units = 'px'
-)
+# coefficients_lm_missouri_before <-
+#   coef(lm_missouri_before)
+# # main_plot <-
+# ggplot(data = transpose_gather,
+#        aes(x = Year, y = Employment, col = State)) +
+#   geom_point() +
+#   geom_vline(aes(xintercept = 2019, linetype = "$0.8 Increase"),
+#              col = 'green4', lwd = 0.9) +
+#   geom_abline(
+#     aes(slope = coefficients_lm_missouri_before[2],
+#         intercept = coefficients_lm_missouri_before[1],
+#         color = "Missouri"),
+#     lwd = 0.9,
+#     show.legend = F
+#     ) +
+#   geom_smooth(
+#     method = "lm",
+#     formula = y ~ x,
+#     data = transpose_gather |>
+#       filter(State == "Missouri" & Year >= 2019),
+#     color = 'black',
+#     linetype = "dashed",
+#     se = F,
+#     lwd = 0.9
+#     # aes(color = "MO After")
+#   ) +
+#   geom_smooth(
+#     method = "lm",
+#     formula = y ~ x,
+#     data = transpose_gather |>
+#       filter(State == "Kansas"),
+#     # color = 'red3',
+#     linetype = "solid",
+#     se = F,
+#     lwd = 0.9,
+#     # aes(color = "KS")
+#   ) +
+#   labs(
+#     title =
+#       "Limited-Service Food Industry Employment",
+#     subtitle =
+#       "Proportion of total employed working in limited-service restaurants.",
+#     x =
+#       "Year",
+#     y =
+#       "Proportion working in limited-service restaurants",
+#     fill =
+#       "State",
+#     linetype = "") +
+#   # scale_color_manual(values = c("Missouri" = "black", "Kansas" = "red3", "Vertical Line" = "green4")) +
+#   scale_linetype_manual(values = c("$0.8 Increase" = "solid")) +
+#   theme_light()
+# 
+# ggsave(
+#   filename = "Rplot08.png",
+#   plot = main_plot,
+#   height = 800 * 3,
+#   width = 1400 * 3,
+#   units = 'px'
+# )
   # geom_smooth(
   #   method = "lm",
   #   formula = y ~ x,
@@ -755,28 +760,28 @@ ggsave(
   # filter(Employment > -90)
 
 #################################### #
-treatment_year <- 2019
+# treatment_year <- 2019
 # Subset for MO
 
-MO_sub <- transpose_plot[str_detect(string = transpose_plot$County, pattern = "Missouri"),]
-MO_Before_2019 <- MO_sub |> filter(Year < treatment_year)
-MO_After_2019 <- MO_sub |> filter(Year >= treatment_year)
-
-plot(
-  x = MO_sub$Year,
-  y = MO_sub$Employment,
-  xlab = "Year",
-  ylab = "Employment level change since 2011 (%)",
-  ylim = c(-70, 80),
-  las = 1,
-  main = "Missouri"
-)
-
-abline(lm_missouri_before, col = 'red', lwd = 2) # Before Min Wage Increase
-abline(lm_missouri_after, col = 'blue', lwd = 2) # After
-#
-# Creating manually
-line_difference <- predict(lm_missouri_before, newdata = data.frame(Year = treatment_year)) - predict(lm_missouri_after, newdata = data.frame(Year = treatment_year))
+# MO_sub <- transpose_plot[str_detect(string = transpose_plot$County, pattern = "Missouri"),]
+# MO_Before_2019 <- MO_sub |> filter(Year < treatment_year)
+# MO_After_2019 <- MO_sub |> filter(Year >= treatment_year)
+# 
+# plot(
+#   x = MO_sub$Year,
+#   y = MO_sub$Employment,
+#   xlab = "Year",
+#   ylab = "Employment level change since 2011 (%)",
+#   ylim = c(-70, 80),
+#   las = 1,
+#   main = "Missouri"
+# )
+# 
+# abline(lm_missouri_before, col = 'red', lwd = 2) # Before Min Wage Increase
+# abline(lm_missouri_after, col = 'blue', lwd = 2) # After
+# #
+# # Creating manually
+# line_difference <- predict(lm_missouri_before, newdata = data.frame(Year = treatment_year)) - predict(lm_missouri_after, newdata = data.frame(Year = treatment_year))
 
 ################## #
 # Segments aren't plotting right
@@ -792,68 +797,68 @@ line_difference <- predict(lm_missouri_before, newdata = data.frame(Year = treat
 #   lty = 2
 # )
 
-abline(
-  a = coef(lm_missouri_after)[1] + line_difference,
-  b = coef(lm_missouri_after)[2],
-  col = 'blue',
-  lwd = 2
-)
-
-abline(v = treatment_year, col = 'orange', lwd = 2) # Min wage Increase
-
-legend(
-  "bottomleft", # Position of the legend on the plot
-  legend = c("Regression Line (Before)", "Regression Line (After)", "Min Wage Increase"),
-  col = c("red", "blue", "orange"), # Colors corresponding to the lines
-  lwd = 2, # Line width
-  # pch = 16, # Point type
-  title = "Legend" # Legend title
-)
-
-
-abline(lm_missouri_overall, col = 'green', lwd = 2)
+# abline(
+#   a = coef(lm_missouri_after)[1] + line_difference,
+#   b = coef(lm_missouri_after)[2],
+#   col = 'blue',
+#   lwd = 2
+# )
+# 
+# abline(v = treatment_year, col = 'orange', lwd = 2) # Min wage Increase
+# 
+# legend(
+#   "bottomleft", # Position of the legend on the plot
+#   legend = c("Regression Line (Before)", "Regression Line (After)", "Min Wage Increase"),
+#   col = c("red", "blue", "orange"), # Colors corresponding to the lines
+#   lwd = 2, # Line width
+#   # pch = 16, # Point type
+#   title = "Legend" # Legend title
+# )
+# 
+# 
+# abline(lm_missouri_overall, col = 'green', lwd = 2)
 
 # Plotting after 2018 only
 
-ggplot(data = MO_sub, aes(x = Year, y = Employment)) +
-  # Add a line for Employment Change
-  geom_point(color = 'black') +
-  geom_smooth(method = "lm", formula = y ~ x, data = MO_Before_2019, color = "blue", se = TRUE) +
-  geom_smooth(method = "lm", formula = y ~ x, data = MO_After_2019, color = "red", se = TRUE) +
-  labs(
-    title = "MO"
-  ) + geom_vline(xintercept = 2019)
-
-############################## #
-############################## #
-
-KS_sub <- transpose_plot[str_detect(string = transpose_plot$County, pattern = "Kansas"),]
-KS_sub$Employment[is.infinite(KS_sub$Employment)] <- 100
-
-KS_Before_2019 <- KS_sub[KS_sub$Year < treatment_year,]
-
-KS_After_2019 <- KS_sub[KS_sub$Year >= treatment_year,]
-
-
-# Edit everything below before running so that it is for KS instrad of MO
-#
-
-
-plot(
-  x = KS_sub$Year,
-  y = KS_sub$Employment,
-  xlab = "Year",
-  ylab = "Employment level change since 2011 (%)",
-  # ylim = c(-70, 80),
-  las = 1,
-  main = "Kansas"
-)
-
-abline(lm_kansas_before, col = 'red', lwd = 2) # Before Min Wage Increase
-abline(lm_kansas_after, col = 'green', lwd = 2) # After
-#
-# Creating manually
-line_difference <- predict(lm_kansas_before, newdata = data.frame(Year = treatment_year)) - predict(lm_kansas_after, newdata = data.frame(Year = treatment_year))
+# ggplot(data = MO_sub, aes(x = Year, y = Employment)) +
+#   # Add a line for Employment Change
+#   geom_point(color = 'black') +
+#   geom_smooth(method = "lm", formula = y ~ x, data = MO_Before_2019, color = "blue", se = TRUE) +
+#   geom_smooth(method = "lm", formula = y ~ x, data = MO_After_2019, color = "red", se = TRUE) +
+#   labs(
+#     title = "MO"
+#   ) + geom_vline(xintercept = 2019)
+# 
+# ############################## #
+# ############################## #
+# 
+# KS_sub <- transpose_plot[str_detect(string = transpose_plot$County, pattern = "Kansas"),]
+# KS_sub$Employment[is.infinite(KS_sub$Employment)] <- 100
+# 
+# KS_Before_2019 <- KS_sub[KS_sub$Year < treatment_year,]
+# 
+# KS_After_2019 <- KS_sub[KS_sub$Year >= treatment_year,]
+# 
+# 
+# # Edit everything below before running so that it is for KS instrad of MO
+# #
+# 
+# 
+# plot(
+#   x = KS_sub$Year,
+#   y = KS_sub$Employment,
+#   xlab = "Year",
+#   ylab = "Employment level change since 2011 (%)",
+#   # ylim = c(-70, 80),
+#   las = 1,
+#   main = "Kansas"
+# )
+# 
+# abline(lm_kansas_before, col = 'red', lwd = 2) # Before Min Wage Increase
+# abline(lm_kansas_after, col = 'green', lwd = 2) # After
+# #
+# # Creating manually
+# line_difference <- predict(lm_kansas_before, newdata = data.frame(Year = treatment_year)) - predict(lm_kansas_after, newdata = data.frame(Year = treatment_year))
 
 ################## #
 # Segments aren't plotting right
@@ -869,21 +874,21 @@ line_difference <- predict(lm_kansas_before, newdata = data.frame(Year = treatme
 #   lty = 2
 # )
 
-abline(
-  a = coef(lm_kansas_after)[1] + line_difference,
-  b = coef(lm_kansas_after)[2],
-  col = 'blue',
-  lwd = 2
-)
-
-abline(v = treatment_year, col = 'orange', lwd = 2) # Min wage Increase
-
-legend(
-  "bottomleft", # Position of the legend on the plot
-  legend = c("Regression Line (Before)", "Regression Line (After)", "Min Wage Increase"),
-  col = c("red", "blue", "orange"), # Colors corresponding to the lines
-  lwd = 2, # Line width
-  # pch = 16, # Point type
-  title = "Legend" # Legend title
-)
-
+# abline(
+#   a = coef(lm_kansas_after)[1] + line_difference,
+#   b = coef(lm_kansas_after)[2],
+#   col = 'blue',
+#   lwd = 2
+# )
+# 
+# abline(v = treatment_year, col = 'orange', lwd = 2) # Min wage Increase
+# 
+# legend(
+#   "bottomleft", # Position of the legend on the plot
+#   legend = c("Regression Line (Before)", "Regression Line (After)", "Min Wage Increase"),
+#   col = c("red", "blue", "orange"), # Colors corresponding to the lines
+#   lwd = 2, # Line width
+#   # pch = 16, # Point type
+#   title = "Legend" # Legend title
+# )
+# 
