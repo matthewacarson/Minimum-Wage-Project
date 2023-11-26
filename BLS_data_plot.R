@@ -500,12 +500,39 @@ joined$data |> filter(year_decimal %in% deci_period_prop_chg & State == "KS") |>
   #   names_from = State,
   #   values_from = change
   # )
-# scatter plot
-deci_period_means_trend <- seq(2011.5, 2022.5, by = 1/12)
+
+# Calculate means ####
+deci_period_means_trend <- seq(2011, 2018.5, by = 1/12)
+
+means_per_period <- joined$data |> 
+  filter(year_decimal %in% deci_period_means_trend) |> 
+  aggregate(proportion_limited ~ year_decimal + State, FUN = mean) |> 
+  pivot_wider(
+    names_from = State,
+    values_from = proportion_limited
+  ) |> data.frame()
+diff_KS <- diff(means_per_period$KS)
+diff_MO <- diff(means_per_period$MO)
+
+lm_diffs <- lm(diff_MO ~ diff_KS)
+plot(
+  x = diff_KS,
+  y = diff_MO,
+  col = 'blue', 
+  pch = 16
+)
+abline(lm_diffs, col = 'red')
+plot(lm_diffs)
+
+write_csv(x = means_per_period, file = "means_per_period.csv")
+
+cor(means_per_period$KS, means_per_period$MO)
+
+# scatter plot ####
 ggplot(data = joined$data |> filter(year_decimal %in% deci_period_means_trend), 
        aes(x = year_decimal, y = proportion_limited, color = State)) +
   # geom_point(position = position_dodge(width = 0.02)) +
-  geom_smooth(method = "loess", se = FALSE, span = 0.1) +
+  # geom_smooth(method = "loess", se = FALSE, span = 0.1) +
   geom_line(
     aes(group = State),
     stat = "summary",
