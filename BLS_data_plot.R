@@ -232,10 +232,10 @@ min_wage$limited <-
 min_wage$limited_increase <-
   left_join(
     x = min_wage$limited,
-    y = min_wage$filtered)
+    y = min_wage$filtered |> select(-mw_increase))
 
-min_wage$limited_increase$mw_increase[
-  is.na(min_wage$limited_increase$mw_increase)] <- 0
+# min_wage$limited_increase$mw_increase[
+  # is.na(min_wage$limited_increase$mw_increase)] <- 0
 
 # # ##################################################### #
 # # Begin importing CSVs for emp lvl in ALL industries ####
@@ -392,47 +392,29 @@ all_ind_combined$gather$industry_code <- NULL
 
 # Joining all industries and limited service
 joined <- new.env()
-
-joined$data <- 
-  full_join(
+library(fastDummies)
+joined$data <- full_join(
     x = min_wage$limited_increase,
     y = all_ind_combined$gather) |> 
   mutate(
     # year_2018 = ifelse(year(date) == 2018, 1, 0),
-    proportion_limited = emplvl_limited / emplvl_all) |> 
-  rename(State = state) |> 
+    proportion_limited = emplvl_limited / emplvl_all) |>
+  rename(State = state) |>
   arrange(date) |> 
-  filter(proportion_limited > 0 & proportion_limited < Inf) |> 
-  mutate(proportion_limited = proportion_limited) |> 
+  na.omit() |> 
+  # filter(proportion_limited > 0 & proportion_limited < Inf) |> 
+  # mutate(proportion_limited = proportion_limited) |>
   mutate(
     area_fips = factor(area_fips),
     area_title = factor(area_title),
-    Post_Treatment = year >= 2019,
-    Treatment_Group = State == "MO",
-    mw_increase = min_wage - min(min_wage)) |> 
-  # dummy_columns(select_columns = c("State", "year")) |> 
-  na.omit()
+    # year = as.character(year_numeric)
+    # Treatment_Group = State == "MO",
+    # mw_increase = min_wage - min(min_wage)
+    ) |> 
+  dummy_columns( # dummy columns as 'treatment' variable in regression
+    select_columns = 'year',
+    remove_first_dummy = TRUE)# c("State", "year"))
 
-# Filter June values
-
-# joined$data_regression <-
-  # joined$data# |>
-  # filter(
-    # month(date) == 6) |>  # &
-      # year(date) %in% 2017:2023) |>
-  # mutate(
-  #   mw_increase = min_wage - 7.25
-  # ) #|> 
-  # na.omit()
-   # mutate(month = month(date)) |>
-  # select(-date, -month) |>
-  # pivot_wider(
-  #   names_from = c(year),
-  #   names_prefix = "prop_",
-  #   values_from = proportion_limited) |>
-
-    # proportion_change = prop_2019 - prop_2018
-    # ) |>
 # Run panel data model with area_title as a fixed effect
 # panel_model <- 
 #   joined_data_1718 |> 
@@ -447,17 +429,30 @@ joined$data <-
 # #################### #
 # #######D-i-D #######
 # #################### #
-library(lfe)
 models <- new.env()
-models$felm <- 
-  joined$data |> 
-  lm(formula = proportion_limited ~ mw_increase + factor(date) + area_title + State)
+library(lfe)
 
-models$felm <- 
-  joined$data |> 
-  lfe::felm(formula = emplvl_limited ~ min_wage + emplvl_all | area_title)#, exactDOF = TRUE)
+felm_2011_2012 <- felm(
+  formula = proportion_limited ~ State + factor(year) | area_title, 
+  data = joined_all_limited |> filter(year %in% 2011:2012))
 
-summary(models$felm)
+felm_2011_2012 <- lm(
+  formula = proportion_limited ~ State + factor(year) + area_title, 
+  data = joined_all_limited |> filter(year %in% 2011:2012))
+
+joined$data |> filter(year > 2011) |> 
+  felm(emplvl_limited ~ emplvl_all + min_wage | area_title + date,
+    data = _) |> summary()
+
+felm_2011_2012 <- lm(
+  formula = emplvl_limited ~ State + factor(year) + emplvl_all + area_title, 
+  data = joined_all_limited |> filter(year %in% 2011:2012))
+
+# try using this with felm:  xactDOF = TRUE)
+
+# models$felm <- 
+#   joined$data |> 
+#   lm(formula = proportion_limited ~ min_wage + area_title + date)
 
 deci_period_prop_chg <- seq(2011.5, 2022.5, by = 1)
 
@@ -466,7 +461,8 @@ joined$data |> filter(year_decimal %in% deci_period_prop_chg & State == "KS") |>
   arrange(State) |> 
   mutate(change = c(NA, diff(proportion_limited))) |> 
   add_row(
-    joined$data |> filter(year_decimal %in% deci_period_prop_chg & State == "MO") |> 
+    joined$data |> 
+      filter(year_decimal %in% deci_period_prop_chg & State == "MO") |> 
       aggregate(proportion_limited ~ State + year_decimal, FUN = mean) |> 
       arrange(State) |> 
       mutate(change = c(NA, diff(proportion_limited)))) |> 
