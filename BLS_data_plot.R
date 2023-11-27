@@ -484,7 +484,7 @@ models$felm <-
 
 models$felm <- 
   joined$data |> 
-  lfe::felm(formula = proportion_limited ~ min_wage | area_title + date)#, exactDOF = TRUE)
+  lfe::felm(formula = emplvl_limited ~ min_wage + emplvl_all | area_title + date)#, exactDOF = TRUE)
 
 summary(models$felm)
 
@@ -508,7 +508,7 @@ joined$data |> filter(year_decimal %in% deci_period_prop_chg & State == "KS") |>
   #   names_from = State,
   #   values_from = change
   # )
-
+ggsave(filename = "means_with_loess.png", dpi = 'retina')
 # Calculate means ####
 deci_period_means_trend <- seq(2011, 2012 + 11/12, by = 1/12)
 
