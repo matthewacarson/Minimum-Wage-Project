@@ -413,39 +413,10 @@ joined$data <-
   # dummy_columns(select_columns = c("State", "year")) |> 
   na.omit()
 
-# joined$data_reduced <-
-#   joined$data |>
-#   select(
-#     "area_fips", 
-#      # "year",
-#      # "qtr", 
-#      "area_title", 
-#      # "ltd_total_qtrly_wages",  
-#      # "ltd_taxable_qtrly_wages", 
-#      # "ltd_qtrly_contributions", 
-#      # "ltd_avg_wkly_wage",  
-#      # "own_title", 
-#      # "month", 
-#      "date", 
-#      # "year_decimal", 
-#      # "emplvl_limited",  
-#      "State", 
-#      # "min_wage", 
-#      # "mw_increase", 
-#      # "all_total_qtrly_wages", 
-#      # "all_taxable_qtrly_wages", 
-#      # "all_qtrly_contributions", 
-#      # "all_avg_wkly_wage", 
-#      # "emplvl_all", 
-#      "proportion_limited", 
-#      "Post_Treatment", 
-#      "Treatment_Group"
-#   )
-
 # Filter June values
 
-joined$data_regression <-
-  joined$data# |>
+# joined$data_regression <-
+  # joined$data# |>
   # filter(
     # month(date) == 6) |>  # &
       # year(date) %in% 2017:2023) |>
@@ -474,7 +445,7 @@ joined$data_regression <-
 # summary(panel_model)
 
 # #################### #
-# D-i-D 2017-2018 ####
+# #######D-i-D #######
 # #################### #
 library(lfe)
 models <- new.env()
@@ -484,7 +455,7 @@ models$felm <-
 
 models$felm <- 
   joined$data |> 
-  lfe::felm(formula = emplvl_limited ~ min_wage + emplvl_all | area_title + date)#, exactDOF = TRUE)
+  lfe::felm(formula = emplvl_limited ~ min_wage + emplvl_all | area_title)#, exactDOF = TRUE)
 
 summary(models$felm)
 
