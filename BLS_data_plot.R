@@ -403,52 +403,56 @@ joined$data <-
   rename(State = state) |> 
   arrange(date) |> 
   filter(proportion_limited > 0 & proportion_limited < Inf) |> 
-  mutate(proportion_limited = proportion_limited * 100) |> 
+  mutate(proportion_limited = proportion_limited) |> 
   mutate(
     area_fips = factor(area_fips),
     area_title = factor(area_title),
     Post_Treatment = year >= 2019,
-    Treatment_Group = State == "MO") |> 
+    Treatment_Group = State == "MO",
+    mw_increase = min_wage - min(min_wage)) |> 
   # dummy_columns(select_columns = c("State", "year")) |> 
   na.omit()
 
-joined$data_reduced <-
-  joined$data |>
-  select(
-    "area_fips", 
-     # "year",
-     # "qtr", 
-     "area_title", 
-     # "ltd_total_qtrly_wages",  
-     # "ltd_taxable_qtrly_wages", 
-     # "ltd_qtrly_contributions", 
-     # "ltd_avg_wkly_wage",  
-     # "own_title", 
-     # "month", 
-     "date", 
-     # "year_decimal", 
-     # "emplvl_limited",  
-     "State", 
-     # "min_wage", 
-     # "mw_increase", 
-     # "all_total_qtrly_wages", 
-     # "all_taxable_qtrly_wages", 
-     # "all_qtrly_contributions", 
-     # "all_avg_wkly_wage", 
-     # "emplvl_all", 
-     "proportion_limited", 
-     "Post_Treatment", 
-     "Treatment_Group"
-  )
+# joined$data_reduced <-
+#   joined$data |>
+#   select(
+#     "area_fips", 
+#      # "year",
+#      # "qtr", 
+#      "area_title", 
+#      # "ltd_total_qtrly_wages",  
+#      # "ltd_taxable_qtrly_wages", 
+#      # "ltd_qtrly_contributions", 
+#      # "ltd_avg_wkly_wage",  
+#      # "own_title", 
+#      # "month", 
+#      "date", 
+#      # "year_decimal", 
+#      # "emplvl_limited",  
+#      "State", 
+#      # "min_wage", 
+#      # "mw_increase", 
+#      # "all_total_qtrly_wages", 
+#      # "all_taxable_qtrly_wages", 
+#      # "all_qtrly_contributions", 
+#      # "all_avg_wkly_wage", 
+#      # "emplvl_all", 
+#      "proportion_limited", 
+#      "Post_Treatment", 
+#      "Treatment_Group"
+#   )
 
 # Filter June values
 
-joined$data_18_19 <- 
-  joined$data_reduced |>
-  filter(
-    month(date) == 6 &
-      year(date) %in% 2018:2019) |>
-  na.omit() # |> 
+joined$data_regression <-
+  joined$data# |>
+  # filter(
+    # month(date) == 6) |>  # &
+      # year(date) %in% 2017:2023) |>
+  # mutate(
+  #   mw_increase = min_wage - 7.25
+  # ) #|> 
+  # na.omit()
    # mutate(month = month(date)) |>
   # select(-date, -month) |>
   # pivot_wider(
@@ -475,8 +479,12 @@ joined$data_18_19 <-
 library(lfe)
 models <- new.env()
 models$felm <- 
-  joined$data_18_19 |> 
-  lm(formula = proportion_limited ~  Treatment_Group + Post_Treatment + area_fips)
+  joined$data |> 
+  lm(formula = proportion_limited ~ mw_increase + factor(date) + area_title + State)
+
+models$felm <- 
+  joined$data |> 
+  lfe::felm(formula = proportion_limited ~ min_wage | area_title + date)#, exactDOF = TRUE)
 
 summary(models$felm)
 
@@ -502,7 +510,7 @@ joined$data |> filter(year_decimal %in% deci_period_prop_chg & State == "KS") |>
   # )
 
 # Calculate means ####
-deci_period_means_trend <- seq(2011, 2018.5, by = 1/12)
+deci_period_means_trend <- seq(2011, 2012 + 11/12, by = 1/12)
 
 means_per_period <- joined$data |> 
   filter(year_decimal %in% deci_period_means_trend) |> 
@@ -532,7 +540,7 @@ cor(means_per_period$KS, means_per_period$MO)
 ggplot(data = joined$data |> filter(year_decimal %in% deci_period_means_trend), 
        aes(x = year_decimal, y = proportion_limited, color = State)) +
   # geom_point(position = position_dodge(width = 0.02)) +
-  # geom_smooth(method = "loess", se = FALSE, span = 0.1) +
+  geom_smooth(method = "loess", se = FALSE, span = 0.3) +
   geom_line(
     aes(group = State),
     stat = "summary",
@@ -553,6 +561,7 @@ ggplot(data = joined$data |> filter(year_decimal %in% deci_period_means_trend),
 # Plotting means to check for parallel trends
 ggplot(data = joined$data |> filter(year_decimal %in% deci_period_means_trend), 
        aes(x = year_decimal, y = proportion_limited, color = State)) +
+  geom_smooth(method = "loess", se = FALSE, span = 0.3, lwd = 0.75) +
   stat_summary(
     fun = mean,
     geom = "point") +
@@ -565,10 +574,11 @@ ggplot(data = joined$data |> filter(year_decimal %in% deci_period_means_trend),
     # limits = c(2011, 2023.25)
   # ) +
   labs(title = "Means Plot") + 
+  scale_y_continuous(breaks = seq(0.035, 0.05, by = 0.0025)) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
 
-# ggsave(filename = "means_plot_16_19.png", dpi = 'retina')
+ggsave(filename = "means_plot_16_19.png", dpi = 'retina')
 
 # ################################################################### #
 # ################################################################### #
