@@ -1,18 +1,19 @@
 # Run data wrangling file first ####
-source(file = "BLS_data_wrangling.R")
-
+source(file = "limited_serv_wrangling.R", local = wrangled <- new.env())
+source(file = "all_industries_data_wrangling.R", local = wrangled)
 
 # Joining all industries and limited service
+# library(fastDummies)
+
 joined <- new.env()
-library(fastDummies)
 joined$data <- full_join(
-  x = min_wage$limited_increase,
-  y = all_ind_combined$gather) |> 
-  mutate(
+  x = wrangled$min_wage$limited_increase,
+  y = wrangled$all_ind_combined$gather) |> 
+  # mutate(
     # year_2018 = ifelse(year(date) == 2018, 1, 0),
-    proportion_limited = emplvl_limited / emplvl_all) |>
-  rename(State = state) |>
-  arrange(date) |> 
+    # proportion_limited = emplvl_limited / emplvl_all) |>
+  # rename(State = state) |>
+  # arrange(date) |> 
   na.omit() |> 
   # filter(proportion_limited > 0 & proportion_limited < Inf) |> 
   mutate(
@@ -20,7 +21,7 @@ joined$data <- full_join(
     # year = as.character(year_numeric)
     # Treatment_Group = State == "MO",
     # mw_increase = min_wage - min(min_wage)
-  ) #|> 
+  ) |> new.env()
   # dummy_columns( # dummy columns as 'treatment' variable in regression
     # select_columns = 'year',
     # remove_first_dummy = TRUE)# c("State", "year"))
@@ -51,20 +52,6 @@ felm_all <-
 
 summary(felm_all)
 
-felm_all <- 
-  joined$data |> mutate(date = factor(date)) |> 
-  lm(proportion_limited ~ min_wage + area_title * date,
-     data = _)
-
-felm_2011_2012 <- felm(
-  formula = proportion_limited ~ State + year | area_title, 
-  data = joined_all_limited |> 
-    filter(year %in% 2011:2012) |> mutate(year = factor(year)))
-
-felm_2011_2012 <- lm(
-  formula = proportion_limited ~ State + factor(year) + area_title, 
-  data = joined_all_limited |> filter(year %in% 2011:2012))
-
 models$felm_2012_2013 <- joined$data |> 
   filter(year %in% 2012:2013) |> mutate(year = as.factor(year)) |> 
   felm(emplvl_limited ~ State * year + emplvl_all | area_title, 
@@ -72,18 +59,11 @@ models$felm_2012_2013 <- joined$data |>
 
 summary(models$felm_2012_2013)
 
-models$felm_2012_2013 <- joined$data |> 
-  filter(year %in% 2012:2013) |> mutate(year = factor(year)) |> 
-  lm(emplvl_limited ~ State * year + emplvl_all + area_title, 
-     data = _)
-summary(models$felm_2012_2013)
-
 # try using this with felm:  xactDOF = TRUE)
 
-# models$felm <- 
-#   joined$data |> 
-#   lm(formula = proportion_limited ~ min_wage + area_title + date)
-
+############ #
+# GGplots ####
+############ #
 deci_period_prop_chg <- seq(2011.5, 2022.5, by = 1)
 
 joined$data |> filter(year_decimal %in% deci_period_prop_chg & State == "KS") |> 
