@@ -166,12 +166,13 @@ limited_combined$combined <-
 ### ################################################################### #
 limited_combined$gather <- 
   limited_combined$combined |> 
-  gather(
-    key = "month", 
-    value = "emplvl",  
-    month1_emplvl, 
-    month2_emplvl, 
-    month3_emplvl) |> 
+  pivot_longer(
+    names_to = "month", 
+    cols = c(month1_emplvl, 
+             month2_emplvl, 
+             month3_emplvl),
+    values_to = "emplvl"
+  ) |> 
   # Extract the numeric part from the "month" column
   mutate(
     month =
