@@ -3,24 +3,44 @@ source(file = "limited_serv_wrangling.R", local = wrangled <- new.env())
 source(file = "all_industries_data_wrangling.R", local = wrangled)
 
 # Joining all industries and limited service
+# library(fastDummies)
 
 joined <- new.env()
 joined$data <- full_join(
   x = wrangled$min_wage$limited_increase,
   y = wrangled$all_ind_combined$gather) |> 
   mutate(
+    # year_2018 = ifelse(year(date) == 2018, 1, 0),
     proportion_limited = emplvl_limited / emplvl_all) |>
-  na.omit() |>
+  # rename(State = state) |>
+  # arrange(date) |> 
+  na.omit() |> 
+  # filter(proportion_limited > 0 & proportion_limited < Inf) |> 
   mutate(
     area_fips = factor(area_fips)
+    # year = as.character(year_numeric)
+    # Treatment_Group = State == "MO",
+    # mw_increase = min_wage - min(min_wage)
   )
+  # dummy_columns( # dummy columns as 'treatment' variable in regression
+    # select_columns = 'year',
+    # remove_first_dummy = TRUE)# c("State", "year"))
 
+# Run panel data model with area_title as a fixed effect
+# panel_model <- 
+#   joined_data_1718 |> 
+#   plm(proportion_limited ~  Treatment_Group + Post_Treatment+ date + area_title, 
+#       model = "within",
+#       index = c("area_title", "date"),
+#       effect = "twoways",
+#       data = _)
+# 
+# summary(panel_model)
 library(fastDummies)
 data_2012_2013 <- joined$data |> 
   filter(year %in% 2012:2013) |> 
   dummy_columns(
-    select_columns = c('year', 'state'), 
-    remove_first_dummy = TRUE, 
+    select_columns = c('year', 'state'), remove_first_dummy = TRUE, 
   ) |> 
   rename(post = year_2013, treat = state_MO)
   
@@ -28,10 +48,10 @@ data_2012_2013 <- joined$data |>
 # #################### #
 # #######D-i-D #######
 # #################### #
-# models <- new.env()
+models <- new.env()
 library(lfe)
 
-felm_proportion <-
+felm_all <-
   felm(proportion_limited ~ treat * post | area_title,
        data = data_2012_2013)
 
@@ -43,12 +63,14 @@ felm_all <-
 
 summary(felm_all)
 
-felm_cont_treatment <- 
-  felm(emplvl_limited ~ min_wage + emplvl_all | area_title + date, 
-       data = joined$data)
 
-summary(models$felm)
 
+models$felm_2012_2013 <- joined$data |> 
+  filter(year %in% 2012:2013) |> mutate(year = as.factor(year)) |> 
+  felm(emplvl_limited ~ State * year + emplvl_all | area_title, 
+       data = _)
+
+summary(models$felm_2012_2013)
 
 # try using this with felm:  xactDOF = TRUE)
 
