@@ -38,6 +38,7 @@ data_2012_2013 <- joined$data |>
   rename(post = year_2013, treat = state_MO)
 
 # write_csv(x = data_2012_2013, file = "data_2012_2013.csv")
+# data_2012_2013 <- read_csv(file = "data_2012_2013.csv")
 
 # Checking if there are any zeros
 range(data_2012_2013$proportion_limited)
