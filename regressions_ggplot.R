@@ -16,6 +16,15 @@ joined$data <- full_join(
     area_fips = factor(area_fips)
   )
 
+# Checking if there are any zeros
+range(joined$data$proportion_limited)
+range(joined$data$emplvl_all)
+range(joined$data$emplvl_limited)
+any(joined$data[,1:21] == 0)
+# Checking how many times each county appears
+table(joined$data$year, joined$data$area_title)
+
+
 # write_csv(x = joined$data, file = "joined_data.csv")
 
 # Creating dummies ####
@@ -27,8 +36,17 @@ data_2012_2013 <- joined$data |>
     remove_first_dummy = TRUE, 
   ) |> 
   rename(post = year_2013, treat = state_MO)
-  
+
 # write_csv(x = data_2012_2013, file = "data_2012_2013.csv")
+
+# Checking if there are any zeros
+range(data_2012_2013$proportion_limited)
+range(data_2012_2013$emplvl_all)
+range(data_2012_2013$emplvl_limited)
+any(data_2012_2013[,1:21] == 0)
+# Checking how many times each county appears
+table(data_2012_2013$year, data_2012_2013$area_title)
+
 # #################### #
 # #######D-i-D #######
 # #################### #
