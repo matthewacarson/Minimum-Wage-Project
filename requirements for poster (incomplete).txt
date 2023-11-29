@@ -1,0 +1,11 @@
+Poster
+
+- Title and authors
+- Question
+- Motivation: the puzzle
+- Hypothesis
+- Data and methods
+- Results: plots and tables
+- Further research/ weaknesses
+- Mechanism and other test
+- Conclusion

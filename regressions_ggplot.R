@@ -2,7 +2,7 @@
 source(file = "limited_serv_wrangling.R", local = wrangled <- new.env())
 source(file = "all_industries_data_wrangling.R", local = wrangled)
 
-# Joining all industries and limited service
+# Joining all industries and limited service ####
 
 joined <- new.env()
 joined$data <- full_join(
@@ -10,11 +10,15 @@ joined$data <- full_join(
   y = wrangled$all_ind_combined$gather) |> 
   mutate(
     proportion_limited = emplvl_limited / emplvl_all) |>
+  filter(proportion_limited > 0 & !is.infinite(proportion_limited)) |> 
   na.omit() |>
   mutate(
     area_fips = factor(area_fips)
   )
 
+# write_csv(x = joined$data, file = "joined_data.csv")
+
+# Creating dummies ####
 library(fastDummies)
 data_2012_2013 <- joined$data |> 
   filter(year %in% 2012:2013) |> 
@@ -24,7 +28,7 @@ data_2012_2013 <- joined$data |>
   ) |> 
   rename(post = year_2013, treat = state_MO)
   
-
+# write_csv(x = data_2012_2013, file = "data_2012_2013.csv")
 # #################### #
 # #######D-i-D #######
 # #################### #
@@ -81,7 +85,7 @@ joined$data |>
 # Calculate means ####
 # 
 # select which years youa re interested in:
-deci_period_means_trend <- seq(2011, 2012 + 11/12, by = 1/12)
+deci_period_means_trend <- unique(joined$data$year_decimal)# seq(unique(joined$data$year_decimal), by = 1/12)
 
 # Checking parallel trends assumption
 
@@ -99,21 +103,27 @@ lm_diffs <- lm(diff_MO ~ diff_KS)
 plot(
   x = diff_KS,
   y = diff_MO,
-  col = 'blue', 
+  col = 'dodgerblue', 
   pch = 16
 )
 abline(lm_diffs, col = 'red')
+abline(b = 1, a = 0, col = 'blue')
+
 # plot(lm_diffs)
 
-write_csv(x = means_per_period, file = "means_per_period.csv")
+# write_csv(x = means_per_period, file = "means_per_period.csv")
 
 cor(means_per_period$KS, means_per_period$MO)
 
 # scatter plot ####
+
+# Set loess span
+loess_span <- 0.3
+
 ggplot(data = joined$data |> filter(year_decimal %in% deci_period_means_trend), 
        aes(x = year_decimal, y = proportion_limited, color = state)) +
   # geom_point(position = position_dodge(width = 0.02)) +
-  geom_smooth(method = "loess", se = FALSE, span = 0.3) +
+  geom_smooth(method = "loess", se = FALSE, span = loess_span) +
   geom_line(
     aes(group = state),
     stat = "summary",
@@ -132,9 +142,11 @@ ggplot(data = joined$data |> filter(year_decimal %in% deci_period_means_trend),
 # ) +
 
 # Plotting means to check for parallel trends
+
+
 ggplot(data = joined$data |> filter(year_decimal %in% deci_period_means_trend), 
        aes(x = year_decimal, y = proportion_limited, color = state)) +
-  geom_smooth(method = "loess", se = FALSE, span = 0.3, lwd = 0.75) +
+  geom_smooth(method = "loess", se = FALSE, span = loess_span, lwd = 0.75) +
   stat_summary(
     fun = mean,
     size = 2,
@@ -165,4 +177,4 @@ ggplot(data = joined$data |> filter(year_decimal %in% deci_period_means_trend),
     axis.text.x = element_text(
       angle = 90, vjust = 0.5, hjust = 1))
 
-ggsave(filename = "means_plot_11_12_no_loess.png", dpi = 'retina')
+# ggsave(filename = "means_plot_11_12_no_loess.png", dpi = 'retina')
