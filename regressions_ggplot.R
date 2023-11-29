@@ -10,20 +10,19 @@ joined$data <- full_join(
   y = wrangled$all_ind_combined$gather) |> 
   mutate(
     proportion_limited = emplvl_limited / emplvl_all) |>
-  filter(proportion_limited > 0 & !is.infinite(proportion_limited)) |> 
+  # filter(proportion_limited > 0 & !is.infinite(proportion_limited)) |> 
   na.omit() |>
   mutate(
     area_fips = factor(area_fips)
   )
 
-# Checking if there are any zeros
+# Checking if there are any zeros ####
 range(joined$data$proportion_limited)
 range(joined$data$emplvl_all)
 range(joined$data$emplvl_limited)
 any(joined$data[,1:21] == 0)
 # Checking how many times each county appears
 table(joined$data$year, joined$data$area_title)
-
 
 # write_csv(x = joined$data, file = "joined_data.csv")
 
@@ -38,9 +37,9 @@ data_2012_2013 <- joined$data |>
   rename(post = year_2013, treat = state_MO)
 
 # write_csv(x = data_2012_2013, file = "data_2012_2013.csv")
-# data_2012_2013 <- read_csv(file = "data_2012_2013.csv")
+data_2012_2013 <- read_csv(file = "data_2012_2013.csv")
 
-# Checking if there are any zeros
+# Checking if there are any zeros ####
 range(data_2012_2013$proportion_limited)
 range(data_2012_2013$emplvl_all)
 range(data_2012_2013$emplvl_limited)
@@ -71,7 +70,6 @@ felm_cont_treatment <-
        data = joined$data)
 
 summary(felm_cont_treatment)
-
 
 # try using this with felm:  xactDOF = TRUE)
 

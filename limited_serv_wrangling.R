@@ -49,7 +49,7 @@ library(tidyverse)
 load(file = "BLS_limited-service_rest.RData", 
     envir = limited_serv_orig <- new.env())
 
-counties_of_interest <- "((Wyandotte|Johnson|Leavenworth|Atchison|Bourbon|Cherokee|Brown) County, Kansas|(Buchanan|Platte|Clay|Jackson|Cass|Bates|Barton|Jasper|Newton|Vernon) County, Missouri)" # Removed Linn & Miami & Donaphin
+counties_of_interest <- "((Wyandotte|Johnson|Leavenworth|Atchison|Bourbon|Cherokee|Donaphin) County, Kansas|(Buchanan|Platte|Clay|Jackson|Cass|Bates|Barton|Jasper|Newton) County, Missouri)" # Removed Linn, Miami, Vernon, Brown
 # counties_of_interest <- "Kansas|Missouri"
 
 
