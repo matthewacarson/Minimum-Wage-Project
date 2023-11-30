@@ -75,6 +75,12 @@ felm_cont_treatment <-
 
 summary(felm_cont_treatment)
 
+lm_cont_treatment <- 
+  lm(emplvl_limited ~ min_wage + emplvl_all + area_title + factor(date), 
+       data = joined$data)
+
+summary(lm_cont_treatment)
+
 # try using this with felm:  xactDOF = TRUE)
 
 # Trying without fixed effects ####
@@ -93,7 +99,7 @@ summary(lm_all)
 ############ #
 # GGplots ####
 ############ #
-deci_period_prop_chg <- seq(2011.5, 2022.5, by = 1)
+deci_period_prop_chg <- unique(joined$data$year_decimal)# seq(2011.5, 2022.5, by = 1)
 
 joined$data |> 
   filter(year_decimal %in% deci_period_prop_chg & state == "KS") |> 

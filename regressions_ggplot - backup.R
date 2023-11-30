@@ -26,14 +26,6 @@ joined$data <- full_join(
     # select_columns = 'year',
     # remove_first_dummy = TRUE)# c("State", "year"))
 
-# Run panel data model with area_title as a fixed effect
-# panel_model <- 
-#   joined_data_1718 |> 
-#   plm(proportion_limited ~  Treatment_Group + Post_Treatment+ date + area_title, 
-#       model = "within",
-#       index = c("area_title", "date"),
-#       effect = "twoways",
-#       data = _)
 # 
 # summary(panel_model)
 library(fastDummies)
