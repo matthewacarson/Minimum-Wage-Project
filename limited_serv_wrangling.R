@@ -46,7 +46,7 @@ library(tidyverse)
 
 # All the "Limited-service restaurants" CSVs can be 
 # loaded with the .RData file below:
-load(file = "BLS_limited-service_rest.RData", 
+load(file = "RData/BLS_limited-service_rest.RData", 
     envir = limited_serv_orig <- new.env())
 
 counties_of_interest <- "((Wyandotte|Johnson|Leavenworth|Atchison|Bourbon|Cherokee|Donaphin) County, Kansas|(Buchanan|Platte|Clay|Jackson|Cass|Bates|Barton|Jasper|Newton) County, Missouri)" # Removed Linn, Miami, Vernon, Brown
@@ -215,7 +215,9 @@ limited_combined$pivot <-
 # Minimum wage data ####
 # ###################### #
 min_wage <- new.env()
-min_wage$backup <- read_csv(file = "min-wage.csv")
+min_wage$backup <- read_csv(
+  file = "CSVs/min-wage.csv", 
+  show_col_types = F)
 
 min_wage$filtered <-
   min_wage$backup |> 

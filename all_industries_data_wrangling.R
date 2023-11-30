@@ -15,9 +15,10 @@
 # All_Ind_2012 <- read_csv("BLS/2012.q1-q4 10 Total, all industries.csv")
 # All_Ind_2011 <- read_csv("BLS/2011.q1-q4 10 Total, all industries.csv")
 
+
 # All the "all industries" CSVs can be loaded with the .RData file below:
 load(
-  file = "BLS_all_industries.RData",
+  file = "RData/BLS_all_industries.RData",
   envir = all_industries_orig <- new.env())
 # ## ############################################# #
 # ## Filtering columns and counties of interest ####
