@@ -20,11 +20,14 @@ joined$data <- full_join(
 range(joined$data$proportion_limited)
 range(joined$data$emplvl_all)
 range(joined$data$emplvl_limited)
-any(joined$data[,1:21] == 0)
+any(joined$data[,-22:-23] == 0)
 # Checking how many times each county appears
 table(joined$data$year, joined$data$area_title)
 
 # write_csv(x = joined$data, file = "joined_data.csv")
+# joined <- new.env()
+# joined$data <- read_csv(file = "joined_data.csv")
+
 
 # Creating dummies ####
 library(fastDummies)
@@ -37,13 +40,14 @@ data_2012_2013 <- joined$data |>
   rename(post = year_2013, treat = state_MO)
 
 # write_csv(x = data_2012_2013, file = "data_2012_2013.csv")
-data_2012_2013 <- read_csv(file = "data_2012_2013.csv")
+# data_2012_2013 <- read_csv(file = "data_2012_2013.csv")
+
 
 # Checking if there are any zeros ####
 range(data_2012_2013$proportion_limited)
 range(data_2012_2013$emplvl_all)
 range(data_2012_2013$emplvl_limited)
-any(data_2012_2013[,1:21] == 0)
+any(data_2012_2013[,-22:-23] == 0)
 # Checking how many times each county appears
 table(data_2012_2013$year, data_2012_2013$area_title)
 
@@ -72,6 +76,19 @@ felm_cont_treatment <-
 summary(felm_cont_treatment)
 
 # try using this with felm:  xactDOF = TRUE)
+
+# Trying without fixed effects ####
+lm_proportion <-
+  lm(proportion_limited ~ treat * post,
+       data = data_2012_2013)
+
+summary(lm_proportion)
+
+lm_all <-
+  lm(emplvl_limited ~ treat : post + emplvl_all,
+       data = data_2012_2013)
+
+summary(lm_all)
 
 ############ #
 # GGplots ####
