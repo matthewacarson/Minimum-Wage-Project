@@ -43,8 +43,8 @@ stat_summary(
   geom = "point",
   size = 2) +
 scale_x_continuous(
-breaks = seq(2016, 2020, by = 0.25),
-limits = c(2011, 2023.25)
+breaks = deci_period_means_trend,
+limits = range(deci_period_means_trend)
 )
 
 # Plotting means to check for parallel trends
