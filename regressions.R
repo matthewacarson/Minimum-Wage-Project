@@ -39,6 +39,7 @@ joined$data <- full_join(
 library(fastDummies)
 data_2012_2013 <- joined$data |> 
   filter(year %in% 2012:2013) |> 
+  mutate(year = as.factor(year)) |> 
   dummy_columns(
     select_columns = c('year', 'state'), 
     remove_first_dummy = TRUE, 
@@ -64,16 +65,22 @@ data_2012_2013 <- joined$data |>
 library(lfe)
 
 felm_proportion <-
-  felm(proportion_limited ~ treat * post | area_title,
+  felm(proportion_limited ~ state * year,
        data = data_2012_2013)
 
-# summary(felm_proportion)
+summary(felm_proportion)
+
 
 felm_all <-
-  felm(emplvl_limited ~ treat * post + emplvl_all | area_title,
+  felm(emplvl_limited ~ treat * post * emplvl_all,
        data = data_2012_2013)
 
-# summary(felm_all)
+summary(felm_all)
+
+
+
+
+
 
 felm_cont_treatment <- 
   felm(emplvl_limited ~ min_wage + emplvl_all | area_title + date, 
