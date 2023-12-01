@@ -10,30 +10,10 @@ joined <- new.env()
 joined$data <- full_join(
   x = wrangled$min_wage$limited_increase,
   y = wrangled$all_ind_combined$gather) |> 
-  mutate(
-    proportion_limited = emplvl_limited / emplvl_all) |>
-  # filter(proportion_limited > 0 & !is.infinite(proportion_limited)) |> 
   na.omit() |>
   mutate(
     area_fips = factor(area_fips)
   )
-
-################################ #
-# Diagnostics ####
-################################ #
-
-# Checking if there are any zeros ####
-# range(joined$data$proportion_limited)
-# range(joined$data$emplvl_all)
-# range(joined$data$emplvl_limited)
-# any(joined$data[,-22:-23] == 0)
-# # Checking how many times each county appears
-# table(joined$data$year, joined$data$area_title)
-
-# write_csv(x = joined$data, file = "joined_data.csv")
-# joined <- new.env()
-# joined$data <- read_csv(file = "joined_data.csv")
-
 
 # Creating dummies ####
 library(fastDummies)
@@ -46,65 +26,40 @@ data_2012_2013 <- joined$data |>
   ) |> 
   rename(post = year_2013, treat = state_MO)
 
-# write_csv(x = data_2012_2013, file = "data_2012_2013.csv")
-# data_2012_2013 <- read_csv(file = "data_2012_2013.csv")
-
-
-# # Checking if there are any zeros ####
-# range(data_2012_2013$proportion_limited)
-# range(data_2012_2013$emplvl_all)
-# range(data_2012_2013$emplvl_limited)
-# any(data_2012_2013[,-22:-23] == 0)
-# # Checking how many times each county appears
-# table(data_2012_2013$year, data_2012_2013$area_title)
-
 # #################### #
 # #######D-i-D #######
 # #################### #
 # models <- new.env()
-library(lfe)
+# library(lfe)
 
-felm_proportion <-
-  felm(proportion_limited ~ state * year,
-       data = data_2012_2013)
+lm_2012_2013 <- data_2012_2013 |> 
+  lm(emplvl_limited ~ year * state * emplvl_all,
+       data = _)
 
-summary(felm_proportion)
+summary(lm_2012_2013)
 
+lm_2012_2013$coefficients[c("(Intercept)", "year2013", "stateMO", "year2013:stateMO")] |> sum()
 
-felm_all <-
-  lm(emplvl_limited ~ emplvl_all*year*state,
-       data = data_2012_2013)
+# Assuming emplvl_all = 0, year = 2013, and state = "MO" in the original model
+# Add other variables if your model includes more predictors
+# For example, if your model includes other predictors like x1 and x2:
+# new_data <- expand.grid(emplvl_all = 0, year = 2013, state = "MO", x1 = some_value, x2 = some_value)
 
-summary(felm_all)
+# Use the predict function with the new data
+predict(lm_2012_2013, expand.grid(emplvl_all = 0, year = "2013", state = "MO"))
 
-
-
-
-
-
-felm_cont_treatment <- 
-  felm(emplvl_limited ~ min_wage + emplvl_all | area_title + date, 
-       data = joined$data)
-
-# summary(felm_cont_treatment)
-
-lm_cont_treatment <- 
-  lm(emplvl_limited ~ min_wage + emplvl_all + area_title + factor(date), 
-       data = joined$data)
-
-# summary(lm_cont_treatment)
 
 # try using this with felm:  xactDOF = TRUE)
 
-# Trying without fixed effects ####
-lm_proportion <-
-  lm(proportion_limited ~ treat * post,
-       data = data_2012_2013)
+################################################# #
+# Running regressions for each county for 2012-2013
+# Caution! This is tentative 
+################################################# 
 
-# summary(lm_proportion)
+lm_2012_2013 <-
+  data_2012_2013 |> 
+  lm(
+    emplvl_limited ~ area_title * year * emplvl_all, 
+    data = _) |> summary()# |> data.frame(coefficients, residuals, fstatistic, r_squared)
 
-lm_all <-
-  lm(emplvl_limited ~ treat : post + emplvl_all,
-       data = data_2012_2013)
-
-# summary(lm_all)
+write.csv(x = lm_2012_2013[["coefficients"]] |> as.data.frame(), file = "delete_this.csv")
