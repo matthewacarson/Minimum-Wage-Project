@@ -72,7 +72,7 @@ summary(felm_proportion)
 
 
 felm_all <-
-  felm(emplvl_limited ~ treat * post * emplvl_all,
+  lm(emplvl_limited ~ emplvl_all*year*state,
        data = data_2012_2013)
 
 summary(felm_all)
