@@ -54,7 +54,7 @@ predict(lm_2012_2013, expand.grid(emplvl_all = 0, year = "2013", state = "MO"))
 ################################################# #
 # Running regressions for each county for 2012-2013
 # Caution! This is tentative 
-################################################# 
+################################################# #
 
 lm_2012_2013 <-
   data_2012_2013 |> 
