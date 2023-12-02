@@ -15,16 +15,12 @@ joined$data <- full_join(
     area_fips = factor(area_fips)
   )
 
+
 # Creating dummies ####
-library(fastDummies)
+# library(fastDummies)
 data_2012_2013 <- joined$data |> 
   filter(year %in% 2012:2013) |> 
-  mutate(year = as.factor(year)) |> 
-  dummy_columns(
-    select_columns = c('year', 'state'), 
-    remove_first_dummy = TRUE, 
-  ) |> 
-  rename(post = year_2013, treat = state_MO)
+  mutate(year = as.factor(year))
 
 # #################### #
 # #######D-i-D #######
@@ -32,13 +28,15 @@ data_2012_2013 <- joined$data |>
 # models <- new.env()
 # library(lfe)
 
+################################# #
+# @ Luis: Use this for each year
 lm_2012_2013 <- data_2012_2013 |> 
   lm(emplvl_limited ~ year * state * emplvl_all,
        data = _)
+################################# #
 
 summary(lm_2012_2013)
 
-lm_2012_2013$coefficients[c("(Intercept)", "year2013", "stateMO", "year2013:stateMO")] |> sum()
 
 # Assuming emplvl_all = 0, year = 2013, and state = "MO" in the original model
 # Add other variables if your model includes more predictors
@@ -62,4 +60,6 @@ lm_2012_2013 <-
     emplvl_limited ~ area_title * year * emplvl_all, 
     data = _) |> summary()# |> data.frame(coefficients, residuals, fstatistic, r_squared)
 
-write.csv(x = lm_2012_2013[["coefficients"]] |> as.data.frame(), file = "delete_this.csv")
+lm_2012_2013$coefficients[c("(Intercept)", "year2013", "stateMO", "year2013:stateMO")]
+
+write.csv(x = lm_2012_2013[["coefficients"]] |> as.data.frame(), file = "each_county.csv")
