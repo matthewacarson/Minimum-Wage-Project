@@ -19,7 +19,7 @@ joined$data <- full_join(
 # Creating dummies ####
 # library(fastDummies)
 data_2012_2013 <- joined$data |> 
-  filter(year %in% 2012:2013) |> 
+  filter(year_decimal %in% seq(2012.5,2013.5, by = 1/12)) |> 
   mutate(year = as.factor(year))
 
 # #################### #
@@ -30,7 +30,9 @@ data_2012_2013 <- joined$data |>
 
 ################################# #
 # @ Luis: Use this for each year
-lm_2012_2013 <- data_2012_2013 |> 
+lm_2012_2013 <- joined$data |> 
+  filter(year_decimal %in% seq(2012.5,2013.5, by = 1/12)) |> 
+  mutate(year = as.factor(year)) |> 
   lm(emplvl_limited ~ year * state * emplvl_all,
        data = _)
 ################################# #
@@ -63,3 +65,45 @@ lm_2012_2013 <-
 lm_2012_2013$coefficients[c("(Intercept)", "year2013", "stateMO", "year2013:stateMO")]
 
 write.csv(x = lm_2012_2013[["coefficients"]] |> as.data.frame(), file = "each_county.csv")
+
+################################################### #
+# Creating confidence intervals for regressions
+################################################### #
+
+
+confidence_intervals <- data.frame(
+  v1 = rep(NA, 10),
+  v2 = rep(NA, 10),
+  v3 = rep(NA, 10)
+)
+
+
+
+calculate_conf_int <- function(years = 2012:2022) {
+  function_data <- joined$data
+  for (i in seq_along(years)) {
+    assign(
+      paste(
+        "lm", 
+        years[i], sep = "_"),
+      function_data |> 
+        filter(year_decimal %in% 
+                 seq(years[i] + .5, years[i] + 1.5, by = 1/12)) |> 
+        mutate(year = as.factor(year)) |> 
+        lm(emplvl_limited ~ year * state * emplvl_all,
+           data = _))
+    
+    assign(
+      paste(
+        "CI", 
+        years[i], sep = "_"),
+      confint(
+        object = get(paste(
+          "lm", 
+          years[i], sep = "_")),
+        parm = paste0("year", years[i], ":stateMO")
+      ))
+  }
+}
+
+

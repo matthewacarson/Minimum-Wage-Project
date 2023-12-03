@@ -91,6 +91,7 @@ ggsave(
   height = 4.81)
 
 
+
 ############################################ #
 # Not using stuff below for now (11/29)
 ############################################ #
@@ -147,3 +148,44 @@ abline(b = 1, a = 0, col = 'blue')
 # write_csv(x = means_per_period, file = "means_per_period.csv")
 
 cor(means_per_period$KS, means_per_period$MO)
+
+# Proportion working in limited service
+# Most recent plot made by Matt Marsh
+
+ggplot(data = joined$data |> filter(year_decimal %in% deci_period_means_trend), 
+       aes(x = year_decimal, y = proportion_limited, color = State)) +
+  # geom_point(position = position_dodge(width = 0.02)) +
+  # geom_smooth(method = "loess", se = FALSE, span = 0.1) +
+  geom_line(
+    aes(group = State),
+    stat = "summary",
+    fun = mean,
+    lwd = 1) +
+  labs(title = "Means Plot, 2011 - 2023", x = "Year", y = "Proportion Employed in Limited Service Restaurants") +
+  geom_vline(aes(xintercept = 2013, linetype = "Small"),
+             lwd = .6,
+             linetype = "dashed") +
+  geom_vline(aes(xintercept = 2014, linetype = "Small"),
+             lwd = .6,
+             linetype = "dashed") +
+  geom_vline(aes(xintercept = 2015, linetype = "Small"),
+             lwd = .6,
+             linetype = "dashed") +
+  geom_vline(aes(xintercept = 2017, linetype = "Small"),
+             lwd = .6,
+             linetype = "dashed") +
+  geom_vline(aes(xintercept = 2018, linetype = "Small"),
+             lwd = .6,
+             linetype = "dashed") +
+  geom_vline(aes(xintercept = 2019, linetype = "Large"),
+             lwd = .6) +
+  geom_vline(aes(xintercept = 2020, linetype = "Large"),
+             lwd = .6) +
+  geom_vline(aes(xintercept = 2021, linetype = "Large"),
+             lwd = .6) +
+  geom_vline(aes(xintercept = 2022, linetype = "Large"),
+             lwd = .6) +
+  scale_color_manual(name = "Minimum Wage Increase", values = c("Small" = "#2874AE", "Large" = "#2874AE", "MO" = "#2874AE", "KS" = "brown1"), guide = guide_legend(override.aes = list(linetype = c("dashed", "solid")))) +
+  scale_x_continuous(breaks = seq(2011, 2023, by = 1)) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(vjust = 0.5, hjust = 1))
