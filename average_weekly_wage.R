@@ -30,11 +30,13 @@ ggplot(
     y = "US Dollars"
   ) + 
   guides(fill = guide_legend(title = "State")) +
-  theme_light()
+  theme_light() +
+  scale_fill_manual(values = c("MO" = "red2", "KS" = "blue2"))
 
 ggsave(
   filename = "average_weekly_wage.png",
-  dpi = 'retina'
-)
+  dpi = 'retina',
+  width = 10.4,
+  height = 4.81)
   
 

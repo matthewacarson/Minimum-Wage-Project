@@ -189,3 +189,17 @@ ggplot(data = joined$data |> filter(year_decimal %in% deci_period_means_trend),
   scale_x_continuous(breaks = seq(2011, 2023, by = 1)) +
   theme_minimal() +
   theme(axis.text.x = element_text(vjust = 0.5, hjust = 1))
+
+
+object <- 
+  rbind(
+    m_1 = c(123, 45),
+    m_2 = c(123, 456)
+  )
+
+object <- 
+  rbind(
+    confint(lm_1),
+    confint(lm_2)
+  ) |> as.data.frame()
+
