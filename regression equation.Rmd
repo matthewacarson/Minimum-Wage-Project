@@ -1,0 +1,17 @@
+$\textit{Emplvl Limited Service}_{ij} = \beta_{0} + \beta_{1} * State_{i} + \beta_{2} * Year_{i} + \beta_{3} * Year_{i} * State_{i} + \beta_{4} * \textit{Emplvl All}_{ij}$
+
+Regular text
+
+$\text{Emplvl Limited Service}$
+
+For italicized text
+
+$\textit{Emplvl Limited Service}$
+
+These are larger (huge)
+
+$\huge\textit{Emplvl Limited Service}_{ij} = \beta_{0} + \beta_{1} * State_{i} + \beta_{2} * Year_{i} + \beta_{3} * Year_{i} * State_{i} + \beta_{4} * \textit{Emplvl All}_{ij}$
+
+This one does not include the asterisks between beta and the term.
+
+$\huge\textit{Emplvl Limited Service}_{ij} = \beta_{0} + \beta_{1}  State_{i} + \beta_{2}  Year_{i} + \beta_{3}  Year_{i} * State_{i} + \beta_{4}  \textit{Emplvl All}_{ij}$
