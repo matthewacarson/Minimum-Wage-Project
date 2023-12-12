@@ -1,0 +1,626 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\author{}
+\date{\vspace{-2.5em}}
+
+\begin{document}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(tidyverse)}
+\CommentTok{\# Run data wrangling files first \#\#\#\#}
+\CommentTok{\# Run limited service script}
+\FunctionTok{source}\NormalTok{(}\AttributeTok{file =} \StringTok{"limited\_serv\_wrangling.R"}\NormalTok{, }\AttributeTok{local =}\NormalTok{ wrangled }\OtherTok{\textless{}{-}} \FunctionTok{new.env}\NormalTok{())}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Joining with `by = join_by(year, state)`
+## Joining with `by = join_by(year, date, state, min_wage)`
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Run all industries script}
+\FunctionTok{source}\NormalTok{(}\AttributeTok{file =} \StringTok{"all\_industries\_data\_wrangling.R"}\NormalTok{, }\AttributeTok{local =}\NormalTok{ wrangled)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{joining-all-industries-and-limited-service}{%
+\section{Joining all industries and limited
+service}\label{joining-all-industries-and-limited-service}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{joined }\OtherTok{\textless{}{-}} \FunctionTok{new.env}\NormalTok{()}
+\NormalTok{joined}\SpecialCharTok{$}\NormalTok{data }\OtherTok{\textless{}{-}} \FunctionTok{full\_join}\NormalTok{(}
+  \AttributeTok{x =}\NormalTok{ wrangled}\SpecialCharTok{$}\NormalTok{min\_wage}\SpecialCharTok{$}\NormalTok{limited\_increase,}
+  \AttributeTok{y =}\NormalTok{ wrangled}\SpecialCharTok{$}\NormalTok{all\_ind\_combined}\SpecialCharTok{$}\NormalTok{gather) }\SpecialCharTok{|\textgreater{}} 
+  \FunctionTok{mutate}\NormalTok{(}
+    \AttributeTok{proportion\_limited =}\NormalTok{ emplvl\_limited }\SpecialCharTok{/}\NormalTok{ emplvl\_all) }\SpecialCharTok{|\textgreater{}}
+  \CommentTok{\# filter(proportion\_limited \textgreater{} 0 \& !is.infinite(proportion\_limited)) |\textgreater{} }
+  \FunctionTok{na.omit}\NormalTok{() }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{mutate}\NormalTok{(}
+    \AttributeTok{area\_fips =} \FunctionTok{factor}\NormalTok{(area\_fips)}
+\NormalTok{  ) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{filter}\NormalTok{(emplvl\_limited }\SpecialCharTok{\textgreater{}} \DecValTok{0}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Joining with `by = join_by(area_fips, year, qtr, area_title, own_title, month)`
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#Setting up for 2012{-}2013}
+
+\NormalTok{data\_2012\_2013 }\OtherTok{\textless{}{-}}\NormalTok{ joined}\SpecialCharTok{$}\NormalTok{data }\SpecialCharTok{|\textgreater{}} 
+  \FunctionTok{filter}\NormalTok{(year\_decimal }\SpecialCharTok{\%in\%} \FunctionTok{seq}\NormalTok{(}\FloatTok{2012.5}\NormalTok{,}\FloatTok{2013.5}\NormalTok{, }\AttributeTok{by =} \DecValTok{1}\SpecialCharTok{/}\DecValTok{12}\NormalTok{)) }\SpecialCharTok{|\textgreater{}} 
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{year =} \FunctionTok{as.factor}\NormalTok{(year)) }\CommentTok{\#|\textgreater{} }
+  \CommentTok{\# dummy\_columns(}
+  \CommentTok{\#   select\_columns = c(\textquotesingle{}year\_decimal\textquotesingle{}, \textquotesingle{}state\textquotesingle{}), }
+  \CommentTok{\#   remove\_first\_dummy = TRUE, }
+  \CommentTok{\# ) |\textgreater{} }
+  \CommentTok{\# rename(post = year\_2013, treat = state\_MO)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#Regression for 2012{-}2013}
+
+\NormalTok{model\_2012\_2013 }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(}\AttributeTok{formula =}\NormalTok{ emplvl\_limited }\SpecialCharTok{\textasciitilde{}}\NormalTok{ state }\SpecialCharTok{*}\NormalTok{ year }\SpecialCharTok{+}\NormalTok{ emplvl\_all,}
+   \AttributeTok{data =}\NormalTok{ data\_2012\_2013) }
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Setting up for 2013 {-} 2014}
+
+\NormalTok{data\_2013\_2014 }\OtherTok{\textless{}{-}}\NormalTok{ joined}\SpecialCharTok{$}\NormalTok{data }\SpecialCharTok{|\textgreater{}} 
+  \FunctionTok{filter}\NormalTok{(year\_decimal }\SpecialCharTok{\%in\%} \FunctionTok{seq}\NormalTok{(}\FloatTok{2013.5}\NormalTok{,}\FloatTok{2014.5}\NormalTok{, }\AttributeTok{by =} \DecValTok{1}\SpecialCharTok{/}\DecValTok{12}\NormalTok{)) }\SpecialCharTok{|\textgreater{}} 
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{year =} \FunctionTok{as.factor}\NormalTok{(year))}
+
+\CommentTok{\#Regression for 2013 {-} 2014}
+
+\NormalTok{model\_2013\_2014 }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(}\AttributeTok{formula =}\NormalTok{ emplvl\_limited }\SpecialCharTok{\textasciitilde{}}\NormalTok{ state }\SpecialCharTok{*}\NormalTok{ year }\SpecialCharTok{+}\NormalTok{ emplvl\_all,}
+   \AttributeTok{data =}\NormalTok{ data\_2013\_2014) }
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Setting up for 2014 {-} 2015}
+
+\NormalTok{data\_2014\_2015 }\OtherTok{\textless{}{-}}\NormalTok{ joined}\SpecialCharTok{$}\NormalTok{data }\SpecialCharTok{|\textgreater{}} 
+  \FunctionTok{filter}\NormalTok{(year\_decimal }\SpecialCharTok{\%in\%} \FunctionTok{seq}\NormalTok{(}\FloatTok{2014.5}\NormalTok{,}\FloatTok{2015.5}\NormalTok{, }\AttributeTok{by =} \DecValTok{1}\SpecialCharTok{/}\DecValTok{12}\NormalTok{)) }\SpecialCharTok{|\textgreater{}} 
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{year =} \FunctionTok{as.factor}\NormalTok{(year))}
+
+\CommentTok{\#Regression for 2014 {-} 2015}
+
+\NormalTok{model\_2014\_2015 }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(}\AttributeTok{formula =}\NormalTok{ emplvl\_limited }\SpecialCharTok{\textasciitilde{}}\NormalTok{ state }\SpecialCharTok{*}\NormalTok{ year }\SpecialCharTok{+}\NormalTok{ emplvl\_all,}
+   \AttributeTok{data =}\NormalTok{ data\_2014\_2015) }
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Setting up for 2015 {-} 2016}
+
+\NormalTok{data\_2015\_2016 }\OtherTok{\textless{}{-}}\NormalTok{ joined}\SpecialCharTok{$}\NormalTok{data }\SpecialCharTok{|\textgreater{}} 
+  \FunctionTok{filter}\NormalTok{(year\_decimal }\SpecialCharTok{\%in\%} \FunctionTok{seq}\NormalTok{(}\FloatTok{2015.5}\NormalTok{,}\FloatTok{2016.5}\NormalTok{, }\AttributeTok{by =} \DecValTok{1}\SpecialCharTok{/}\DecValTok{12}\NormalTok{)) }\SpecialCharTok{|\textgreater{}} 
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{year =} \FunctionTok{as.factor}\NormalTok{(year))}
+
+\CommentTok{\#Regression for 2015 {-} 2016}
+
+\NormalTok{model\_2015\_2016 }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(}\AttributeTok{formula =}\NormalTok{ emplvl\_limited }\SpecialCharTok{\textasciitilde{}}\NormalTok{ state }\SpecialCharTok{*}\NormalTok{ year }\SpecialCharTok{+}\NormalTok{ emplvl\_all,}
+   \AttributeTok{data =}\NormalTok{ data\_2015\_2016) }
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Setting up for 2016 {-} 2017}
+
+\NormalTok{data\_2016\_2017 }\OtherTok{\textless{}{-}}\NormalTok{ joined}\SpecialCharTok{$}\NormalTok{data }\SpecialCharTok{|\textgreater{}} 
+  \FunctionTok{filter}\NormalTok{(year\_decimal }\SpecialCharTok{\%in\%} \FunctionTok{seq}\NormalTok{(}\FloatTok{2016.5}\NormalTok{,}\FloatTok{2017.5}\NormalTok{, }\AttributeTok{by =} \DecValTok{1}\SpecialCharTok{/}\DecValTok{12}\NormalTok{)) }\SpecialCharTok{|\textgreater{}} 
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{year =} \FunctionTok{as.factor}\NormalTok{(year))}
+
+\CommentTok{\#Regression for 2016 {-} 2017}
+
+\NormalTok{model\_2016\_2017 }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(}\AttributeTok{formula =}\NormalTok{ emplvl\_limited }\SpecialCharTok{\textasciitilde{}}\NormalTok{ state }\SpecialCharTok{*}\NormalTok{ year }\SpecialCharTok{+}\NormalTok{ emplvl\_all,}
+   \AttributeTok{data =}\NormalTok{ data\_2016\_2017) }
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Setting up for 2017 {-} 2018}
+
+\NormalTok{data\_2017\_2018 }\OtherTok{\textless{}{-}}\NormalTok{ joined}\SpecialCharTok{$}\NormalTok{data }\SpecialCharTok{|\textgreater{}} 
+  \FunctionTok{filter}\NormalTok{(year\_decimal }\SpecialCharTok{\%in\%} \FunctionTok{seq}\NormalTok{(}\FloatTok{2017.5}\NormalTok{,}\FloatTok{2018.5}\NormalTok{, }\AttributeTok{by =} \DecValTok{1}\SpecialCharTok{/}\DecValTok{12}\NormalTok{)) }\SpecialCharTok{|\textgreater{}} 
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{year =} \FunctionTok{as.factor}\NormalTok{(year))}
+
+\CommentTok{\#Regression for 2017 {-} 2018}
+
+\NormalTok{model\_2017\_2018 }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(}\AttributeTok{formula =}\NormalTok{ emplvl\_limited }\SpecialCharTok{\textasciitilde{}}\NormalTok{ state }\SpecialCharTok{*}\NormalTok{ year }\SpecialCharTok{+}\NormalTok{ emplvl\_all,}
+   \AttributeTok{data =}\NormalTok{ data\_2017\_2018) }
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Setting up for 2018 {-} 2019}
+
+\NormalTok{data\_2018\_2019 }\OtherTok{\textless{}{-}}\NormalTok{ joined}\SpecialCharTok{$}\NormalTok{data }\SpecialCharTok{|\textgreater{}} 
+  \FunctionTok{filter}\NormalTok{(year\_decimal }\SpecialCharTok{\%in\%} \FunctionTok{seq}\NormalTok{(}\FloatTok{2018.5}\NormalTok{,}\FloatTok{2019.5}\NormalTok{, }\AttributeTok{by =} \DecValTok{1}\SpecialCharTok{/}\DecValTok{12}\NormalTok{)) }\SpecialCharTok{|\textgreater{}} 
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{year =} \FunctionTok{as.factor}\NormalTok{(year))}
+
+\CommentTok{\#Regression for 2018 {-} 2019}
+
+\NormalTok{model\_2018\_2019 }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(}\AttributeTok{formula =}\NormalTok{ emplvl\_limited }\SpecialCharTok{\textasciitilde{}}\NormalTok{ state }\SpecialCharTok{*}\NormalTok{ year }\SpecialCharTok{+}\NormalTok{ emplvl\_all,}
+   \AttributeTok{data =}\NormalTok{ data\_2018\_2019) }
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Setting up for 2019 {-} 2020}
+
+\NormalTok{data\_2019\_2020 }\OtherTok{\textless{}{-}}\NormalTok{ joined}\SpecialCharTok{$}\NormalTok{data }\SpecialCharTok{|\textgreater{}} 
+  \FunctionTok{filter}\NormalTok{(year\_decimal }\SpecialCharTok{\%in\%} \FunctionTok{seq}\NormalTok{(}\FloatTok{2019.5}\NormalTok{,}\FloatTok{2020.5}\NormalTok{, }\AttributeTok{by =} \DecValTok{1}\SpecialCharTok{/}\DecValTok{12}\NormalTok{)) }\SpecialCharTok{|\textgreater{}} 
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{year =} \FunctionTok{as.factor}\NormalTok{(year))}
+
+\CommentTok{\#Regression for 2019 {-} 2020}
+
+\NormalTok{model\_2019\_2020 }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(}\AttributeTok{formula =}\NormalTok{ emplvl\_limited }\SpecialCharTok{\textasciitilde{}}\NormalTok{ state }\SpecialCharTok{*}\NormalTok{ year }\SpecialCharTok{+}\NormalTok{ emplvl\_all,}
+   \AttributeTok{data =}\NormalTok{ data\_2019\_2020) }
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{data\_2011\_2012 }\OtherTok{\textless{}{-}}\NormalTok{ joined}\SpecialCharTok{$}\NormalTok{data }\SpecialCharTok{|\textgreater{}} 
+  \FunctionTok{filter}\NormalTok{(year\_decimal }\SpecialCharTok{\%in\%} \FunctionTok{seq}\NormalTok{(}\FloatTok{2011.5}\NormalTok{,}\FloatTok{2012.5}\NormalTok{, }\AttributeTok{by =} \DecValTok{1}\SpecialCharTok{/}\DecValTok{12}\NormalTok{)) }\SpecialCharTok{|\textgreater{}} 
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{year =} \FunctionTok{as.factor}\NormalTok{(year))}
+
+\CommentTok{\#Regression for 2011{-}2012}
+
+\NormalTok{model\_2011\_2012 }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(}\AttributeTok{formula =}\NormalTok{ emplvl\_limited }\SpecialCharTok{\textasciitilde{}}\NormalTok{ state }\SpecialCharTok{*}\NormalTok{ year }\SpecialCharTok{+}\NormalTok{ emplvl\_all,}
+   \AttributeTok{data =}\NormalTok{ data\_2011\_2012)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Setting up for 2020 {-} 2021}
+
+\NormalTok{data\_2020\_2021 }\OtherTok{\textless{}{-}}\NormalTok{ joined}\SpecialCharTok{$}\NormalTok{data }\SpecialCharTok{|\textgreater{}} 
+  \FunctionTok{filter}\NormalTok{(year\_decimal }\SpecialCharTok{\%in\%} \FunctionTok{seq}\NormalTok{(}\FloatTok{2020.5}\NormalTok{,}\FloatTok{2021.5}\NormalTok{, }\AttributeTok{by =} \DecValTok{1}\SpecialCharTok{/}\DecValTok{12}\NormalTok{)) }\SpecialCharTok{|\textgreater{}} 
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{year =} \FunctionTok{as.factor}\NormalTok{(year))}
+
+\CommentTok{\#Regression for 2020 {-} 2021}
+
+\NormalTok{model\_2020\_2021 }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(}\AttributeTok{formula =}\NormalTok{ emplvl\_limited }\SpecialCharTok{\textasciitilde{}}\NormalTok{ state }\SpecialCharTok{*}\NormalTok{ year }\SpecialCharTok{+}\NormalTok{ emplvl\_all,}
+   \AttributeTok{data =}\NormalTok{ data\_2020\_2021)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Setting up for 2021 {-} 2022}
+
+\NormalTok{data\_2021\_2022 }\OtherTok{\textless{}{-}}\NormalTok{ joined}\SpecialCharTok{$}\NormalTok{data }\SpecialCharTok{|\textgreater{}} 
+  \FunctionTok{filter}\NormalTok{(year\_decimal }\SpecialCharTok{\%in\%} \FunctionTok{seq}\NormalTok{(}\FloatTok{2021.5}\NormalTok{,}\FloatTok{2022.5}\NormalTok{, }\AttributeTok{by =} \DecValTok{1}\SpecialCharTok{/}\DecValTok{12}\NormalTok{)) }\SpecialCharTok{|\textgreater{}} 
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{year =} \FunctionTok{as.factor}\NormalTok{(year))}
+
+\CommentTok{\#Regression for 2021 {-} 2022}
+
+\NormalTok{model\_2021\_2022 }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(}\AttributeTok{formula =}\NormalTok{ emplvl\_limited }\SpecialCharTok{\textasciitilde{}}\NormalTok{ state }\SpecialCharTok{*}\NormalTok{ year }\SpecialCharTok{+}\NormalTok{ emplvl\_all,}
+   \AttributeTok{data =}\NormalTok{ data\_2021\_2022) }
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{confint\_model\_2011\_2012 }\OtherTok{\textless{}{-}} \FunctionTok{confint}\NormalTok{(model\_2011\_2012)[}\StringTok{"stateMO:year2012"}\NormalTok{,]}
+          
+\NormalTok{confint\_model\_2012\_2013 }\OtherTok{\textless{}{-}} \FunctionTok{confint}\NormalTok{(model\_2012\_2013)[}\StringTok{"stateMO:year2013"}\NormalTok{,]}
+
+\NormalTok{confint\_model\_2013\_2014 }\OtherTok{\textless{}{-}} \FunctionTok{confint}\NormalTok{(model\_2013\_2014)}
+\NormalTok{confint\_model\_2014\_2015 }\OtherTok{\textless{}{-}} \FunctionTok{confint}\NormalTok{(model\_2014\_2015)}
+\NormalTok{confint\_model\_2015\_2016 }\OtherTok{\textless{}{-}} \FunctionTok{confint}\NormalTok{(model\_2015\_2016)}
+\NormalTok{confint\_model\_2016\_2017 }\OtherTok{\textless{}{-}} \FunctionTok{confint}\NormalTok{(model\_2016\_2017)}
+\NormalTok{confint\_model\_2017\_2018 }\OtherTok{\textless{}{-}} \FunctionTok{confint}\NormalTok{(model\_2017\_2018)}
+\NormalTok{confint\_model\_2018\_2019 }\OtherTok{\textless{}{-}} \FunctionTok{confint}\NormalTok{(model\_2018\_2019)}
+\NormalTok{confint\_model\_2019\_2020 }\OtherTok{\textless{}{-}} \FunctionTok{confint}\NormalTok{(model\_2019\_2020)}
+\NormalTok{confint\_model\_2020\_2021 }\OtherTok{\textless{}{-}} \FunctionTok{confint}\NormalTok{(model\_2020\_2021)}
+\NormalTok{confint\_model\_2021\_2022 }\OtherTok{\textless{}{-}} \FunctionTok{confint}\NormalTok{(model\_2021\_2022)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{confints }\OtherTok{\textless{}{-}} \FunctionTok{rbind}\NormalTok{(}
+\StringTok{"m\_2012"} \OtherTok{=} \FunctionTok{confint}\NormalTok{(model\_2011\_2012)[}\StringTok{"stateMO:year2012"}\NormalTok{,], }\StringTok{"m\_2013"} \OtherTok{=} \FunctionTok{confint}\NormalTok{(model\_2012\_2013)[}\StringTok{"stateMO:year2013"}\NormalTok{,], }\StringTok{"m\_2014"} \OtherTok{=} \FunctionTok{confint}\NormalTok{(model\_2013\_2014)[}\StringTok{"stateMO:year2014"}\NormalTok{,], }\StringTok{"m\_2015"} \OtherTok{=} \FunctionTok{confint}\NormalTok{(model\_2014\_2015)[}\StringTok{"stateMO:year2015"}\NormalTok{,],}
+\StringTok{"m\_2016"} \OtherTok{=} \FunctionTok{confint}\NormalTok{(model\_2015\_2016)[}\StringTok{"stateMO:year2016"}\NormalTok{,],}
+\StringTok{"m\_2017"} \OtherTok{=} \FunctionTok{confint}\NormalTok{(model\_2016\_2017)[}\StringTok{"stateMO:year2017"}\NormalTok{,],}
+\StringTok{"m\_2018"} \OtherTok{=} \FunctionTok{confint}\NormalTok{(model\_2017\_2018)[}\StringTok{"stateMO:year2018"}\NormalTok{,],}
+\StringTok{"m\_2019"} \OtherTok{=} \FunctionTok{confint}\NormalTok{(model\_2018\_2019)[}\StringTok{"stateMO:year2019"}\NormalTok{,],}
+\StringTok{"m\_2020"} \OtherTok{=} \FunctionTok{confint}\NormalTok{(model\_2019\_2020)[}\StringTok{"stateMO:year2020"}\NormalTok{,],}
+\StringTok{"m\_2021"} \OtherTok{=} \FunctionTok{confint}\NormalTok{(model\_2020\_2021)[}\StringTok{"stateMO:year2021"}\NormalTok{,],}
+\StringTok{"m\_2022"} \OtherTok{=} \FunctionTok{confint}\NormalTok{(model\_2021\_2022)[}\StringTok{"stateMO:year2022"}\NormalTok{,]}
+\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{as.data.frame}\NormalTok{() }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{year =} \DecValTok{2012}\SpecialCharTok{:}\DecValTok{2022}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Compile coefficients into dataframe for visualizations}
+
+\FunctionTok{library}\NormalTok{(broom)}
+
+\NormalTok{tidy\_model\_2011\_2012 }\OtherTok{\textless{}{-}} \FunctionTok{tidy}\NormalTok{(model\_2011\_2012) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{filter}\NormalTok{(term }\SpecialCharTok{\%in\%} \StringTok{"stateMO:year2012"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+           \FunctionTok{select}\NormalTok{(term,estimate)}
+
+\NormalTok{tidy\_model\_2012\_2013 }\OtherTok{\textless{}{-}} \FunctionTok{tidy}\NormalTok{(model\_2012\_2013) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{filter}\NormalTok{(term }\SpecialCharTok{\%in\%} \StringTok{"stateMO:year2013"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+           \FunctionTok{select}\NormalTok{(term,estimate)}
+
+
+\NormalTok{tidy\_model\_2013\_2014 }\OtherTok{\textless{}{-}} \FunctionTok{tidy}\NormalTok{(model\_2013\_2014) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{filter}\NormalTok{(term }\SpecialCharTok{\%in\%} \StringTok{"stateMO:year2014"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+           \FunctionTok{select}\NormalTok{(term,estimate)}
+
+\NormalTok{tidy\_model\_2014\_2015 }\OtherTok{\textless{}{-}} \FunctionTok{tidy}\NormalTok{(model\_2014\_2015) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{filter}\NormalTok{(term }\SpecialCharTok{\%in\%} \StringTok{"stateMO:year2015"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+           \FunctionTok{select}\NormalTok{(term,estimate)}
+
+\NormalTok{tidy\_model\_2015\_2016 }\OtherTok{\textless{}{-}} \FunctionTok{tidy}\NormalTok{(model\_2015\_2016) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{filter}\NormalTok{(term }\SpecialCharTok{\%in\%} \StringTok{"stateMO:year2016"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+           \FunctionTok{select}\NormalTok{(term,estimate)}
+
+\NormalTok{tidy\_model\_2016\_2017 }\OtherTok{\textless{}{-}} \FunctionTok{tidy}\NormalTok{(model\_2016\_2017) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{filter}\NormalTok{(term }\SpecialCharTok{\%in\%} \StringTok{"stateMO:year2017"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+           \FunctionTok{select}\NormalTok{(term,estimate)}
+
+\NormalTok{tidy\_model\_2017\_2018 }\OtherTok{\textless{}{-}} \FunctionTok{tidy}\NormalTok{(model\_2017\_2018) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{filter}\NormalTok{(term }\SpecialCharTok{\%in\%} \StringTok{"stateMO:year2018"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+           \FunctionTok{select}\NormalTok{(term,estimate)}
+
+\NormalTok{tidy\_model\_2018\_2019 }\OtherTok{\textless{}{-}} \FunctionTok{tidy}\NormalTok{(model\_2018\_2019) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{filter}\NormalTok{(term }\SpecialCharTok{\%in\%} \StringTok{"stateMO:year2019"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+           \FunctionTok{select}\NormalTok{(term,estimate)}
+
+\NormalTok{tidy\_model\_2019\_2020 }\OtherTok{\textless{}{-}} \FunctionTok{tidy}\NormalTok{(model\_2019\_2020) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{filter}\NormalTok{(term }\SpecialCharTok{\%in\%} \StringTok{"stateMO:year2020"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+           \FunctionTok{select}\NormalTok{(term,estimate)}
+
+\NormalTok{tidy\_model\_2020\_2021 }\OtherTok{\textless{}{-}} \FunctionTok{tidy}\NormalTok{(model\_2020\_2021) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{filter}\NormalTok{(term }\SpecialCharTok{\%in\%} \StringTok{"stateMO:year2021"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+           \FunctionTok{select}\NormalTok{(term,estimate)}
+
+\NormalTok{tidy\_model\_2021\_2022 }\OtherTok{\textless{}{-}} \FunctionTok{tidy}\NormalTok{(model\_2021\_2022) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{filter}\NormalTok{(term }\SpecialCharTok{\%in\%} \StringTok{"stateMO:year2022"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+           \FunctionTok{select}\NormalTok{(term,estimate)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#Adding all rows into one table}
+
+\NormalTok{Coefficients\_visualizations\_table }\OtherTok{\textless{}{-}} \FunctionTok{bind\_rows}\NormalTok{(}\StringTok{"Model 2011 {-} 2012"} \OtherTok{=}\NormalTok{ tidy\_model\_2011\_2012, }\StringTok{"Model 2012 {-} 2013"} \OtherTok{=}\NormalTok{ tidy\_model\_2012\_2013, }\StringTok{"Model 2013 {-} 2014"} \OtherTok{=}\NormalTok{ tidy\_model\_2013\_2014, }\StringTok{"Model 2014 {-} 2015"} \OtherTok{=}\NormalTok{ tidy\_model\_2014\_2015, }\StringTok{"Model 2015 {-} 2016"} \OtherTok{=}\NormalTok{ tidy\_model\_2015\_2016, }\StringTok{"Model 2016 {-} 2017"} \OtherTok{=}\NormalTok{ tidy\_model\_2016\_2017, }\StringTok{"Model 2017 {-} 2018"} \OtherTok{=}\NormalTok{ tidy\_model\_2017\_2018, }\StringTok{"Model 2018 {-} 2019"} \OtherTok{=}\NormalTok{ tidy\_model\_2018\_2019, }\StringTok{"Model 2019 {-} 2020"} \OtherTok{=}\NormalTok{ tidy\_model\_2019\_2020, }\StringTok{"Model 2020 {-} 2021"} \OtherTok{=}\NormalTok{ tidy\_model\_2020\_2021, }\StringTok{"Model 2021 {-} 2022"} \OtherTok{=}\NormalTok{ tidy\_model\_2021\_2022) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{rename}\NormalTok{( }\AttributeTok{state\_year\_coefficient =}\NormalTok{ estimate, }\AttributeTok{year =}\NormalTok{ term)}
+
+\CommentTok{\#Changing into values into the years}
+
+\NormalTok{Coefficients\_visualizations\_table }\OtherTok{\textless{}{-}}\NormalTok{ Coefficients\_visualizations\_table }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{year =} \FunctionTok{case\_when}\NormalTok{( year }\SpecialCharTok{==} \StringTok{"stateMO:year2012"}\SpecialCharTok{\textasciitilde{}} \DecValTok{2012}\NormalTok{,year }\SpecialCharTok{==} \StringTok{"stateMO:year2013"} \SpecialCharTok{\textasciitilde{}} \DecValTok{2013}\NormalTok{, year }\SpecialCharTok{==} \StringTok{"stateMO:year2014"} \SpecialCharTok{\textasciitilde{}} \DecValTok{2014}\NormalTok{, year }\SpecialCharTok{==} \StringTok{"stateMO:year2015"} \SpecialCharTok{\textasciitilde{}} \DecValTok{2015}\NormalTok{, year }\SpecialCharTok{==} \StringTok{"stateMO:year2016"} \SpecialCharTok{\textasciitilde{}} \DecValTok{2016}\NormalTok{, year }\SpecialCharTok{==} \StringTok{"stateMO:year2017"} \SpecialCharTok{\textasciitilde{}} \DecValTok{2017}\NormalTok{, year }\SpecialCharTok{==} \StringTok{"stateMO:year2018"} \SpecialCharTok{\textasciitilde{}} \DecValTok{2018}\NormalTok{, year }\SpecialCharTok{==} \StringTok{"stateMO:year2019"} \SpecialCharTok{\textasciitilde{}} \DecValTok{2019}\NormalTok{, year }\SpecialCharTok{==} \StringTok{"stateMO:year2020"} \SpecialCharTok{\textasciitilde{}} \DecValTok{2020}\NormalTok{, year }\SpecialCharTok{==} \StringTok{"stateMO:year2021"} \SpecialCharTok{\textasciitilde{}} \DecValTok{2021}\NormalTok{, year }\SpecialCharTok{==} \StringTok{"stateMO:year2022"} \SpecialCharTok{\textasciitilde{}} \DecValTok{2022}
+\NormalTok{          ))}
+
+\CommentTok{\# Add min wage data into the table}
+
+\NormalTok{Coefficients\_visualizations\_table }\OtherTok{\textless{}{-}}\NormalTok{ Coefficients\_visualizations\_table }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{mw\_increase =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{ , }\FloatTok{0.10}\NormalTok{ , }\FloatTok{0.15}\NormalTok{ , }\FloatTok{0.15}\NormalTok{ , }\DecValTok{0}\NormalTok{ , }\FloatTok{0.05}\NormalTok{ , }\FloatTok{0.15}\NormalTok{ , }\FloatTok{0.75}\NormalTok{ , }\FloatTok{0.85}\NormalTok{ , }\FloatTok{0.85}\NormalTok{ , }\FloatTok{0.85}\NormalTok{ ))}
+
+\CommentTok{\#Join Confints into the Coefficients Visualizations Table}
+
+\NormalTok{Master\_Table }\OtherTok{\textless{}{-}} \FunctionTok{left\_join}\NormalTok{(}
+\AttributeTok{x =}\NormalTok{ Coefficients\_visualizations\_table, }
+\AttributeTok{y =}\NormalTok{ confints, }
+\AttributeTok{by =} \StringTok{"year"}
+\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{rename}\NormalTok{(}\AttributeTok{lwr =} \StringTok{"2.5 \%"}\NormalTok{, }\AttributeTok{upr =} \StringTok{"97.5 \%"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(stargazer)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Please cite as:
+\end{verbatim}
+
+\begin{verbatim}
+##  Hlavac, Marek (2022). stargazer: Well-Formatted Regression and Summary Statistics Tables.
+\end{verbatim}
+
+\begin{verbatim}
+##  R package version 5.2.3. https://CRAN.R-project.org/package=stargazer
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{table\_models }\OtherTok{\textless{}{-}} \FunctionTok{list}\NormalTok{(model\_2011\_2012, model\_2012\_2013, model\_2013\_2014, model\_2014\_2015, model\_2015\_2016, model\_2016\_2017, model\_2017\_2018, model\_2018\_2019, model\_2019\_2020, model\_2020\_2021, model\_2021\_2022)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{model\_names }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"Model 2011{-}2012"}\NormalTok{, }\StringTok{"Model 2012{-}2013"}\NormalTok{, }\StringTok{"Model 2013{-}2014"}\NormalTok{, }\StringTok{"Model 2014{-}2015"}\NormalTok{, }\StringTok{"Model 2015{-}2016"}\NormalTok{, }\StringTok{"Model 2016{-}2017"}\NormalTok{, }\StringTok{"Model 2017{-}2018"}\NormalTok{, }\StringTok{"Model 2018{-}2019"}\NormalTok{, }\StringTok{"Model 2019{-}2020"}\NormalTok{, }\StringTok{"Model 2020{-}2021"}\NormalTok{, }\StringTok{"Model 2021{-}2022"}\NormalTok{)}
+
+\CommentTok{\# Extract coefficients for each model}
+\NormalTok{coefficients\_list }\OtherTok{\textless{}{-}} \FunctionTok{lapply}\NormalTok{(table\_models, coef)}
+
+\CommentTok{\# Create a new list to store consolidated coefficients}
+\NormalTok{consolidated\_coefficients }\OtherTok{\textless{}{-}} \FunctionTok{list}\NormalTok{()}
+
+\CommentTok{\# Loop through each year}
+\ControlFlowTok{for}\NormalTok{ (year }\ControlFlowTok{in} \FunctionTok{unique}\NormalTok{(}\FunctionTok{gsub}\NormalTok{(}\StringTok{".*year(.*)"}\NormalTok{, }\StringTok{"}\SpecialCharTok{\textbackslash{}\textbackslash{}}\StringTok{1"}\NormalTok{, }\FunctionTok{names}\NormalTok{(coefficients\_list[[}\DecValTok{1}\NormalTok{]])))) \{}
+  \CommentTok{\# Extract coefficients for the specific year}
+\NormalTok{  year\_coefficients }\OtherTok{\textless{}{-}} \FunctionTok{lapply}\NormalTok{(coefficients\_list, }\ControlFlowTok{function}\NormalTok{(model) model[}\FunctionTok{grep}\NormalTok{(}\FunctionTok{paste0}\NormalTok{(}\StringTok{"year"}\NormalTok{, year), }\FunctionTok{names}\NormalTok{(model))])}
+  
+  \CommentTok{\# Consolidate coefficients for the specific year}
+\NormalTok{  consolidated\_coefficients[[year]] }\OtherTok{\textless{}{-}} \FunctionTok{do.call}\NormalTok{(cbind, year\_coefficients)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Customize stargazer options}
+\FunctionTok{stargazer}\NormalTok{(}
+\NormalTok{  table\_models,}
+  \AttributeTok{title =} \StringTok{"Regression Results"}\NormalTok{,}
+  \AttributeTok{type =} \StringTok{\textquotesingle{}latex\textquotesingle{}}\NormalTok{,}
+  \AttributeTok{align =} \ConstantTok{TRUE}\NormalTok{,                  }\CommentTok{\# Align coefficient names to the left}
+  \AttributeTok{dep.var.caption =} \StringTok{"Dependent variable: }\SpecialCharTok{\textbackslash{}\textbackslash{}}\StringTok{textbf\{emplvl}\SpecialCharTok{\textbackslash{}\textbackslash{}}\StringTok{\_limited\}"}\NormalTok{,  }\CommentTok{\# Bold dependent variable in the caption}
+  \AttributeTok{column.labels =}\NormalTok{ model\_names,   }\CommentTok{\# Model labels}
+  \AttributeTok{covariate.labels =} \FunctionTok{names}\NormalTok{(consolidated\_coefficients[[}\DecValTok{1}\NormalTok{]]),  }\CommentTok{\# Custom order of variables}
+  \AttributeTok{digits =} \DecValTok{3}\NormalTok{,                    }\CommentTok{\# Number of decimal places}
+  \AttributeTok{star.cutoffs =} \FunctionTok{c}\NormalTok{(}\FloatTok{0.1}\NormalTok{, }\FloatTok{0.05}\NormalTok{, }\FloatTok{0.01}\NormalTok{),  }\CommentTok{\# Customize significance stars}
+  \AttributeTok{notes =} \StringTok{"}\SpecialCharTok{\textbackslash{}\textbackslash{}}\StringTok{textit\{Note:\} $\^{}\{*\}p\textless{}0.1; \^{}\{**\}p\textless{}0.05; \^{}\{***\}p\textless{}0.01"}\NormalTok{,  }\CommentTok{\# Custom note}
+  \AttributeTok{omit =} \FunctionTok{names}\NormalTok{(consolidated\_coefficients[[}\DecValTok{1}\NormalTok{]])[}\SpecialCharTok{{-}}\DecValTok{1}\NormalTok{]  }\CommentTok{\# Omit redundant coefficients}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\% Table created by stargazer v.5.2.3 by Marek Hlavac, Social Policy
+Institute. E-mail: marek.hlavac at gmail.com \% Date and time: Mon, Dec
+11, 2023 - 10:07:26 PM \% Requires LaTeX packages: dcolumn
+
+\begin{table}[!htbp] \centering 
+  \caption{Regression Results} 
+  \label{} 
+\begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} } 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+ & \multicolumn{11}{c}{Dependent variable: \textbf{emplvl\_limited}} \\ 
+\cline{2-12} 
+\\[-1.8ex] & \multicolumn{11}{c}{emplvl\_limited} \\ 
+ & \multicolumn{1}{c}{Model 2011-2012} & \multicolumn{1}{c}{Model 2012-2013} & \multicolumn{1}{c}{Model 2013-2014} & \multicolumn{1}{c}{Model 2014-2015} & \multicolumn{1}{c}{Model 2015-2016} & \multicolumn{1}{c}{Model 2016-2017} & \multicolumn{1}{c}{Model 2017-2018} & \multicolumn{1}{c}{Model 2018-2019} & \multicolumn{1}{c}{Model 2019-2020} & \multicolumn{1}{c}{Model 2020-2021} & \multicolumn{1}{c}{Model 2021-2022} \\ 
+\\[-1.8ex] & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)} & \multicolumn{1}{c}{(3)} & \multicolumn{1}{c}{(4)} & \multicolumn{1}{c}{(5)} & \multicolumn{1}{c}{(6)} & \multicolumn{1}{c}{(7)} & \multicolumn{1}{c}{(8)} & \multicolumn{1}{c}{(9)} & \multicolumn{1}{c}{(10)} & \multicolumn{1}{c}{(11)}\\ 
+\hline \\[-1.8ex] 
+ stateMO & 629.192^{***} & 549.001^{***} & 596.568^{***} & 695.808^{***} & 824.376^{***} & 716.771^{***} & 731.105^{***} & 671.627^{***} & 698.266^{***} & 807.297^{***} & 850.163^{***} \\ 
+  & (93.663) & (91.299) & (113.536) & (127.717) & (128.405) & (115.514) & (115.792) & (110.996) & (112.193) & (125.400) & (138.533) \\ 
+  & & & & & & & & & & & \\ 
+ year2012 & 127.233 &  &  &  &  &  &  &  &  &  &  \\ 
+  & (98.859) &  &  &  &  &  &  &  &  &  &  \\ 
+  & & & & & & & & & & & \\ 
+ year2013 &  & 23.996 &  &  &  &  &  &  &  &  &  \\ 
+  &  & (96.362) &  &  &  &  &  &  &  &  &  \\ 
+  & & & & & & & & & & & \\ 
+ year2014 &  &  & -32.315 &  &  &  &  &  &  &  &  \\ 
+  &  &  & (119.825) &  &  &  &  &  &  &  &  \\ 
+  & & & & & & & & & & & \\ 
+ year2015 &  &  &  & 11.112 &  &  &  &  &  &  &  \\ 
+  &  &  &  & (134.782) &  &  &  &  &  &  &  \\ 
+  & & & & & & & & & & & \\ 
+ year2016 &  &  &  &  & 133.016 &  &  &  &  &  &  \\ 
+  &  &  &  &  & (135.516) &  &  &  &  &  &  \\ 
+  & & & & & & & & & & & \\ 
+ year2017 &  &  &  &  &  & 66.430 &  &  &  &  &  \\ 
+  &  &  &  &  &  & (121.916) &  &  &  &  &  \\ 
+  & & & & & & & & & & & \\ 
+ year2018 &  &  &  &  &  &  & 23.472 &  &  &  &  \\ 
+  &  &  &  &  &  &  & (122.207) &  &  &  &  \\ 
+  & & & & & & & & & & & \\ 
+ year2019 &  &  &  &  &  &  &  & 44.110 &  &  &  \\ 
+  &  &  &  &  &  &  &  & (117.149) &  &  &  \\ 
+  & & & & & & & & & & & \\ 
+ year2020 &  &  &  &  &  &  &  &  & -6.167 &  &  \\ 
+  &  &  &  &  &  &  &  &  & (118.420) &  &  \\ 
+  & & & & & & & & & & & \\ 
+ year2021 &  &  &  &  &  &  &  &  &  & -29.569 &  \\ 
+  &  &  &  &  &  &  &  &  &  & (132.342) &  \\ 
+  & & & & & & & & & & & \\ 
+ year2022 &  &  &  &  &  &  &  &  &  &  & 24.896 \\ 
+  &  &  &  &  &  &  &  &  &  &  & (146.207) \\ 
+  & & & & & & & & & & & \\ 
+ emplvl\_all & 0.031^{***} & 0.031^{***} & 0.032^{***} & 0.032^{***} & 0.032^{***} & 0.033^{***} & 0.032^{***} & 0.031^{***} & 0.032^{***} & 0.032^{***} & 0.031^{***} \\ 
+  & (0.0003) & (0.0003) & (0.0004) & (0.0004) & (0.0004) & (0.0004) & (0.0004) & (0.0004) & (0.0004) & (0.0004) & (0.0005) \\ 
+  & & & & & & & & & & & \\ 
+ stateMO:year2012 & -110.262 &  &  &  &  &  &  &  &  &  &  \\ 
+  & (127.627) &  &  &  &  &  &  &  &  &  &  \\ 
+  & & & & & & & & & & & \\ 
+ stateMO:year2013 &  & 6.807 &  &  &  &  &  &  &  &  &  \\ 
+  &  & (124.403) &  &  &  &  &  &  &  &  &  \\ 
+  & & & & & & & & & & & \\ 
+ stateMO:year2014 &  &  & 94.415 &  &  &  &  &  &  &  &  \\ 
+  &  &  & (154.693) &  &  &  &  &  &  &  &  \\ 
+  & & & & & & & & & & & \\ 
+ stateMO:year2015 &  &  &  & 75.992 &  &  &  &  &  &  &  \\ 
+  &  &  &  & (174.003) &  &  &  &  &  &  &  \\ 
+  & & & & & & & & & & & \\ 
+ stateMO:year2016 &  &  &  &  & -102.881 &  &  &  &  &  &  \\ 
+  &  &  &  &  & (174.950) &  &  &  &  &  &  \\ 
+  & & & & & & & & & & & \\ 
+ stateMO:year2017 &  &  &  &  &  & 7.615 &  &  &  &  &  \\ 
+  &  &  &  &  &  & (157.393) &  &  &  &  &  \\ 
+  & & & & & & & & & & & \\ 
+ stateMO:year2018 &  &  &  &  &  &  & -78.050 &  &  &  &  \\ 
+  &  &  &  &  &  &  & (157.769) &  &  &  &  \\ 
+  & & & & & & & & & & & \\ 
+ stateMO:year2019 &  &  &  &  &  &  &  & 3.542 &  &  &  \\ 
+  &  &  &  &  &  &  &  & (151.238) &  &  &  \\ 
+  & & & & & & & & & & & \\ 
+ stateMO:year2020 &  &  &  &  &  &  &  &  & 28.622 &  &  \\ 
+  &  &  &  &  &  &  &  &  & (152.866) &  &  \\ 
+  & & & & & & & & & & & \\ 
+ stateMO:year2021 &  &  &  &  &  &  &  &  &  & 4.472 &  \\ 
+  &  &  &  &  &  &  &  &  &  & (170.853) &  \\ 
+  & & & & & & & & & & & \\ 
+ stateMO:year2022 &  &  &  &  &  &  &  &  &  &  & 37.830 \\ 
+  &  &  &  &  &  &  &  &  &  &  & (188.753) \\ 
+  & & & & & & & & & & & \\ 
+ Constant & -236.602^{***} & -163.555^{**} & -192.222^{**} & -253.571^{**} & -312.909^{***} & -237.268^{**} & -168.572^{*} & -146.203 & -132.300 & -148.375 & -206.682^{*} \\ 
+  & (75.642) & (73.741) & (91.753) & (103.266) & (103.818) & (93.388) & (93.612) & (89.708) & (90.898) & (101.363) & (111.925) \\ 
+  & & & & & & & & & & & \\ 
+\hline \\[-1.8ex] 
+Observations & \multicolumn{1}{c}{195} & \multicolumn{1}{c}{195} & \multicolumn{1}{c}{195} & \multicolumn{1}{c}{195} & \multicolumn{1}{c}{195} & \multicolumn{1}{c}{195} & \multicolumn{1}{c}{195} & \multicolumn{1}{c}{195} & \multicolumn{1}{c}{195} & \multicolumn{1}{c}{195} & \multicolumn{1}{c}{195} \\ 
+R$^{2}$ & \multicolumn{1}{c}{0.976} & \multicolumn{1}{c}{0.980} & \multicolumn{1}{c}{0.971} & \multicolumn{1}{c}{0.965} & \multicolumn{1}{c}{0.967} & \multicolumn{1}{c}{0.974} & \multicolumn{1}{c}{0.974} & \multicolumn{1}{c}{0.975} & \multicolumn{1}{c}{0.974} & \multicolumn{1}{c}{0.967} & \multicolumn{1}{c}{0.961} \\ 
+Adjusted R$^{2}$ & \multicolumn{1}{c}{0.976} & \multicolumn{1}{c}{0.979} & \multicolumn{1}{c}{0.970} & \multicolumn{1}{c}{0.964} & \multicolumn{1}{c}{0.966} & \multicolumn{1}{c}{0.974} & \multicolumn{1}{c}{0.973} & \multicolumn{1}{c}{0.975} & \multicolumn{1}{c}{0.974} & \multicolumn{1}{c}{0.966} & \multicolumn{1}{c}{0.961} \\ 
+Residual Std. Error (df = 190) & \multicolumn{1}{c}{435.258} & \multicolumn{1}{c}{424.262} & \multicolumn{1}{c}{527.563} & \multicolumn{1}{c}{593.418} & \multicolumn{1}{c}{596.648} & \multicolumn{1}{c}{536.770} & \multicolumn{1}{c}{538.053} & \multicolumn{1}{c}{515.781} & \multicolumn{1}{c}{521.334} & \multicolumn{1}{c}{582.674} & \multicolumn{1}{c}{643.720} \\ 
+F Statistic (df = 4; 190) & \multicolumn{1}{c}{1,971.273$^{***}$} & \multicolumn{1}{c}{2,270.146$^{***}$} & \multicolumn{1}{c}{1,568.023$^{***}$} & \multicolumn{1}{c}{1,310.419$^{***}$} & \multicolumn{1}{c}{1,392.954$^{***}$} & \multicolumn{1}{c}{1,799.399$^{***}$} & \multicolumn{1}{c}{1,764.895$^{***}$} & \multicolumn{1}{c}{1,875.651$^{***}$} & \multicolumn{1}{c}{1,812.423$^{***}$} & \multicolumn{1}{c}{1,387.950$^{***}$} & \multicolumn{1}{c}{1,180.373$^{***}$} \\ 
+\hline 
+\hline \\[-1.8ex] 
+\textit{Note:}  & \multicolumn{11}{r}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\ 
+ & \multicolumn{11}{r}{\textit{Note:} $^{*}p<0.1; ^{**}p<0.05; ^{***}p<0.01} \\ 
+\end{tabular} 
+\end{table}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Trying with the three year pairs instead}
+
+\CommentTok{\# table\_models\_2 \textless{}{-} list(model\_2011\_2012, model\_2012\_2013, model\_2013\_2014)}
+
+
+\CommentTok{\# stargazer(table\_models\_2)}
+\end{Highlighting}
+\end{Shaded}
+
+
+\end{document}
