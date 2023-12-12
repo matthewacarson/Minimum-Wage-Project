@@ -1,6 +1,8 @@
 ---
 output:
-  pdf_document: default
+  pdf_document:
+    latex_engine: pdflatex  # or xelatex, lualatex, depending on your preference
+
 ---
 ```{r message=FALSE}
 library(tidyverse)
@@ -12,7 +14,7 @@ source(file = "all_industries_data_wrangling.R", local = wrangled)
 
 ```
 
-# Joining all industries and limited service ####
+Joining all industries and limited service
 
 
 ```{r message=FALSE}

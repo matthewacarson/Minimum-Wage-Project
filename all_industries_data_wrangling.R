@@ -152,3 +152,4 @@ all_ind_combined$gather$emplvl_all <- all_ind_combined$gather$emplvl
 
 all_ind_combined$gather$emplvl <- NULL
 all_ind_combined$gather$industry_code <- NULL
+
